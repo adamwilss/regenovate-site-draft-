@@ -263,10 +263,10 @@ export function ParticleTextEffect({
             particle.pos.x = randomPos.x
             particle.pos.y = randomPos.y
 
-            particle.maxSpeed = Math.random() * 6 + 4
-            particle.maxForce = particle.maxSpeed * 0.05
-            particle.particleSize = Math.random() * 6 + 6
-            particle.colorBlendRate = Math.random() * 0.0275 + 0.0025
+            particle.maxSpeed = Math.random() * 3 + 2
+            particle.maxForce = particle.maxSpeed * 0.04
+            particle.particleSize = Math.random() * 4 + 3
+            particle.colorBlendRate = Math.random() * 0.015 + 0.002
 
             particles.push(particle)
           }

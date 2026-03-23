@@ -13,9 +13,9 @@ const PARTICLE_COLORS = [
 
 const WORDS = ["Regenerate", "Innovate", "Regenovate"];
 
-// Total intro duration: 3 words × 4s each = ~12s, but we transition to content
-// after the third word ("Regenovate") has had time to form
-const CONTENT_DELAY = 10; // seconds before hero content appears
+// Each word holds for ~6s (360 frames at 60fps), 3 words = ~18s
+// Content appears after "Regenovate" has had time to settle
+const CONTENT_DELAY = 16; // seconds before hero content appears
 
 export default function Hero() {
   const [showContent, setShowContent] = useState(false);
@@ -63,13 +63,13 @@ export default function Hero() {
         <ParticleTextEffect
           words={WORDS}
           colors={PARTICLE_COLORS}
-          transitionInterval={210}
+          transitionInterval={360}
           width={1000}
           height={500}
           fontSize={90}
           fontFamily="'Playfair Display', Georgia, serif"
           bgColor="rgba(2, 6, 23, 0.12)"
-          pixelSteps={5}
+          pixelSteps={8}
           className="w-full max-w-5xl pointer-events-auto"
         />
       </motion.div>
