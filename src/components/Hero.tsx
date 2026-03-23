@@ -91,12 +91,11 @@ export default function Hero() {
           transitionInterval={360}
           width={1000}
           height={400}
-          fontSize={85}
+          fontSize={90}
           fontFamily="'Playfair Display', Georgia, serif"
-          bgColor="rgba(2, 6, 23, 0.08)"
-          pixelSteps={7}
-          mouseRadius={90}
-          glow={true}
+          particleSpacing={4}
+          mouseRadius={100}
+          connectionDistance={30}
           onWordChange={onWordChange}
           className="w-full max-w-5xl pointer-events-auto cursor-crosshair"
         />
