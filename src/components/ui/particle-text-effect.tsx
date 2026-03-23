@@ -24,7 +24,19 @@ class Particle {
   colorWeight = 0
   colorBlendRate = 0.01
 
-  move() {
+  move(mouseX: number, mouseY: number, mouseRadius: number) {
+    // Mouse repulsion — push particles away from cursor
+    const mdx = this.pos.x - mouseX
+    const mdy = this.pos.y - mouseY
+    const mouseDist = Math.sqrt(mdx * mdx + mdy * mdy)
+
+    if (mouseDist < mouseRadius && mouseDist > 0) {
+      const repulse = (mouseRadius - mouseDist) / mouseRadius
+      this.acc.x += (mdx / mouseDist) * repulse * 2.5
+      this.acc.y += (mdy / mouseDist) * repulse * 2.5
+    }
+
+    // Steering towards target
     let proximityMult = 1
     const distance = Math.sqrt(Math.pow(this.pos.x - this.target.x, 2) + Math.pow(this.pos.y - this.target.y, 2))
 
@@ -65,33 +77,36 @@ class Particle {
     this.acc.y = 0
   }
 
-  draw(ctx: CanvasRenderingContext2D, drawAsPoints: boolean) {
+  draw(ctx: CanvasRenderingContext2D, glow: boolean) {
     if (this.colorWeight < 1.0) {
       this.colorWeight = Math.min(this.colorWeight + this.colorBlendRate, 1.0)
     }
 
-    const currentColor = {
-      r: Math.round(this.startColor.r + (this.targetColor.r - this.startColor.r) * this.colorWeight),
-      g: Math.round(this.startColor.g + (this.targetColor.g - this.startColor.g) * this.colorWeight),
-      b: Math.round(this.startColor.b + (this.targetColor.b - this.startColor.b) * this.colorWeight),
+    const r = Math.round(this.startColor.r + (this.targetColor.r - this.startColor.r) * this.colorWeight)
+    const g = Math.round(this.startColor.g + (this.targetColor.g - this.startColor.g) * this.colorWeight)
+    const b = Math.round(this.startColor.b + (this.targetColor.b - this.startColor.b) * this.colorWeight)
+
+    if (glow) {
+      // Subtle glow around each particle
+      ctx.shadowColor = `rgba(${r}, ${g}, ${b}, 0.6)`
+      ctx.shadowBlur = 6
     }
 
-    if (drawAsPoints) {
-      ctx.fillStyle = `rgb(${currentColor.r}, ${currentColor.g}, ${currentColor.b})`
-      ctx.fillRect(this.pos.x, this.pos.y, 2, 2)
-    } else {
-      ctx.fillStyle = `rgb(${currentColor.r}, ${currentColor.g}, ${currentColor.b})`
-      ctx.beginPath()
-      ctx.arc(this.pos.x, this.pos.y, this.particleSize / 2, 0, Math.PI * 2)
-      ctx.fill()
+    ctx.fillStyle = `rgb(${r}, ${g}, ${b})`
+    ctx.fillRect(this.pos.x, this.pos.y, 2, 2)
+
+    if (glow) {
+      ctx.shadowColor = "transparent"
+      ctx.shadowBlur = 0
     }
   }
 
   kill(width: number, height: number) {
     if (!this.isKilled) {
-      const randomPos = this.generateRandomPos(width / 2, height / 2, (width + height) / 2)
-      this.target.x = randomPos.x
-      this.target.y = randomPos.y
+      const angle = Math.random() * Math.PI * 2
+      const dist = (width + height) / 2
+      this.target.x = width / 2 + Math.cos(angle) * dist
+      this.target.y = height / 2 + Math.sin(angle) * dist
 
       this.startColor = {
         r: this.startColor.r + (this.targetColor.r - this.startColor.r) * this.colorWeight,
@@ -100,29 +115,7 @@ class Particle {
       }
       this.targetColor = { r: 0, g: 0, b: 0 }
       this.colorWeight = 0
-
       this.isKilled = true
-    }
-  }
-
-  private generateRandomPos(x: number, y: number, mag: number): Vector2D {
-    const randomX = Math.random() * 1000
-    const randomY = Math.random() * 500
-
-    const direction = {
-      x: randomX - x,
-      y: randomY - y,
-    }
-
-    const magnitude = Math.sqrt(direction.x * direction.x + direction.y * direction.y)
-    if (magnitude > 0) {
-      direction.x = (direction.x / magnitude) * mag
-      direction.y = (direction.y / magnitude) * mag
-    }
-
-    return {
-      x: x + direction.x,
-      y: y + direction.y,
     }
   }
 }
@@ -130,25 +123,21 @@ class Particle {
 interface ParticleTextEffectProps {
   words?: string[]
   colors?: Array<{ r: number; g: number; b: number }>
-  /** Frames between word transitions (60fps). Default 240 = 4 seconds */
   transitionInterval?: number
-  /** Canvas internal width */
   width?: number
-  /** Canvas internal height */
   height?: number
-  /** Font size for text rendering */
   fontSize?: number
-  /** Background color as CSS string, e.g. "rgba(2,6,23,0.12)" */
   bgColor?: string
-  /** Additional CSS classes on the canvas */
   className?: string
-  /** Font family */
   fontFamily?: string
-  /** Pixel sampling step (lower = more particles = heavier) */
   pixelSteps?: number
+  mouseRadius?: number
+  glow?: boolean
+  /** Called with word index each time a new word begins forming */
+  onWordChange?: (index: number) => void
 }
 
-const DEFAULT_WORDS = ["HELLO", "21st.dev", "ParticleTextEffect", "BY", "KAINXU"]
+const DEFAULT_WORDS = ["HELLO", "21st.dev", "ParticleTextEffect"]
 
 export function ParticleTextEffect({
   words = DEFAULT_WORDS,
@@ -161,36 +150,16 @@ export function ParticleTextEffect({
   className = "",
   fontFamily = "Arial",
   pixelSteps = 6,
+  mouseRadius = 80,
+  glow = false,
+  onWordChange,
 }: ParticleTextEffectProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationRef = useRef<number>(0)
   const particlesRef = useRef<Particle[]>([])
   const frameCountRef = useRef(0)
   const wordIndexRef = useRef(0)
-  const mouseRef = useRef({ x: 0, y: 0, isPressed: false, isRightClick: false })
-
-  const drawAsPoints = true
-
-  const generateRandomPos = (x: number, y: number, mag: number): Vector2D => {
-    const randomX = Math.random() * width
-    const randomY = Math.random() * height
-
-    const direction = {
-      x: randomX - x,
-      y: randomY - y,
-    }
-
-    const magnitude = Math.sqrt(direction.x * direction.x + direction.y * direction.y)
-    if (magnitude > 0) {
-      direction.x = (direction.x / magnitude) * mag
-      direction.y = (direction.y / magnitude) * mag
-    }
-
-    return {
-      x: x + direction.x,
-      y: y + direction.y,
-    }
-  }
+  const mouseRef = useRef({ x: -9999, y: -9999 })
 
   const getColor = useCallback(
     (index: number) => {
@@ -221,9 +190,7 @@ export function ParticleTextEffect({
 
       const imageData = offscreenCtx.getImageData(0, 0, canvas.width, canvas.height)
       const pixels = imageData.data
-
       const newColor = getColor(colorIndex)
-
       const particles = particlesRef.current
       let particleIndex = 0
 
@@ -232,19 +199,18 @@ export function ParticleTextEffect({
         coordsIndexes.push(i)
       }
 
-      // Shuffle for fluid motion
+      // Shuffle for organic motion
       for (let i = coordsIndexes.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1))
         ;[coordsIndexes[i], coordsIndexes[j]] = [coordsIndexes[j], coordsIndexes[i]]
       }
 
       for (const coordIndex of coordsIndexes) {
-        const pixelIndex = coordIndex
-        const alpha = pixels[pixelIndex + 3]
+        const alpha = pixels[coordIndex + 3]
 
         if (alpha > 0) {
-          const x = (pixelIndex / 4) % canvas.width
-          const y = Math.floor(pixelIndex / 4 / canvas.width)
+          const x = (coordIndex / 4) % canvas.width
+          const y = Math.floor(coordIndex / 4 / canvas.width)
 
           let particle: Particle
 
@@ -255,13 +221,12 @@ export function ParticleTextEffect({
           } else {
             particle = new Particle()
 
-            const randomPos = generateRandomPos(
-              canvas.width / 2,
-              canvas.height / 2,
-              (canvas.width + canvas.height) / 2,
-            )
-            particle.pos.x = randomPos.x
-            particle.pos.y = randomPos.y
+            // Spawn from random edge position
+            const edge = Math.floor(Math.random() * 4)
+            if (edge === 0) { particle.pos.x = Math.random() * canvas.width; particle.pos.y = -50 }
+            else if (edge === 1) { particle.pos.x = canvas.width + 50; particle.pos.y = Math.random() * canvas.height }
+            else if (edge === 2) { particle.pos.x = Math.random() * canvas.width; particle.pos.y = canvas.height + 50 }
+            else { particle.pos.x = -50; particle.pos.y = Math.random() * canvas.height }
 
             particle.maxSpeed = Math.random() * 3 + 2
             particle.maxForce = particle.maxSpeed * 0.04
@@ -278,13 +243,11 @@ export function ParticleTextEffect({
           }
           particle.targetColor = newColor
           particle.colorWeight = 0
-
           particle.target.x = x
           particle.target.y = y
         }
       }
 
-      // Kill remaining particles
       for (let i = particleIndex; i < particles.length; i++) {
         particles[i].kill(canvas.width, canvas.height)
       }
@@ -299,52 +262,39 @@ export function ParticleTextEffect({
     canvas.width = width
     canvas.height = height
 
-    // Initialize with first word
     nextWord(words[0], canvas, 0)
+    onWordChange?.(0)
 
     const animate = () => {
       const ctx = canvas.getContext("2d")!
       const particles = particlesRef.current
+      const mouse = mouseRef.current
 
-      // Background with motion blur
       ctx.fillStyle = bgColor
       ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-      // Update and draw particles
       for (let i = particles.length - 1; i >= 0; i--) {
         const particle = particles[i]
-        particle.move()
-        particle.draw(ctx, drawAsPoints)
+        particle.move(mouse.x, mouse.y, mouseRadius)
+        particle.draw(ctx, glow)
 
         if (particle.isKilled) {
           if (
-            particle.pos.x < 0 ||
-            particle.pos.x > canvas.width ||
-            particle.pos.y < 0 ||
-            particle.pos.y > canvas.height
+            particle.pos.x < -100 ||
+            particle.pos.x > canvas.width + 100 ||
+            particle.pos.y < -100 ||
+            particle.pos.y > canvas.height + 100
           ) {
             particles.splice(i, 1)
           }
         }
       }
 
-      // Mouse interaction
-      if (mouseRef.current.isPressed && mouseRef.current.isRightClick) {
-        particles.forEach((particle) => {
-          const distance = Math.sqrt(
-            Math.pow(particle.pos.x - mouseRef.current.x, 2) + Math.pow(particle.pos.y - mouseRef.current.y, 2),
-          )
-          if (distance < 50) {
-            particle.kill(canvas.width, canvas.height)
-          }
-        })
-      }
-
-      // Auto-advance words
       frameCountRef.current++
       if (frameCountRef.current % transitionInterval === 0) {
         wordIndexRef.current = (wordIndexRef.current + 1) % words.length
         nextWord(words[wordIndexRef.current], canvas, wordIndexRef.current)
+        onWordChange?.(wordIndexRef.current)
       }
 
       animationRef.current = requestAnimationFrame(animate)
@@ -352,49 +302,29 @@ export function ParticleTextEffect({
 
     animate()
 
-    // Mouse handlers
-    const handleMouseDown = (e: MouseEvent) => {
-      mouseRef.current.isPressed = true
-      mouseRef.current.isRightClick = e.button === 2
-      const rect = canvas.getBoundingClientRect()
-      const scaleX = canvas.width / rect.width
-      const scaleY = canvas.height / rect.height
-      mouseRef.current.x = (e.clientX - rect.left) * scaleX
-      mouseRef.current.y = (e.clientY - rect.top) * scaleY
-    }
-
-    const handleMouseUp = () => {
-      mouseRef.current.isPressed = false
-      mouseRef.current.isRightClick = false
-    }
-
     const handleMouseMove = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect()
       const scaleX = canvas.width / rect.width
       const scaleY = canvas.height / rect.height
-      mouseRef.current.x = (e.clientX - rect.left) * scaleX
-      mouseRef.current.y = (e.clientY - rect.top) * scaleY
+      mouseRef.current = {
+        x: (e.clientX - rect.left) * scaleX,
+        y: (e.clientY - rect.top) * scaleY,
+      }
     }
 
-    const handleContextMenu = (e: MouseEvent) => {
-      e.preventDefault()
+    const handleMouseLeave = () => {
+      mouseRef.current = { x: -9999, y: -9999 }
     }
 
-    canvas.addEventListener("mousedown", handleMouseDown)
-    canvas.addEventListener("mouseup", handleMouseUp)
     canvas.addEventListener("mousemove", handleMouseMove)
-    canvas.addEventListener("contextmenu", handleContextMenu)
+    canvas.addEventListener("mouseleave", handleMouseLeave)
 
     return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current)
-      }
-      canvas.removeEventListener("mousedown", handleMouseDown)
-      canvas.removeEventListener("mouseup", handleMouseUp)
+      cancelAnimationFrame(animationRef.current)
       canvas.removeEventListener("mousemove", handleMouseMove)
-      canvas.removeEventListener("contextmenu", handleContextMenu)
+      canvas.removeEventListener("mouseleave", handleMouseLeave)
     }
-  }, [words, width, height, bgColor, transitionInterval, nextWord])
+  }, [words, width, height, bgColor, transitionInterval, mouseRadius, glow, nextWord, onWordChange])
 
   return (
     <canvas
