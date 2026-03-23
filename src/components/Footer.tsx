@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 const links = [
-  { href: "#about", label: "About Us" },
-  { href: "#solutions", label: "Solutions" },
-  { href: "#approach", label: "Our Approach" },
-  { href: "#contact", label: "Contact" },
+  { href: "/about", label: "About Us" },
+  { href: "/solutions", label: "Solutions" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export default function Footer() {
@@ -35,23 +35,23 @@ export default function Footer() {
       <footer className="border-t border-slate-800 py-12">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-8">
-            <a href="#" className="flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-3">
               <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold text-sm">
                 R
               </span>
               <span className="text-lg font-semibold text-white tracking-tight">
                 Regenovate
               </span>
-            </a>
+            </Link>
             <div className="flex flex-wrap gap-6 justify-center">
               {links.map((link) => (
-                <a
+                <Link
                   key={link.href}
                   href={link.href}
                   className="text-sm text-slate-400 hover:text-white transition-colors"
                 >
                   {link.label}
-                </a>
+                </Link>
               ))}
             </div>
           </div>
@@ -74,20 +74,10 @@ export default function Footer() {
             <div>
               <h4 className="text-xs text-slate-500 uppercase tracking-wider mb-3">Follow</h4>
               <div className="flex gap-4">
-                <a
-                  href="https://www.linkedin.com/company/regenovate"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-slate-400 hover:text-blue-400 transition-colors"
-                >
+                <a href="https://www.linkedin.com/company/regenovate" target="_blank" rel="noopener noreferrer" className="text-sm text-slate-400 hover:text-blue-400 transition-colors">
                   LinkedIn
                 </a>
-                <a
-                  href="https://www.facebook.com/regenovate"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-slate-400 hover:text-blue-400 transition-colors"
-                >
+                <a href="https://www.facebook.com/regenovate" target="_blank" rel="noopener noreferrer" className="text-sm text-slate-400 hover:text-blue-400 transition-colors">
                   Facebook
                 </a>
               </div>
@@ -98,12 +88,7 @@ export default function Footer() {
             <p className="text-sm text-slate-500">
               &copy; {new Date().getFullYear()} Regenovate. All rights reserved.
             </p>
-            <a
-              href="https://www.regenovate.co"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-slate-500 hover:text-blue-400 transition-colors"
-            >
+            <a href="https://www.regenovate.co" target="_blank" rel="noopener noreferrer" className="text-sm text-slate-500 hover:text-blue-400 transition-colors">
               www.regenovate.co
             </a>
           </div>

@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import ClientShell from "@/components/ClientShell";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Regenovate — We Invest in Businesses Like Yours",
+  title: {
+    default: "Regenovate — We Invest in Businesses Like Yours",
+    template: "%s | Regenovate",
+  },
   description:
     "Regenovate invests, partners and acquires businesses to transform and scale them using our proven Business Transformation Programme. Protecting your team and securing your legacy.",
   keywords: [
@@ -54,7 +59,11 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-        <ClientShell>{children}</ClientShell>
+        <ClientShell>
+          <Navbar />
+          {children}
+          <Footer />
+        </ClientShell>
       </body>
     </html>
   );

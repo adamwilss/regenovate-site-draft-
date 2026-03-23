@@ -2,6 +2,7 @@
 
 import { useRef, useState, type ReactNode, type MouseEvent } from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 interface MagneticButtonProps {
   children: ReactNode;
@@ -38,7 +39,7 @@ export function MagneticButton({
     setPos({ x: 0, y: 0 });
   };
 
-  const Tag = as === "button" ? "button" : "a";
+  const isInternal = href?.startsWith("/");
 
   return (
     <motion.div
@@ -49,9 +50,19 @@ export function MagneticButton({
       transition={{ type: "spring", stiffness: 200, damping: 15 }}
       className="inline-block"
     >
-      <Tag href={href} onClick={onClick} className={className}>
-        {children}
-      </Tag>
+      {as === "button" ? (
+        <button onClick={onClick} className={className}>
+          {children}
+        </button>
+      ) : isInternal ? (
+        <Link href={href!} className={className}>
+          {children}
+        </Link>
+      ) : (
+        <a href={href} className={className}>
+          {children}
+        </a>
+      )}
     </motion.div>
   );
 }

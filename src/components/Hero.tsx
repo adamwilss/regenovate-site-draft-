@@ -126,14 +126,14 @@ export default function Hero() {
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
           <MagneticButton
-            href="#approach"
+            href="/solutions"
             strength={0.25}
             className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-full transition-all hover:shadow-xl hover:shadow-blue-500/25 inline-block"
           >
             Discover Our Approach
           </MagneticButton>
           <MagneticButton
-            href="#contact"
+            href="/contact"
             strength={0.25}
             className="px-8 py-4 border border-slate-600 hover:border-blue-500 text-white font-semibold rounded-full transition-all inline-block"
           >
