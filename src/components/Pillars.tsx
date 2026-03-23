@@ -6,27 +6,24 @@ import { useRef } from "react";
 const pillars = [
   {
     number: "01",
-    title: "Climate Positive",
-    desc: "Going beyond carbon neutral to actively restore atmospheric balance. We design systems that sequester more than they emit.",
-    color: "from-emerald-500 to-emerald-600",
+    title: "Stabilise",
+    subtitle: "PEOPLE",
+    desc: "We understand that the most important resource in your business is your Human Resource, your PEOPLE. When people feel safe, valued and rewarded fairly, the culture is strong, resilient and can cope with the challenges of growth. Get it right and the business becomes a \"Talent Magnet\".",
+    color: "from-blue-400 to-blue-500",
   },
   {
     number: "02",
-    title: "Nature Positive",
-    desc: "Enhancing biodiversity and ecosystem health through every business decision. Growth that gives back to the natural world.",
-    color: "from-teal-500 to-teal-600",
+    title: "Systemise",
+    subtitle: "PROCESS",
+    desc: "By using the power of the Cloud, combined with the wisdom of traditional business practice, we have created a 'secret sauce' that puts growth on autopilot. Efficient businesses are more fun to work in and as a result generate more profit.",
+    color: "from-blue-500 to-blue-600",
   },
   {
     number: "03",
-    title: "Social Positive",
-    desc: "Creating equitable opportunities and strengthening communities. Business as a force for social regeneration and inclusion.",
-    color: "from-emerald-400 to-teal-500",
-  },
-  {
-    number: "04",
-    title: "Economic Positive",
-    desc: "Building resilient, circular economic models that distribute prosperity and sustain themselves long into the future.",
-    color: "from-teal-400 to-emerald-500",
+    title: "Scale",
+    subtitle: "PERFORMANCE",
+    desc: "We know how to generate perfect customers who want your products and services, from you, now, and can afford them. By constantly monitoring what works using the latest technology, we secure Market Share and create Scale.",
+    color: "from-blue-600 to-blue-700",
   },
 ];
 
@@ -43,18 +40,23 @@ export default function Pillars() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <p className="text-emerald-400 text-sm font-semibold tracking-[0.15em] uppercase mb-4">
-            Our Pillars
+          <p className="text-blue-400 text-sm font-semibold tracking-[0.15em] uppercase mb-4">
+            Our Philosophy
           </p>
           <h2
-            className="text-4xl md:text-5xl font-bold text-white"
+            className="text-4xl md:text-5xl font-bold text-white mb-6"
             style={{ fontFamily: "var(--font-serif)" }}
           >
-            Four dimensions of positive impact
+            Stabilise. Systemise. Scale.
           </h2>
+          <p className="text-slate-400 max-w-2xl mx-auto text-lg">
+            In business you are always trying to do &ldquo;more of what works&rdquo; and
+            &ldquo;less of what doesn&apos;t&rdquo;. Sounds simple — and it is, if you have access
+            to the right tools, wisdom and experience.
+          </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-3 gap-6">
           {pillars.map((pillar, i) => (
             <motion.div
               key={pillar.number}
@@ -63,19 +65,22 @@ export default function Pillars() {
               transition={{ duration: 0.5, delay: 0.15 * i }}
               className="group relative"
             >
-              <div className="p-8 rounded-2xl border border-slate-800 hover:border-emerald-500/30 bg-slate-900/50 transition-all duration-300 h-full">
+              <div className="p-8 rounded-2xl border border-slate-800 hover:border-blue-500/30 bg-slate-900/50 transition-all duration-300 h-full">
                 <div
-                  className={`text-5xl font-bold bg-gradient-to-br ${pillar.color} bg-clip-text text-transparent mb-6`}
+                  className={`text-5xl font-bold bg-gradient-to-br ${pillar.color} bg-clip-text text-transparent mb-2`}
                 >
                   {pillar.number}
                 </div>
-                <h3 className="text-lg font-semibold text-white mb-3">
+                <h3 className="text-xl font-semibold text-white mb-1">
                   {pillar.title}
                 </h3>
+                <p className="text-blue-400 text-sm font-medium tracking-wider uppercase mb-4">
+                  {pillar.subtitle}
+                </p>
                 <p className="text-slate-400 text-sm leading-relaxed">
                   {pillar.desc}
                 </p>
-                <div className="mt-6 h-px bg-gradient-to-r from-emerald-500/50 to-transparent w-0 group-hover:w-full transition-all duration-500" />
+                <div className="mt-6 h-px bg-gradient-to-r from-blue-500/50 to-transparent w-0 group-hover:w-full transition-all duration-500" />
               </div>
             </motion.div>
           ))}

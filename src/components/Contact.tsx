@@ -17,9 +17,9 @@ export default function Contact() {
 
     const form = e.currentTarget;
     const data = {
-      name: (form.elements.namedItem("name") as HTMLInputElement).value,
+      name: `${(form.elements.namedItem("firstName") as HTMLInputElement).value} ${(form.elements.namedItem("lastName") as HTMLInputElement).value}`,
       email: (form.elements.namedItem("email") as HTMLInputElement).value,
-      org: (form.elements.namedItem("org") as HTMLInputElement).value,
+      org: (form.elements.namedItem("company") as HTMLInputElement).value,
       message: (form.elements.namedItem("message") as HTMLTextAreaElement).value,
     };
 
@@ -29,7 +29,7 @@ export default function Contact() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      if (!res.ok) throw new Error("Failed to send message");
+      if (!res.ok) throw new Error("Failed to send");
       setSubmitted(true);
     } catch {
       setError("Something went wrong. Please try again.");
@@ -40,7 +40,7 @@ export default function Contact() {
 
   return (
     <section id="contact" className="py-32 relative" ref={ref}>
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
 
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-16">
@@ -49,35 +49,40 @@ export default function Contact() {
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.7 }}
           >
-            <p className="text-emerald-400 text-sm font-semibold tracking-[0.15em] uppercase mb-4">
-              Get in Touch
+            <p className="text-blue-400 text-sm font-semibold tracking-[0.15em] uppercase mb-4">
+              Getting to Know You
             </p>
             <h2
               className="text-4xl md:text-5xl font-bold text-white leading-tight mb-6"
               style={{ fontFamily: "var(--font-serif)" }}
             >
-              Ready to regenovate?
+              Ready to elevate your
+              <br />
+              business legacy?
             </h2>
             <p className="text-slate-400 mb-10 leading-relaxed">
-              Whether you&apos;re looking to transform your business, build a
-              regenerative strategy, or explore how positive impact frameworks
-              can drive your growth — we&apos;d love to hear from you.
+              Whether you&apos;re looking to exit your business, secure your
+              legacy, or explore how our Business Transformation Programme can
+              drive your growth — we&apos;d love to hear from you.
             </p>
             <div className="space-y-4">
               <div>
-                <span className="text-xs text-slate-500 uppercase tracking-wider">
-                  Web
-                </span>
+                <span className="text-xs text-slate-500 uppercase tracking-wider">Email</span>
                 <div>
-                  <a
-                    href="https://www.regenovate.co"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-emerald-400 hover:text-emerald-300 transition-colors"
-                  >
-                    www.regenovate.co
+                  <a href="mailto:Info@regenovate.com" className="text-blue-400 hover:text-blue-300 transition-colors">
+                    Info@regenovate.com
                   </a>
                 </div>
+              </div>
+              <div>
+                <span className="text-xs text-slate-500 uppercase tracking-wider">Office</span>
+                <p className="text-slate-300 text-sm">
+                  Dalton House, Lakhpur Court,
+                  <br />
+                  Staffordshire Technology Park,
+                  <br />
+                  Stafford. ST18 0FX
+                </p>
               </div>
             </div>
           </motion.div>
@@ -88,90 +93,59 @@ export default function Contact() {
             transition={{ duration: 0.7, delay: 0.2 }}
           >
             {submitted ? (
-              <div className="h-full flex items-center justify-center p-8 rounded-2xl border border-emerald-500/30 bg-slate-900/50">
+              <div className="h-full flex items-center justify-center p-8 rounded-2xl border border-blue-500/30 bg-slate-900/50">
                 <div className="text-center">
-                  <div className="text-emerald-400 text-5xl mb-4">&#10003;</div>
-                  <h3 className="text-xl font-semibold text-white mb-2">
-                    Message sent
-                  </h3>
-                  <p className="text-slate-400">
-                    We&apos;ll be in touch soon.
-                  </p>
+                  <div className="text-blue-400 text-5xl mb-4">&#10003;</div>
+                  <h3 className="text-xl font-semibold text-white mb-2">Message sent</h3>
+                  <p className="text-slate-400">We&apos;ll be in touch soon.</p>
                 </div>
               </div>
             ) : (
               <form
                 onSubmit={handleSubmit}
-                className="space-y-5 p-8 rounded-2xl border border-slate-800 bg-slate-900/50"
+                className="space-y-4 p-8 rounded-2xl border border-slate-800 bg-slate-900/50"
               >
-                <div>
-                  <label
-                    htmlFor="name"
-                    className="block text-sm text-slate-400 mb-2"
-                  >
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    required
-                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all"
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="firstName" className="block text-sm text-slate-400 mb-2">First Name *</label>
+                    <input type="text" id="firstName" name="firstName" required className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all" />
+                  </div>
+                  <div>
+                    <label htmlFor="lastName" className="block text-sm text-slate-400 mb-2">Last Name *</label>
+                    <input type="text" id="lastName" name="lastName" required className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="email" className="block text-sm text-slate-400 mb-2">Email *</label>
+                    <input type="email" id="email" name="email" required className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all" />
+                  </div>
+                  <div>
+                    <label htmlFor="phone" className="block text-sm text-slate-400 mb-2">Phone *</label>
+                    <input type="tel" id="phone" name="phone" required className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="company" className="block text-sm text-slate-400 mb-2">Company Name *</label>
+                    <input type="text" id="company" name="company" required className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all" />
+                  </div>
+                  <div>
+                    <label htmlFor="jobTitle" className="block text-sm text-slate-400 mb-2">Job Title *</label>
+                    <input type="text" id="jobTitle" name="jobTitle" required className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all" />
+                  </div>
                 </div>
                 <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm text-slate-400 mb-2"
-                  >
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    required
-                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all"
-                  />
+                  <label htmlFor="message" className="block text-sm text-slate-400 mb-2">Message *</label>
+                  <textarea id="message" name="message" rows={4} required className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all resize-none" />
                 </div>
-                <div>
-                  <label
-                    htmlFor="org"
-                    className="block text-sm text-slate-400 mb-2"
-                  >
-                    Organisation
-                  </label>
-                  <input
-                    type="text"
-                    id="org"
-                    name="org"
-                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="message"
-                    className="block text-sm text-slate-400 mb-2"
-                  >
-                    How can we help?
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    rows={4}
-                    required
-                    className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 transition-all resize-none"
-                  />
-                </div>
-                {error && (
-                  <p className="text-red-400 text-sm">{error}</p>
-                )}
+                {error && <p className="text-red-400 text-sm">{error}</p>}
                 <button
                   type="submit"
                   disabled={sending}
-                  className="w-full py-4 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-full transition-all hover:shadow-lg hover:shadow-emerald-500/25"
+                  className="w-full py-4 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-full transition-all hover:shadow-lg hover:shadow-blue-500/25"
                 >
-                  {sending ? "Sending..." : "Send Message"}
+                  {sending ? "Sending..." : "Submit"}
                 </button>
               </form>
             )}

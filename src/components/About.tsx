@@ -17,17 +17,27 @@ export default function About() {
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.7 }}
           >
-            <p className="text-emerald-400 text-sm font-semibold tracking-[0.15em] uppercase mb-4">
-              Who We Are
+            <p className="text-blue-400 text-sm font-semibold tracking-[0.15em] uppercase mb-4">
+              Our Story
             </p>
             <h2
-              className="text-4xl md:text-5xl font-bold text-white leading-tight"
+              className="text-4xl md:text-5xl font-bold text-white leading-tight mb-6"
               style={{ fontFamily: "var(--font-serif)" }}
             >
-              Innovation with
+              20+ years perfecting
               <br />
-              regenerative purpose
+              business transformation
             </h2>
+            <div className="flex gap-6 mt-8">
+              <div className="p-5 rounded-xl border border-slate-800 bg-slate-900/50 flex-1 text-center">
+                <div className="text-2xl font-bold text-blue-400 mb-1">10</div>
+                <p className="text-slate-400 text-xs">Businesses Owned &amp; Operated</p>
+              </div>
+              <div className="p-5 rounded-xl border border-slate-800 bg-slate-900/50 flex-1 text-center">
+                <div className="text-2xl font-bold text-blue-400 mb-1">4</div>
+                <p className="text-slate-400 text-xs">Sectors: Manufacturing, Software, Display, Engineering</p>
+              </div>
+            </div>
           </motion.div>
 
           <motion.div
@@ -37,25 +47,24 @@ export default function About() {
             className="space-y-6 text-slate-400 leading-relaxed"
           >
             <p className="text-lg text-slate-300">
-              <strong className="text-white">Regenovate</strong> is the fusion
-              of <em className="text-emerald-400">regenerate</em> and{" "}
-              <em className="text-emerald-400">innovate</em>. We believe that
-              true progress doesn&apos;t just move forward — it restores, renews,
-              and creates positive impact at every level.
+              For more than two decades, <strong className="text-white">Regenovate</strong> has
+              been at the forefront of perfecting our Transformation Programme,
+              revolutionising businesses through the adoption of Cloud Technology.
             </p>
             <p>
-              We work with businesses, organisations, and communities to
-              transform outdated systems into regenerative ones. Our approach
-              aligns economic growth with natural systems, promoting circular
-              economy thinking and reducing waste while enhancing resilience and
-              long-term sustainability.
+              Our journey began with a commitment to upgrading systems and
+              empowering teams with innovative tools. One day, during a
+              conversation with a new prospect, a unique idea took root — we
+              proposed not just guiding them through the transformation but
+              acquiring their business, completing the transformation, and
+              offering it back to them.
             </p>
             <p>
-              Regenovation isn&apos;t just about quantitative growth — it&apos;s about
-              qualitative, diversified growth that supports the system it
-              operates within. We help you decouple from degenerative practices
-              and adopt strategies that regenerate resources, ecosystems, and
-              social structures.
+              While the initial offer wasn&apos;t accepted, the concept of
+              acquiring businesses before transforming them became a cornerstone
+              of our methodology. Today, we proudly own and operate 10 diverse
+              businesses across Manufacturing, Software, Display, and Engineering
+              — thriving synergistically.
             </p>
           </motion.div>
         </div>

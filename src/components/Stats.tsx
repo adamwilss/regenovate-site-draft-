@@ -1,13 +1,13 @@
 "use client";
 
-import { motion, useInView, useMotionValue, useTransform, animate } from "framer-motion";
+import { motion, useInView, animate } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 
 const stats = [
-  { value: 100, suffix: "%", label: "Commitment to regenerative principles" },
-  { value: 4, suffix: "", label: "Pillars of positive impact" },
-  { value: 360, suffix: "°", label: "Holistic systems thinking" },
-  { value: 0, suffix: "", label: "Waste in a circular model", prefix: "Net " },
+  { value: 200, suffix: "+", label: "Clients Transformed" },
+  { value: 20, suffix: "+", label: "Years' Experience" },
+  { value: 300, prefix: "£", suffix: "M+", label: "Revenues Generated" },
+  { value: 98, suffix: "%", label: "Annual Client Retention" },
 ];
 
 function AnimatedNumber({ value, suffix, prefix }: { value: number; suffix: string; prefix?: string }) {

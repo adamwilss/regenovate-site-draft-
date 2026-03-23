@@ -2,21 +2,23 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Regenovate — Regenerate. Innovate. Transform.",
+  title: "Regenovate — We Invest in Businesses Like Yours",
   description:
-    "Regenovate transforms businesses and systems through regenerative innovation — creating sustainable, resilient solutions that benefit people and planet.",
+    "Regenovate invests, partners and acquires businesses to transform and scale them using our proven Business Transformation Programme. Protecting your team and securing your legacy.",
   keywords: [
-    "regenerative innovation",
-    "sustainability",
-    "circular economy",
     "business transformation",
-    "climate positive",
+    "business acquisition",
+    "cloud technology",
     "regenovate",
+    "business growth",
+    "exit strategy",
+    "ERP",
+    "business legacy",
   ],
   openGraph: {
-    title: "Regenovate — Regenerate. Innovate. Transform.",
+    title: "Regenovate — We Invest in Businesses Like Yours",
     description:
-      "Transforming businesses and systems through regenerative innovation — sustainable, resilient solutions for people and planet.",
+      "We invest, partner or acquire businesses to transform and scale them — protecting your most valuable asset, your dedicated team.",
     url: "https://www.regenovate.co",
     siteName: "Regenovate",
     type: "website",
@@ -24,9 +26,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Regenovate — Regenerate. Innovate. Transform.",
+    title: "Regenovate — We Invest in Businesses Like Yours",
     description:
-      "Transforming businesses and systems through regenerative innovation.",
+      "Business transformation through acquisition, cloud technology and proven growth strategies.",
   },
   metadataBase: new URL("https://www.regenovate.co"),
 };
