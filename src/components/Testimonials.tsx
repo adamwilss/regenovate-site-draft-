@@ -1,7 +1,8 @@
 "use client";
 
-import { motion, useInView } from "framer-motion";
-import { useRef, useState } from "react";
+import { motion, useInView, AnimatePresence } from "framer-motion";
+import { useRef, useState, useEffect } from "react";
+import { TextReveal } from "@/components/ui/text-reveal";
 
 const testimonials = [
   {
@@ -29,6 +30,14 @@ export default function Testimonials() {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [active, setActive] = useState(0);
 
+  // Auto-rotate every 6 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActive((prev) => (prev + 1) % testimonials.length);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <section className="py-32 relative" ref={ref}>
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
@@ -47,7 +56,7 @@ export default function Testimonials() {
             className="text-3xl md:text-4xl font-bold text-white"
             style={{ fontFamily: "var(--font-serif)" }}
           >
-            What people are saying about Regenovate
+            <TextReveal delay={0.1}>What people are saying about Regenovate</TextReveal>
           </h2>
         </motion.div>
 
@@ -57,32 +66,52 @@ export default function Testimonials() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="relative"
         >
-          <div className="p-8 md:p-12 rounded-2xl border border-slate-800 bg-slate-900/50 text-center">
-            <div className="text-blue-500/40 text-6xl leading-none mb-6">&ldquo;</div>
-            <p
-              className="text-lg md:text-xl text-slate-300 leading-relaxed mb-8 min-h-[120px]"
-              style={{ fontFamily: "var(--font-serif)" }}
-            >
-              {testimonials[active].quote}
-            </p>
-            <div className="mb-6">
-              <p className="text-white font-semibold">{testimonials[active].name}</p>
-              <p className="text-slate-500 text-sm">{testimonials[active].role}</p>
+          <div className="p-8 md:p-12 rounded-2xl border border-slate-800 bg-slate-900/50 text-center overflow-hidden">
+            <div className="text-blue-500/30 text-7xl leading-none mb-6">&ldquo;</div>
+
+            <div className="relative min-h-[160px] flex items-center justify-center">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={active}
+                  initial={{ opacity: 0, y: 20, filter: "blur(4px)" }}
+                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, y: -20, filter: "blur(4px)" }}
+                  transition={{ duration: 0.6 }}
+                >
+                  <p
+                    className="text-lg md:text-xl text-slate-300 leading-relaxed mb-8"
+                    style={{ fontFamily: "var(--font-serif)" }}
+                  >
+                    {testimonials[active].quote}
+                  </p>
+                  <div>
+                    <p className="text-white font-semibold">{testimonials[active].name}</p>
+                    <p className="text-slate-500 text-sm">{testimonials[active].role}</p>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
             </div>
 
-            {/* Dots */}
-            <div className="flex gap-2 justify-center">
+            {/* Progress dots */}
+            <div className="flex gap-2 justify-center mt-8">
               {testimonials.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => setActive(i)}
-                  className={`w-2.5 h-2.5 rounded-full transition-all ${
-                    active === i
-                      ? "bg-blue-500 w-8"
-                      : "bg-slate-700 hover:bg-slate-600"
-                  }`}
+                  className="relative h-2.5 rounded-full transition-all overflow-hidden"
+                  style={{ width: active === i ? 32 : 10 }}
                   aria-label={`Testimonial ${i + 1}`}
-                />
+                >
+                  <div className={`absolute inset-0 rounded-full ${active === i ? "bg-blue-600" : "bg-slate-700 hover:bg-slate-600"}`} />
+                  {active === i && (
+                    <motion.div
+                      initial={{ scaleX: 0 }}
+                      animate={{ scaleX: 1 }}
+                      transition={{ duration: 6, ease: "linear" }}
+                      className="absolute inset-0 rounded-full bg-blue-400 origin-left"
+                    />
+                  )}
+                </button>
               ))}
             </div>
           </div>

@@ -2,6 +2,8 @@
 
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import { TiltCard } from "@/components/ui/tilt-card";
+import { TextReveal } from "@/components/ui/text-reveal";
 
 const pillars = [
   {
@@ -10,6 +12,13 @@ const pillars = [
     subtitle: "PEOPLE",
     desc: "We understand that the most important resource in your business is your Human Resource, your PEOPLE. When people feel safe, valued and rewarded fairly, the culture is strong, resilient and can cope with the challenges of growth. Get it right and the business becomes a \"Talent Magnet\".",
     color: "from-blue-400 to-blue-500",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6">
+        <path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    ),
   },
   {
     number: "02",
@@ -17,6 +26,11 @@ const pillars = [
     subtitle: "PROCESS",
     desc: "By using the power of the Cloud, combined with the wisdom of traditional business practice, we have created a 'secret sauce' that puts growth on autopilot. Efficient businesses are more fun to work in and as a result generate more profit.",
     color: "from-blue-500 to-blue-600",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
   },
   {
     number: "03",
@@ -24,6 +38,11 @@ const pillars = [
     subtitle: "PERFORMANCE",
     desc: "We know how to generate perfect customers who want your products and services, from you, now, and can afford them. By constantly monitoring what works using the latest technology, we secure Market Share and create Scale.",
     color: "from-blue-600 to-blue-700",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6">
+        <path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
   },
 ];
 
@@ -33,6 +52,13 @@ export default function Pillars() {
 
   return (
     <section id="pillars" className="py-32 relative" ref={ref}>
+      {/* Wave divider top */}
+      <div className="wave-divider top">
+        <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
+          <path d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,50 1440,40 L1440,0 L0,0 Z" fill="var(--color-slate-950)" />
+        </svg>
+      </div>
+
       <div className="max-w-7xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -47,7 +73,7 @@ export default function Pillars() {
             className="text-4xl md:text-5xl font-bold text-white mb-6"
             style={{ fontFamily: "var(--font-serif)" }}
           >
-            Stabilise. Systemise. Scale.
+            <TextReveal delay={0.1}>Stabilise. Systemise. Scale.</TextReveal>
           </h2>
           <p className="text-slate-400 max-w-2xl mx-auto text-lg">
             In business you are always trying to do &ldquo;more of what works&rdquo; and
@@ -63,26 +89,45 @@ export default function Pillars() {
               initial={{ opacity: 0, y: 40 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: 0.15 * i }}
-              className="group relative"
             >
-              <div className="p-8 rounded-2xl border border-slate-800 hover:border-blue-500/30 bg-slate-900/50 transition-all duration-300 h-full">
-                <div
-                  className={`text-5xl font-bold bg-gradient-to-br ${pillar.color} bg-clip-text text-transparent mb-2`}
-                >
-                  {pillar.number}
+              <TiltCard className="h-full" glareColor="rgba(65, 105, 225, 0.1)">
+                <div className="p-8 rounded-2xl border border-slate-800 hover:border-blue-500/30 bg-slate-900/50 transition-all duration-300 h-full group">
+                  <div className="flex items-center justify-between mb-6">
+                    <div
+                      className={`text-5xl font-bold bg-gradient-to-br ${pillar.color} bg-clip-text text-transparent`}
+                    >
+                      {pillar.number}
+                    </div>
+                    <div className="text-blue-400/40 group-hover:text-blue-400/80 transition-colors">
+                      {pillar.icon}
+                    </div>
+                  </div>
+                  <h3 className="text-xl font-semibold text-white mb-1">
+                    {pillar.title}
+                  </h3>
+                  <p className="text-blue-400 text-sm font-medium tracking-wider uppercase mb-4">
+                    {pillar.subtitle}
+                  </p>
+                  <p className="text-slate-400 text-sm leading-relaxed">
+                    {pillar.desc}
+                  </p>
+                  <div className="mt-6 h-px bg-gradient-to-r from-blue-500/50 to-transparent w-0 group-hover:w-full transition-all duration-500" />
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-1">
-                  {pillar.title}
-                </h3>
-                <p className="text-blue-400 text-sm font-medium tracking-wider uppercase mb-4">
-                  {pillar.subtitle}
-                </p>
-                <p className="text-slate-400 text-sm leading-relaxed">
-                  {pillar.desc}
-                </p>
-                <div className="mt-6 h-px bg-gradient-to-r from-blue-500/50 to-transparent w-0 group-hover:w-full transition-all duration-500" />
-              </div>
+              </TiltCard>
             </motion.div>
+          ))}
+        </div>
+
+        {/* Connecting line between pillars */}
+        <div className="hidden md:flex items-center justify-center mt-8 gap-4">
+          {[0, 1].map((i) => (
+            <motion.div
+              key={i}
+              initial={{ scaleX: 0 }}
+              animate={isInView ? { scaleX: 1 } : {}}
+              transition={{ duration: 0.8, delay: 0.8 + i * 0.2 }}
+              className="flex-1 h-px bg-gradient-to-r from-blue-500/30 via-blue-400/50 to-blue-500/30 origin-left"
+            />
           ))}
         </div>
       </div>

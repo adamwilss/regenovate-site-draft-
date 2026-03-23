@@ -2,6 +2,8 @@
 
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import { TiltCard } from "@/components/ui/tilt-card";
+import { TextReveal } from "@/components/ui/text-reveal";
 
 const solutions = [
   {
@@ -49,6 +51,13 @@ const solutions = [
   },
 ];
 
+const highlights = [
+  { title: "Proven Success", desc: "Numerous small businesses turned into industry leaders." },
+  { title: "Holistic Approach", desc: "Cloud technology, marketing and acquisition combined." },
+  { title: "Experienced Team", desc: "Experts in finance, marketing, technology and operations." },
+  { title: "Tailored Solutions", desc: "Strategies as individual as your business." },
+];
+
 export default function Services() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
@@ -71,7 +80,7 @@ export default function Services() {
             className="text-4xl md:text-5xl font-bold text-white mb-6"
             style={{ fontFamily: "var(--font-serif)" }}
           >
-            The blueprint for sustainable success
+            <TextReveal delay={0.1}>The blueprint for sustainable success</TextReveal>
           </h2>
           <p className="text-slate-400 max-w-2xl mx-auto text-lg">
             We don&apos;t just transform your business for today — we prepare it for
@@ -86,36 +95,34 @@ export default function Services() {
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: 0.1 * i }}
-              className="group relative p-8 rounded-2xl border border-slate-800 hover:border-blue-500/30 bg-slate-900/50 hover:bg-slate-900/80 transition-all duration-300"
             >
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="relative">
-                <div className="text-blue-400 mb-5">{solution.icon}</div>
-                <h3 className="text-xl font-semibold text-white mb-3">
-                  {solution.title}
-                </h3>
-                <p className="text-slate-400 leading-relaxed">{solution.desc}</p>
-              </div>
+              <TiltCard className="h-full" tiltAmount={8}>
+                <div className="group relative p-8 rounded-2xl border border-slate-800 hover:border-blue-500/30 bg-slate-900/50 hover:bg-slate-900/80 transition-all duration-300 h-full shimmer">
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="relative">
+                    <div className="text-blue-400 mb-5 group-hover:scale-110 transition-transform origin-left">{solution.icon}</div>
+                    <h3 className="text-xl font-semibold text-white mb-3">
+                      {solution.title}
+                    </h3>
+                    <p className="text-slate-400 leading-relaxed">{solution.desc}</p>
+                  </div>
+                </div>
+              </TiltCard>
             </motion.div>
           ))}
         </div>
 
-        {/* Bottom highlights */}
+        {/* Highlight strip */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-12">
-          {[
-            { title: "Proven Success", desc: "Numerous small businesses turned into industry leaders." },
-            { title: "Holistic Approach", desc: "Cloud technology, marketing and acquisition combined." },
-            { title: "Experienced Team", desc: "Experts in finance, marketing, technology and operations." },
-            { title: "Tailored Solutions", desc: "Strategies as individual as your business." },
-          ].map((item, i) => (
+          {highlights.map((item, i) => (
             <motion.div
               key={item.title}
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.4, delay: 0.6 + 0.1 * i }}
-              className="p-5 rounded-xl border border-slate-800/50 bg-slate-900/30"
+              className="p-5 rounded-xl border border-slate-800/50 bg-slate-900/30 hover:bg-slate-900/60 transition-colors group"
             >
-              <h4 className="text-white font-semibold text-sm mb-1">{item.title}</h4>
+              <h4 className="text-white font-semibold text-sm mb-1 group-hover:text-blue-400 transition-colors">{item.title}</h4>
               <p className="text-slate-500 text-xs leading-relaxed">{item.desc}</p>
             </motion.div>
           ))}

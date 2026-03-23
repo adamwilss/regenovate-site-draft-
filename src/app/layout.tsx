@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import ClientShell from "@/components/ClientShell";
 
 export const metadata: Metadata = {
   title: "Regenovate — We Invest in Businesses Like Yours",
@@ -52,7 +53,9 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <ClientShell>{children}</ClientShell>
+      </body>
     </html>
   );
 }

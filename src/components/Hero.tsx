@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useCallback } from "react";
 import { ParticleTextEffect } from "@/components/ui/particle-text-effect";
 import { ParticleField } from "@/components/ui/particle-field";
+import { MagneticButton } from "@/components/ui/magnetic-button";
 
 const PARTICLE_COLORS = [
   { r: 52, g: 211, b: 153 },   // emerald — "Regenerate"
@@ -175,18 +176,20 @@ export default function Hero() {
           transition={{ duration: 0.6, delay: 0.7 }}
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
-          <a
+          <MagneticButton
             href="#approach"
-            className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-full transition-all hover:shadow-xl hover:shadow-blue-500/25 hover:-translate-y-0.5"
+            strength={0.25}
+            className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-full transition-all hover:shadow-xl hover:shadow-blue-500/25 inline-block"
           >
             Discover Our Approach
-          </a>
-          <a
+          </MagneticButton>
+          <MagneticButton
             href="#contact"
-            className="px-8 py-4 border border-slate-600 hover:border-blue-500 text-white font-semibold rounded-full transition-all hover:-translate-y-0.5"
+            strength={0.25}
+            className="px-8 py-4 border border-slate-600 hover:border-blue-500 text-white font-semibold rounded-full transition-all inline-block"
           >
             Get Started
-          </a>
+          </MagneticButton>
         </motion.div>
       </motion.div>
 

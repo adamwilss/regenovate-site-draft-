@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef } from "react";
+import { TextReveal } from "@/components/ui/text-reveal";
 
 export default function About() {
   const ref = useRef(null);
@@ -24,9 +25,7 @@ export default function About() {
               className="text-4xl md:text-5xl font-bold text-white leading-tight mb-6"
               style={{ fontFamily: "var(--font-serif)" }}
             >
-              20+ years perfecting
-              <br />
-              business transformation
+              <TextReveal delay={0.2}>20+ years perfecting business transformation</TextReveal>
             </h2>
             <div className="flex gap-6 mt-8">
               <div className="p-5 rounded-xl border border-slate-800 bg-slate-900/50 flex-1 text-center">
