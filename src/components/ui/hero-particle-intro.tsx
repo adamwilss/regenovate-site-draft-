@@ -25,7 +25,7 @@ class P {
     if (sm > this.frc) { sfx = (sfx / sm) * this.frc; sfy = (sfy / sm) * this.frc }
 
     this.vx += sfx; this.vy += sfy
-    this.x  += this.vx; this.y += this.vy
+    this.x  += this.vx; this.y  += this.vy
 
     if (this.blend < 1) this.blend = Math.min(1, this.blend + this.rate)
     this.r = this.sr + (this.tr - this.sr) * this.blend
@@ -40,17 +40,21 @@ class P {
     this.blend = 0; this.dead = false
   }
 
-  kill(cw: number, ch: number) {
+  // Burst outward from current position — target stays far away so
+  // particles keep moving until reformWord() redirects them.
+  burst() {
     if (this.dead) return
     this.dead = true
-    const a = Math.random() * Math.PI * 2
-    const d = Math.max(cw, ch) * (0.6 + Math.random() * 0.5)
-    this.tx = cw / 2 + Math.cos(a) * d
-    this.ty = ch / 2 + Math.sin(a) * d
-    this.sr = this.r | 0; this.sg = this.g | 0; this.sb = this.b | 0
-    this.tr = 2; this.tg = 6; this.tb = 23
+    const a    = Math.random() * Math.PI * 2
+    const spd  = 8 + Math.random() * 7
+    this.vx    = Math.cos(a) * spd
+    this.vy    = Math.sin(a) * spd
+    // Far target in same direction → steering force sustains velocity
+    this.tx    = this.x + Math.cos(a) * 3000
+    this.ty    = this.y + Math.sin(a) * 3000
+    this.sr    = this.r | 0; this.sg = this.g | 0; this.sb = this.b | 0
+    this.tr    = 2; this.tg = 6; this.tb = 23   // fade to bg colour
     this.blend = 0
-    this.spd = Math.min(this.spd * 2.2, 22)
   }
 }
 
@@ -82,24 +86,15 @@ function shuffle<T>(a: T[]): T[] {
 }
 
 // ─── Component ─────────────────────────────────────────────────────
-export interface HeroParticleIntroHandle {
-  skip: () => void
-}
-
 interface Props {
   onWordFormed: () => void
-  onComplete: () => void
+  onComplete:   () => void
 }
 
 export function HeroParticleIntro({ onWordFormed, onComplete }: Props) {
-  const canvasRef       = useRef<HTMLCanvasElement>(null)
-  const onFormedRef     = useRef(onWordFormed)
-  const onCompleteRef   = useRef(onComplete)
-  const phaseRef        = useRef(0)   // 0=forming 1=hold 2=burst 3=reform 4=hold2 5=done
-  const frameRef        = useRef(0)
-  const rafRef          = useRef<number>(0)
-  const doneRef         = useRef(false)
-
+  const canvasRef     = useRef<HTMLCanvasElement>(null)
+  const onFormedRef   = useRef(onWordFormed)
+  const onCompleteRef = useRef(onComplete)
   onFormedRef.current   = onWordFormed
   onCompleteRef.current = onComplete
 
@@ -107,8 +102,8 @@ export function HeroParticleIntro({ onWordFormed, onComplete }: Props) {
     const canvas = canvasRef.current
     if (!canvas) return
 
-    const W   = canvas.offsetWidth  || 1200
-    const H   = canvas.offsetHeight || 600
+    const W = canvas.offsetWidth  || 1200
+    const H = canvas.offsetHeight || 600
     canvas.width  = W
     canvas.height = H
 
@@ -118,19 +113,20 @@ export function HeroParticleIntro({ onWordFormed, onComplete }: Props) {
 
     const particles: P[] = []
     const mob  = W < 700
-    const STEP = mob ? 7 : 9   // fewer pixels sampled → fewer particles on mobile
+    const STEP = mob ? 7 : 9
 
-    // Font sizes
     const fSrc = Math.min(Math.max((W / (mob ? 10 : 20)) | 0, 30), 90)
-    const fFin = Math.min(Math.max((W / (mob ? 7  : 12)) | 0, 40), 120)
+    // Final word same density as source — the SAME dots reform it
+    const fFin = Math.min(Math.max((W / (mob ? 8  : 15)) | 0, 36), 100)
 
     const WHITE: [number, number, number] = [255, 255, 255]
     const BLUE:  [number, number, number] = [96,  165, 250]
 
-    // ── Phase thresholds (frames @ ~60 fps) ──────────────────────
-    const T = { hold: 155, burst: 205, reform: 248, hold2: 430, done: 520 }
+    // ── Phase thresholds ─────────────────────────────────────────
+    // 0 forming → 1 hold → 2 burst → 3 reform → 4 hold2 → 5 done
+    const T = { hold: 155, burst: 205, reform: 240, hold2: 430, done: 520 }
 
-    // ── Form both source words ────────────────────────────────────
+    // ── Build source words ────────────────────────────────────────
     const formWords = () => {
       const cx1 = mob ? W * 0.5 : W * 0.28
       const cy1 = mob ? H * 0.37 : H * 0.5
@@ -138,61 +134,61 @@ export function HeroParticleIntro({ onWordFormed, onComplete }: Props) {
       const cy2 = mob ? H * 0.63 : H * 0.5
 
       type Tagged = { x: number; y: number; c: [number,number,number]; left: boolean }
-
       const rPts: Tagged[] = shuffle(textPositions("Regenerate", cx1, cy1, fSrc, W, H, STEP))
         .map(p => ({ ...p, c: WHITE, left: true  }))
       const iPts: Tagged[] = shuffle(textPositions("Innovate",   cx2, cy2, fSrc, W, H, STEP))
         .map(p => ({ ...p, c: BLUE,  left: false }))
 
       for (const pos of [...rPts, ...iPts]) {
-        const p     = new P()
-        p.x         = pos.left ? -80 - Math.random() * 80 : W + Math.random() * 80
-        p.y         = H * 0.3 + Math.random() * H * 0.4
-        p.vx        = pos.left ? Math.random() * 3 : -Math.random() * 3
-        p.spd       = Math.random() * 4 + 7
-        p.frc       = p.spd * 0.07
-        p.rate      = Math.random() * 0.025 + 0.012
-        // Pre-set to target colour so no colour-blend on initial fly-in
+        const p   = new P()
+        p.x       = pos.left ? -80 - Math.random() * 80 : W + Math.random() * 80
+        p.y       = H * 0.3 + Math.random() * H * 0.4
+        p.vx      = pos.left ? Math.random() * 3 : -Math.random() * 3
+        p.spd     = Math.random() * 4 + 7
+        p.frc     = p.spd * 0.07
+        p.rate    = Math.random() * 0.025 + 0.012
         p.r = p.sr = p.tr = pos.c[0]
         p.g = p.sg = p.tg = pos.c[1]
         p.b = p.sb = p.tb = pos.c[2]
-        p.blend     = 1
+        p.blend   = 1
         p.setTarget(pos.x, pos.y, pos.c[0], pos.c[1], pos.c[2])
         particles.push(p)
       }
     }
 
-    // ── Reform as final word ──────────────────────────────────────
+    // ── Reform: redirect the SAME particles to Regenovate ─────────
     const reformWord = () => {
       const pts = shuffle(textPositions("Regenovate", W * 0.5, H * 0.5, fFin, W, H, STEP))
-      let idx = 0
 
-      for (const pos of pts) {
-        let p: P
-        if (idx < particles.length) {
-          p = particles[idx]
-          p.dead   = false
-          p.spd    = Math.random() * 4 + 6
-          p.frc    = p.spd * 0.07
-        } else {
-          p = new P()
-          p.x      = Math.random() * W
-          p.y      = Math.random() * H
-          p.spd    = Math.random() * 4 + 6
-          p.frc    = p.spd * 0.07
-          particles.push(p)
-        }
+      // Redirect existing particles (including mid-burst ones)
+      for (let i = 0; i < Math.min(pts.length, particles.length); i++) {
+        const p  = particles[i]
+        const pos = pts[i]
+        p.spd    = Math.random() * 5 + 12  // fast so they snap back
+        p.frc    = p.spd * 0.08
+        p.rate   = Math.random() * 0.02 + 0.015
         p.setTarget(pos.x, pos.y, 255, 255, 255)
-        idx++
       }
-      for (let i = idx; i < particles.length; i++) particles[i].kill(W, H)
+
+      // Excess particles (source had more than Regenovate needs) → fade out
+      for (let i = pts.length; i < particles.length; i++) {
+        const p = particles[i]
+        if (!p.dead) p.burst()
+        // Move target off-screen so they leave permanently
+        const a = Math.random() * Math.PI * 2
+        p.tx = W / 2 + Math.cos(a) * (W + 200)
+        p.ty = H / 2 + Math.sin(a) * (H + 200)
+      }
     }
 
     formWords()
 
-    // ── Animation loop ────────────────────────────────────────────
+    let phase = 0
+    let frame = 0
+    let done  = false
+    let rafId = 0
+
     const tick = () => {
-      // Semi-transparent clear → motion trail
       ctx.fillStyle = "rgba(2,6,23,0.22)"
       ctx.fillRect(0, 0, W, H)
 
@@ -201,28 +197,25 @@ export function HeroParticleIntro({ onWordFormed, onComplete }: Props) {
         p.update()
         ctx.fillStyle = `rgb(${p.r | 0},${p.g | 0},${p.b | 0})`
         ctx.fillRect(p.x | 0, p.y | 0, 2, 2)
-        // Prune dead particles that have left the viewport
-        if (p.dead && (p.x < -160 || p.x > W + 160 || p.y < -160 || p.y > H + 160))
+
+        // Only prune once we're past hold2 — during burst/reform keep ALL particles
+        if (phase >= 4 && p.dead &&
+            (p.x < -200 || p.x > W + 200 || p.y < -200 || p.y > H + 200))
           particles.splice(i, 1)
       }
 
-      const f = ++frameRef.current
-      const ph = phaseRef.current
+      frame++
+      if (phase === 0 && frame >= T.hold)   phase = 1
+      if (phase === 1 && frame >= T.burst)  { phase = 2; particles.forEach(p => p.burst()) }
+      if (phase === 2 && frame >= T.reform) { phase = 3; reformWord() }
+      if (phase === 3 && frame >= T.hold2)  { phase = 4; onFormedRef.current() }
+      if (phase === 4 && frame >= T.done && !done) { done = true; onCompleteRef.current() }
 
-      if (ph === 0 && f >= T.hold)   phaseRef.current = 1
-      if (ph === 1 && f >= T.burst)  { phaseRef.current = 2; particles.forEach(p => p.kill(W, H)) }
-      if (ph === 2 && f >= T.reform) { phaseRef.current = 3; reformWord() }
-      if (ph === 3 && f >= T.hold2)  { phaseRef.current = 4; onFormedRef.current() }
-      if (ph === 4 && f >= T.done && !doneRef.current) {
-        doneRef.current = true
-        onCompleteRef.current()
-      }
-
-      rafRef.current = requestAnimationFrame(tick)
+      rafId = requestAnimationFrame(tick)
     }
 
-    rafRef.current = requestAnimationFrame(tick)
-    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
+    rafId = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(rafId)
   }, [])
 
   return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full block" />
