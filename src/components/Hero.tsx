@@ -2,23 +2,81 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
-import { GooeyText } from "@/components/ui/gooey-text-morphing";
 import { ParticleField } from "@/components/ui/particle-field";
 import { MagneticButton } from "@/components/ui/magnetic-button";
 
-const CONTENT_DELAY = 12;
+// ─── Phase timeline ───────────────────────────────────────────────
+// "enter"    0 ms  → words fly in from both sides
+// "converge" 2200ms → words accelerate toward centre
+// "collide"  3500ms → flash + REGENOVATE crystallises
+// "hold"     4200ms → REGENOVATE rests, equation subtitle appears
+// "done"     8000ms → intro fades, main content reveals
+// ─────────────────────────────────────────────────────────────────
+type Phase = "enter" | "converge" | "collide" | "hold" | "done";
+
+const PHASE_TIMINGS: [Phase, number][] = [
+  ["enter",    0],
+  ["converge", 2200],
+  ["collide",  3500],
+  ["hold",     4200],
+  ["done",     8000],
+];
 
 export default function Hero() {
+  const [phase, setPhase] = useState<Phase>("enter");
   const [showContent, setShowContent] = useState(false);
+  const [flash, setFlash] = useState(false);
+  const [revealWord, setRevealWord] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowContent(true), CONTENT_DELAY * 1000);
-    return () => clearTimeout(timer);
+    const timers = PHASE_TIMINGS.slice(1).map(([p, ms]) =>
+      setTimeout(() => {
+        setPhase(p);
+        if (p === "collide") {
+          setFlash(true);
+          setTimeout(() => setFlash(false), 700);
+        }
+        if (p === "hold") setRevealWord(true);
+        if (p === "done") setShowContent(true);
+      }, ms)
+    );
+    return () => timers.forEach(clearTimeout);
   }, []);
+
+  const skipIntro = () => {
+    setRevealWord(true);
+    setPhase("done");
+    setShowContent(true);
+  };
+
+  // ─── x values for each word at each phase ─────────────────────
+  const leftX: Record<Phase, string> = {
+    enter:    "-28vw",
+    converge: "-5vw",
+    collide:  "0vw",
+    hold:     "0vw",
+    done:     "0vw",
+  };
+  const rightX: Record<Phase, string> = {
+    enter:    "28vw",
+    converge: "5vw",
+    collide:  "0vw",
+    hold:     "0vw",
+    done:     "0vw",
+  };
+  const wordOpacity = (at: Phase): number =>
+    at === "collide" || at === "hold" || at === "done" ? 0 : 1;
+
+  const transition = (at: Phase) =>
+    at === "enter"
+      ? { duration: 1.6, ease: [0.16, 1, 0.3, 1] as const }
+      : at === "converge"
+      ? { duration: 1.1, ease: "easeInOut" as const }
+      : { duration: 0.35, ease: "easeIn" as const };
 
   return (
     <header className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Interactive particle field */}
+      {/* Particle field */}
       <ParticleField
         particleCount={90}
         connectionDistance={130}
@@ -38,49 +96,125 @@ export default function Hero() {
       <div
         className="absolute inset-0 opacity-[0.02] z-[2]"
         style={{
-          backgroundImage: "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)",
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)",
           backgroundSize: "60px 60px",
         }}
       />
 
-      {/* === GOOEY TEXT MORPHING ANIMATION === */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: showContent ? 0 : 1 }}
-        transition={{ duration: 1.5 }}
-        className="absolute inset-0 z-[10] flex flex-col items-center justify-center pointer-events-none"
-      >
-        <GooeyText
-          texts={["Regenerate", "Innovate", "Regenovate"]}
-          morphTime={1.5}
-          cooldownTime={3}
-          className="h-[120px] md:h-[160px] w-full"
-          textClassName="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold text-white"
-        />
+      {/* ═══════════════════════════════════════════════════════
+          INTRO ANIMATION
+      ═══════════════════════════════════════════════════════ */}
+      <AnimatePresence>
+        {phase !== "done" && (
+          <motion.div
+            key="intro"
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.5 }}
+            className="absolute inset-0 z-[10] flex flex-col items-center justify-center pointer-events-none select-none"
+          >
+            {/*
+              All three words sit in the same CSS grid cell so they
+              naturally overlap at dead centre. Framer Motion x offsets
+              them left/right during the intro, then converge to 0.
+            */}
+            <div className="grid place-items-center h-40 md:h-52 w-full overflow-visible">
 
-        {/* Subtitle */}
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1 }}
-          className="text-slate-400 text-sm sm:text-base tracking-[0.25em] uppercase mt-4"
-        >
-          Regenerate + Innovate = Regenovate
-        </motion.p>
+              {/* REGENERATE ← from left */}
+              <motion.span
+                style={{ gridArea: "1/1", fontFamily: "var(--font-serif)" }}
+                initial={{ x: "-110vw", opacity: 0 }}
+                animate={{ x: leftX[phase], opacity: wordOpacity(phase) }}
+                transition={transition(phase)}
+                className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white whitespace-nowrap"
+              >
+                Regenerate
+              </motion.span>
 
-        {/* Skip button */}
-        <motion.button
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 3 }}
-          onClick={() => setShowContent(true)}
-          className="mt-12 text-xs text-slate-600 hover:text-slate-400 transition-colors tracking-wider uppercase pointer-events-auto"
-        >
-          Skip intro
-        </motion.button>
-      </motion.div>
+              {/* INNOVATE → from right */}
+              <motion.span
+                style={{ gridArea: "1/1", fontFamily: "var(--font-serif)" }}
+                initial={{ x: "110vw", opacity: 0 }}
+                animate={{ x: rightX[phase], opacity: wordOpacity(phase) }}
+                transition={transition(phase)}
+                className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-blue-400 whitespace-nowrap"
+              >
+                Innovate
+              </motion.span>
 
-      {/* === MAIN HERO CONTENT === */}
+              {/* ✦ Collision flash ✦ */}
+              <AnimatePresence>
+                {flash && (
+                  <motion.div
+                    key="flash"
+                    style={{ gridArea: "1/1" }}
+                    initial={{ opacity: 0, scale: 0.2 }}
+                    animate={{ opacity: [0, 1, 0.6, 0], scale: [0.2, 1.4, 2.5, 4] }}
+                    transition={{ duration: 0.7, ease: "easeOut" }}
+                    className="w-72 h-72 rounded-full bg-blue-400/25 blur-3xl pointer-events-none"
+                  />
+                )}
+              </AnimatePresence>
+
+              {/* ✦ Secondary ring burst ✦ */}
+              <AnimatePresence>
+                {flash && (
+                  <motion.div
+                    key="ring"
+                    style={{ gridArea: "1/1" }}
+                    initial={{ opacity: 0.8, scale: 0.1, borderWidth: 2 }}
+                    animate={{ opacity: 0, scale: 3, borderWidth: 0 }}
+                    transition={{ duration: 0.9, ease: "easeOut" }}
+                    className="w-48 h-48 rounded-full border border-blue-400 pointer-events-none"
+                  />
+                )}
+              </AnimatePresence>
+
+              {/* REGENOVATE — crystallises from centre */}
+              <AnimatePresence>
+                {revealWord && (
+                  <motion.span
+                    key="regenovate"
+                    style={{ gridArea: "1/1", fontFamily: "var(--font-serif)" }}
+                    initial={{ opacity: 0, scale: 0.88, filter: "blur(24px)" }}
+                    animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                    exit={{ opacity: 0, filter: "blur(12px)" }}
+                    transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                    className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white whitespace-nowrap"
+                  >
+                    Regenovate
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Equation subtitle */}
+            <motion.p
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: revealWord ? 1 : 0, y: revealWord ? 0 : 8 }}
+              transition={{ duration: 0.9, delay: 0.4 }}
+              className="mt-4 text-slate-400 text-xs sm:text-sm tracking-[0.3em] uppercase"
+            >
+              Regenerate + Innovate = Regenovate
+            </motion.p>
+
+            {/* Skip button */}
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 2.5 }}
+              onClick={skipIntro}
+              className="mt-14 text-xs text-slate-600 hover:text-slate-400 transition-colors tracking-wider uppercase pointer-events-auto cursor-pointer"
+            >
+              Skip intro
+            </motion.button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ═══════════════════════════════════════════════════════
+          MAIN HERO CONTENT
+      ═══════════════════════════════════════════════════════ */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={showContent ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
