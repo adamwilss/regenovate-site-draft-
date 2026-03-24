@@ -1,82 +1,139 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ParticleField } from "@/components/ui/particle-field";
 import { MagneticButton } from "@/components/ui/magnetic-button";
 
-// ─── Phase timeline ───────────────────────────────────────────────
-// "enter"    0 ms  → words fly in from both sides
-// "converge" 2200ms → words accelerate toward centre
-// "collide"  3500ms → flash + REGENOVATE crystallises
-// "hold"     4200ms → REGENOVATE rests, equation subtitle appears
-// "done"     8000ms → intro fades, main content reveals
-// ─────────────────────────────────────────────────────────────────
-type Phase = "enter" | "converge" | "collide" | "hold" | "done";
+// ─── Letter mapping ────────────────────────────────────────────────
+// "Regenovate" = "Regen" (from Regenerate[0-4]) + "ovate" (from Innovate[3-7])
+//
+// Regenerate: R e g e n | e r a t e  ← last 5 scatter
+// Innovate:   I n n | o v a t e      ← first 3 scatter
+// ──────────────────────────────────────────────────────────────────
 
-const PHASE_TIMINGS: [Phase, number][] = [
-  ["enter",    0],
-  ["converge", 2200],
-  ["collide",  3500],
-  ["hold",     4200],
-  ["done",     8000],
+const REGEN = "Regenerate".split("");
+const INNO  = "Innovate".split("");
+const FINAL = "Regenovate".split("");
+
+type Src = "regen" | "inno";
+const LETTER_MAP: { src: Src; idx: number }[] = [
+  { src: "regen", idx: 0 }, // R
+  { src: "regen", idx: 1 }, // e
+  { src: "regen", idx: 2 }, // g
+  { src: "regen", idx: 3 }, // e
+  { src: "regen", idx: 4 }, // n
+  { src: "inno",  idx: 3 }, // o
+  { src: "inno",  idx: 4 }, // v
+  { src: "inno",  idx: 5 }, // a
+  { src: "inno",  idx: 6 }, // t
+  { src: "inno",  idx: 7 }, // e
 ];
+const REGEN_DISCARD = [5, 6, 7, 8, 9]; // e r a t e
+const INNO_DISCARD  = [0, 1, 2];        // I n n
+
+// ─── Types ────────────────────────────────────────────────────────
+interface FlyLetter {
+  letter: string;
+  tgtTop: number; tgtLeft: number;   // fixed-position target
+  ox: number; oy: number;            // initial offset from target
+  delay: number;
+  isInno: boolean;
+}
+interface ScatLetter {
+  letter: string;
+  top: number; left: number;
+  dx: number; dy: number;
+  delay: number;
+  isInno: boolean;
+}
+
+// ─── Shared text class ────────────────────────────────────────────
+const TEXT_CLS =
+  "text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold whitespace-nowrap leading-none";
 
 export default function Hero() {
-  const [phase, setPhase] = useState<Phase>("enter");
+  const [srcVisible,  setSrcVisible]  = useState(true);
+  const [flying,      setFlying]      = useState(false);
+  const [tgtVisible,  setTgtVisible]  = useState(false);
   const [showContent, setShowContent] = useState(false);
-  const [flash, setFlash] = useState(false);
-  const [revealWord, setRevealWord] = useState(false);
+  const [flyLetters,  setFlyLetters]  = useState<FlyLetter[]>([]);
+  const [scatLetters, setScatLetters] = useState<ScatLetter[]>([]);
+
+  const regenRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const innoRefs  = useRef<(HTMLSpanElement | null)[]>([]);
+  const tgtRefs   = useRef<(HTMLSpanElement | null)[]>([]);
 
   useEffect(() => {
-    const timers = PHASE_TIMINGS.slice(1).map(([p, ms]) =>
-      setTimeout(() => {
-        setPhase(p);
-        if (p === "collide") {
-          setFlash(true);
-          setTimeout(() => setFlash(false), 700);
-        }
-        if (p === "hold") setRevealWord(true);
-        if (p === "done") setShowContent(true);
-      }, ms)
-    );
-    return () => timers.forEach(clearTimeout);
+    // t=3 s: words have settled — compute positions & start fly
+    const tFly = setTimeout(() => {
+      const rR = regenRefs.current.map(r => r?.getBoundingClientRect());
+      const iR = innoRefs.current.map(r => r?.getBoundingClientRect());
+      const tR = tgtRefs.current.map(r => r?.getBoundingClientRect());
+
+      const fly: FlyLetter[] = LETTER_MAP.map((m, i) => {
+        const src = m.src === "regen" ? rR[m.idx] : iR[m.idx];
+        const tgt = tR[i];
+        if (!src || !tgt) return null;
+        return {
+          letter: FINAL[i],
+          tgtTop:  tgt.top,
+          tgtLeft: tgt.left,
+          ox: src.left - tgt.left,
+          oy: src.top  - tgt.top,
+          delay: i * 0.05,
+          isInno: m.src === "inno",
+        };
+      }).filter(Boolean) as FlyLetter[];
+
+      const scat: ScatLetter[] = [
+        ...REGEN_DISCARD.map((idx, i) => {
+          const r = rR[idx]; if (!r) return null;
+          return {
+            letter: REGEN[idx], top: r.top, left: r.left,
+            dx: (Math.random() - 0.5) * 500,
+            dy: 80 + Math.random() * 250,
+            delay: i * 0.06, isInno: false,
+          };
+        }),
+        ...INNO_DISCARD.map((idx, i) => {
+          const r = iR[idx]; if (!r) return null;
+          return {
+            letter: INNO[idx], top: r.top, left: r.left,
+            dx: (Math.random() - 0.5) * 500,
+            dy: 80 + Math.random() * 250,
+            delay: i * 0.06, isInno: true,
+          };
+        }),
+      ].filter(Boolean) as ScatLetter[];
+
+      setFlyLetters(fly);
+      setScatLetters(scat);
+      setSrcVisible(false);
+      setFlying(true);
+    }, 3000);
+
+    // t=4.2 s: flying letters arrive — show assembled word
+    const tAssemble = setTimeout(() => {
+      setTgtVisible(true);
+      setFlying(false);
+    }, 4200);
+
+    // t=8 s: show main content
+    const tContent = setTimeout(() => setShowContent(true), 8000);
+
+    return () => [tFly, tAssemble, tContent].forEach(clearTimeout);
   }, []);
 
   const skipIntro = () => {
-    setRevealWord(true);
-    setPhase("done");
+    setSrcVisible(false);
+    setFlying(false);
+    setTgtVisible(true);
     setShowContent(true);
   };
 
-  // ─── x values for each word at each phase ─────────────────────
-  const leftX: Record<Phase, string> = {
-    enter:    "-28vw",
-    converge: "-5vw",
-    collide:  "0vw",
-    hold:     "0vw",
-    done:     "0vw",
-  };
-  const rightX: Record<Phase, string> = {
-    enter:    "28vw",
-    converge: "5vw",
-    collide:  "0vw",
-    hold:     "0vw",
-    done:     "0vw",
-  };
-  const wordOpacity = (at: Phase): number =>
-    at === "collide" || at === "hold" || at === "done" ? 0 : 1;
-
-  const transition = (at: Phase) =>
-    at === "enter"
-      ? { duration: 1.6, ease: [0.16, 1, 0.3, 1] as const }
-      : at === "converge"
-      ? { duration: 1.1, ease: "easeInOut" as const }
-      : { duration: 0.35, ease: "easeIn" as const };
-
   return (
     <header className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Particle field */}
       <ParticleField
         particleCount={90}
         connectionDistance={130}
@@ -88,7 +145,7 @@ export default function Hero() {
       {/* Background orbs */}
       <div className="absolute inset-0 overflow-hidden z-[1]">
         <div className="orb w-[600px] h-[600px] bg-blue-600/20 -top-48 -left-48" style={{ animationDelay: "0s" }} />
-        <div className="orb w-[500px] h-[500px] bg-blue-500/15 top-1/3 right-[-10%]" style={{ animationDelay: "-7s" }} />
+        <div className="orb w-[500px] h-[500px] bg-blue-500/15 top-1/3 right-[-10%]"  style={{ animationDelay: "-7s" }} />
         <div className="orb w-[400px] h-[400px] bg-blue-400/10 bottom-[-10%] left-1/3" style={{ animationDelay: "-14s" }} />
       </div>
 
@@ -102,88 +159,106 @@ export default function Hero() {
         }}
       />
 
-      {/* ═══════════════════════════════════════════════════════
-          INTRO ANIMATION
-      ═══════════════════════════════════════════════════════ */}
+      {/* ═══ INTRO LAYER ══════════════════════════════════════════ */}
       <AnimatePresence>
-        {phase !== "done" && (
+        {!showContent && (
           <motion.div
             key="intro"
             exit={{ opacity: 0 }}
             transition={{ duration: 1.5 }}
             className="absolute inset-0 z-[10] flex flex-col items-center justify-center pointer-events-none select-none"
           >
-            {/*
-              All three words sit in the same CSS grid cell so they
-              naturally overlap at dead centre. Framer Motion x offsets
-              them left/right during the intro, then converge to 0.
-            */}
-            <div className="grid place-items-center h-40 md:h-52 w-full overflow-visible">
+            {/* Word stage — grid stacks all layers in one cell */}
+            <div className="grid place-items-center w-full h-32 md:h-44">
 
-              {/* REGENERATE ← from left */}
-              <motion.span
-                style={{ gridArea: "1/1", fontFamily: "var(--font-serif)" }}
-                initial={{ x: "-110vw", opacity: 0 }}
-                animate={{ x: leftX[phase], opacity: wordOpacity(phase) }}
-                transition={transition(phase)}
-                className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white whitespace-nowrap"
-              >
-                Regenerate
-              </motion.span>
-
-              {/* INNOVATE → from right */}
-              <motion.span
-                style={{ gridArea: "1/1", fontFamily: "var(--font-serif)" }}
-                initial={{ x: "110vw", opacity: 0 }}
-                animate={{ x: rightX[phase], opacity: wordOpacity(phase) }}
-                transition={transition(phase)}
-                className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-blue-400 whitespace-nowrap"
-              >
-                Innovate
-              </motion.span>
-
-              {/* ✦ Collision flash ✦ */}
-              <AnimatePresence>
-                {flash && (
+              {/* ── Source words ── */}
+              {srcVisible && (
+                <div
+                  className="flex items-center justify-center gap-6 md:gap-14"
+                  style={{ gridArea: "1/1" }}
+                >
+                  {/* Regenerate */}
                   <motion.div
-                    key="flash"
-                    style={{ gridArea: "1/1" }}
-                    initial={{ opacity: 0, scale: 0.2 }}
-                    animate={{ opacity: [0, 1, 0.6, 0], scale: [0.2, 1.4, 2.5, 4] }}
-                    transition={{ duration: 0.7, ease: "easeOut" }}
-                    className="w-72 h-72 rounded-full bg-blue-400/25 blur-3xl pointer-events-none"
-                  />
-                )}
-              </AnimatePresence>
-
-              {/* ✦ Secondary ring burst ✦ */}
-              <AnimatePresence>
-                {flash && (
-                  <motion.div
-                    key="ring"
-                    style={{ gridArea: "1/1" }}
-                    initial={{ opacity: 0.8, scale: 0.1, borderWidth: 2 }}
-                    animate={{ opacity: 0, scale: 3, borderWidth: 0 }}
-                    transition={{ duration: 0.9, ease: "easeOut" }}
-                    className="w-48 h-48 rounded-full border border-blue-400 pointer-events-none"
-                  />
-                )}
-              </AnimatePresence>
-
-              {/* REGENOVATE — crystallises from centre */}
-              <AnimatePresence>
-                {revealWord && (
-                  <motion.span
-                    key="regenovate"
-                    style={{ gridArea: "1/1", fontFamily: "var(--font-serif)" }}
-                    initial={{ opacity: 0, scale: 0.88, filter: "blur(24px)" }}
-                    animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                    exit={{ opacity: 0, filter: "blur(12px)" }}
-                    transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-                    className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white whitespace-nowrap"
+                    className="flex"
+                    initial={{ x: "-70vw", opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
                   >
-                    Regenovate
-                  </motion.span>
+                    {REGEN.map((l, i) => (
+                      <span
+                        key={i}
+                        ref={el => { regenRefs.current[i] = el; }}
+                        className={`${TEXT_CLS} text-white`}
+                        style={{ fontFamily: "var(--font-serif)" }}
+                      >
+                        {l}
+                      </span>
+                    ))}
+                  </motion.div>
+
+                  {/* Innovate */}
+                  <motion.div
+                    className="flex"
+                    initial={{ x: "70vw", opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    {INNO.map((l, i) => (
+                      <span
+                        key={i}
+                        ref={el => { innoRefs.current[i] = el; }}
+                        className={`${TEXT_CLS} text-blue-400`}
+                        style={{ fontFamily: "var(--font-serif)" }}
+                      >
+                        {l}
+                      </span>
+                    ))}
+                  </motion.div>
+                </div>
+              )}
+
+              {/* ── Invisible target for measuring final letter positions ── */}
+              <div
+                className="flex opacity-0 pointer-events-none"
+                style={{ gridArea: "1/1" }}
+                aria-hidden
+              >
+                {FINAL.map((l, i) => (
+                  <span
+                    key={i}
+                    ref={el => { tgtRefs.current[i] = el; }}
+                    className={`${TEXT_CLS} text-white`}
+                    style={{ fontFamily: "var(--font-serif)" }}
+                  >
+                    {l}
+                  </span>
+                ))}
+              </div>
+
+              {/* ── Assembled "Regenovate" ── */}
+              <AnimatePresence>
+                {tgtVisible && (
+                  <motion.div
+                    key="assembled"
+                    className="flex"
+                    style={{ gridArea: "1/1" }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    {FINAL.map((l, i) => (
+                      <motion.span
+                        key={i}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: i * 0.04, duration: 0.3 }}
+                        className={`${TEXT_CLS} text-white`}
+                        style={{ fontFamily: "var(--font-serif)" }}
+                      >
+                        {l}
+                      </motion.span>
+                    ))}
+                  </motion.div>
                 )}
               </AnimatePresence>
             </div>
@@ -191,20 +266,20 @@ export default function Hero() {
             {/* Equation subtitle */}
             <motion.p
               initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: revealWord ? 1 : 0, y: revealWord ? 0 : 8 }}
-              transition={{ duration: 0.9, delay: 0.4 }}
-              className="mt-4 text-slate-400 text-xs sm:text-sm tracking-[0.3em] uppercase"
+              animate={{ opacity: tgtVisible ? 1 : 0, y: tgtVisible ? 0 : 8 }}
+              transition={{ duration: 0.9, delay: 0.5 }}
+              className="mt-5 text-slate-400 text-xs sm:text-sm tracking-[0.3em] uppercase"
             >
               Regenerate + Innovate = Regenovate
             </motion.p>
 
-            {/* Skip button */}
+            {/* Skip */}
             <motion.button
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 2.5 }}
+              transition={{ delay: 2 }}
               onClick={skipIntro}
-              className="mt-14 text-xs text-slate-600 hover:text-slate-400 transition-colors tracking-wider uppercase pointer-events-auto cursor-pointer"
+              className="mt-12 text-xs text-slate-600 hover:text-slate-400 transition-colors tracking-wider uppercase pointer-events-auto cursor-pointer"
             >
               Skip intro
             </motion.button>
@@ -212,9 +287,57 @@ export default function Hero() {
         )}
       </AnimatePresence>
 
-      {/* ═══════════════════════════════════════════════════════
-          MAIN HERO CONTENT
-      ═══════════════════════════════════════════════════════ */}
+      {/* ═══ FLYING LETTERS (fixed-positioned, travel to target) ══ */}
+      {flying &&
+        flyLetters.map((fl, i) => (
+          <motion.span
+            key={`fly-${i}`}
+            className={`${TEXT_CLS} fixed pointer-events-none`}
+            style={{
+              top: fl.tgtTop,
+              left: fl.tgtLeft,
+              fontFamily: "var(--font-serif)",
+              color: fl.isInno ? "#93c5fd" : "#ffffff",
+              zIndex: 30,
+              userSelect: "none",
+            }}
+            initial={{ x: fl.ox, y: fl.oy, opacity: 1 }}
+            animate={{ x: 0, y: 0, opacity: 0 }}
+            transition={{ duration: 0.72, delay: fl.delay, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {fl.letter}
+          </motion.span>
+        ))}
+
+      {/* ═══ SCATTER LETTERS (discard — fall and fade) ════════════ */}
+      {flying &&
+        scatLetters.map((sl, i) => (
+          <motion.span
+            key={`scat-${i}`}
+            className={`${TEXT_CLS} fixed pointer-events-none`}
+            style={{
+              top: sl.top,
+              left: sl.left,
+              fontFamily: "var(--font-serif)",
+              color: sl.isInno ? "#60a5fa" : "#94a3b8",
+              zIndex: 30,
+              userSelect: "none",
+            }}
+            initial={{ x: 0, y: 0, opacity: 1, scale: 1, rotate: 0 }}
+            animate={{
+              x: sl.dx,
+              y: sl.dy,
+              opacity: 0,
+              scale: 0.15,
+              rotate: (Math.random() - 0.5) * 180,
+            }}
+            transition={{ duration: 0.85, delay: sl.delay, ease: "easeIn" }}
+          >
+            {sl.letter}
+          </motion.span>
+        ))}
+
+      {/* ═══ MAIN HERO CONTENT ════════════════════════════════════ */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={showContent ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
