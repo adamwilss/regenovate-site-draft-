@@ -7,13 +7,9 @@ import { MagneticButton } from "@/components/ui/magnetic-button";
 import { HeroParticleIntro } from "@/components/ui/hero-particle-intro";
 
 export default function Hero() {
-  const [showContent,  setShowContent]  = useState(false);
-  const [showEquation, setShowEquation] = useState(false);
+  const [showContent, setShowContent] = useState(false);
 
-  const skipIntro = () => {
-    setShowEquation(true);
-    setShowContent(true);
-  };
+  const skipIntro = () => setShowContent(true);
 
   return (
     <header className="relative h-screen flex items-center justify-center overflow-hidden">
@@ -54,29 +50,12 @@ export default function Hero() {
           >
             {/* Canvas fills the entire intro layer */}
             <HeroParticleIntro
-              onWordFormed={() => setShowEquation(true)}
+              onWordFormed={() => {}}
               onComplete={() => setShowContent(true)}
             />
 
-            {/* Overlays */}
-            <div className="absolute inset-0 flex flex-col items-center justify-end pb-20 pointer-events-none select-none">
-              {/* Equation — appears when Regenovate is formed */}
-              <AnimatePresence>
-                {showEquation && (
-                  <motion.p
-                    key="eq"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.9 }}
-                    className="text-slate-400 text-xs sm:text-sm tracking-[0.3em] uppercase mb-6"
-                  >
-                    Regenerate + Innovate = Regenovate
-                  </motion.p>
-                )}
-              </AnimatePresence>
-
-              {/* Skip button */}
+            {/* Skip button */}
+            <div className="absolute inset-0 flex flex-col items-center justify-end pb-10 pointer-events-none select-none">
               <motion.button
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -115,36 +94,37 @@ export default function Hero() {
         <h1
           className="font-bold mb-8"
           style={{
-            fontFamily: "var(--font-serif)",
-            lineHeight: 0.92,
+            fontFamily: '"DM Serif Display", "Playfair Display", serif',
+            lineHeight: 1.05,
           }}
         >
-          <div className="overflow-hidden">
+          {/* pb-[0.2em] on each wrapper gives descenders room so nothing is clipped */}
+          <div className="overflow-hidden pb-[0.2em]">
             <motion.span
-              className="block text-[clamp(2.8rem,8vw,7.5rem)] text-white"
-              initial={{ y: "110%" }}
-              animate={showContent ? { y: 0 } : { y: "110%" }}
-              transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1], delay: 0.06 }}
+              className="block text-[clamp(3rem,9vw,8.5rem)] text-white"
+              initial={{ y: "115%" }}
+              animate={showContent ? { y: 0 } : { y: "115%" }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.06 }}
             >
               We invest in
             </motion.span>
           </div>
-          <div className="overflow-hidden">
+          <div className="overflow-hidden pb-[0.2em]">
             <motion.span
-              className="block text-[clamp(2.8rem,8vw,7.5rem)] text-white"
-              initial={{ y: "110%" }}
-              animate={showContent ? { y: 0 } : { y: "110%" }}
-              transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1], delay: 0.18 }}
+              className="block text-[clamp(3rem,9vw,8.5rem)] text-white"
+              initial={{ y: "115%" }}
+              animate={showContent ? { y: 0 } : { y: "115%" }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
             >
               businesses
             </motion.span>
           </div>
-          <div className="overflow-hidden">
+          <div className="overflow-hidden pb-[0.3em]">
             <motion.span
-              className="block text-[clamp(2.8rem,8vw,7.5rem)] italic gradient-text"
-              initial={{ y: "110%" }}
-              animate={showContent ? { y: 0 } : { y: "110%" }}
-              transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
+              className="block text-[clamp(3rem,9vw,8.5rem)] italic gradient-text"
+              initial={{ y: "115%" }}
+              animate={showContent ? { y: 0 } : { y: "115%" }}
+              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.34 }}
             >
               like yours.
             </motion.span>
