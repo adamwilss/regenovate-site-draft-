@@ -92,66 +92,97 @@ export default function Hero() {
       </AnimatePresence>
 
       {/* ═══ MAIN HERO CONTENT ════════════════════════════════════ */}
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={showContent ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-        transition={{ duration: 1, ease: "easeOut" }}
-        className="relative z-10 max-w-5xl mx-auto px-6 text-center"
-      >
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={showContent ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="text-blue-400 text-sm font-semibold tracking-[0.2em] uppercase mb-6"
-        >
-          We Invest, Partner &amp; Acquire
-        </motion.p>
+      <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
 
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={showContent ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.1] mb-8"
+        {/* Eyebrow — clips up */}
+        <div className="overflow-hidden mb-8">
+          <motion.p
+            initial={{ y: "110%" }}
+            animate={showContent ? { y: 0 } : { y: "110%" }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className="text-blue-400 text-xs tracking-[0.4em] uppercase font-medium"
+          >
+            Invest &nbsp;·&nbsp; Partner &nbsp;·&nbsp; Acquire
+          </motion.p>
+        </div>
+
+        {/* H1 — each line clips up independently */}
+        <h1
+          className="font-bold leading-[1.0] mb-4"
           style={{ fontFamily: "var(--font-serif)" }}
         >
-          We invest in businesses
-          <br />
-          <span className="gradient-text">like yours</span>
-        </motion.h1>
+          {/* Line 1 */}
+          <div className="overflow-hidden">
+            <motion.span
+              className="block text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-white"
+              initial={{ y: "110%" }}
+              animate={showContent ? { y: 0 } : { y: "110%" }}
+              transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.08 }}
+            >
+              We invest in
+            </motion.span>
+          </div>
+          {/* Line 2 */}
+          <div className="overflow-hidden">
+            <motion.span
+              className="block text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-white"
+              initial={{ y: "110%" }}
+              animate={showContent ? { y: 0 } : { y: "110%" }}
+              transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+            >
+              businesses{" "}
+              <em className="gradient-text not-italic">like yours.</em>
+            </motion.span>
+          </div>
+        </h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={showContent ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed"
-        >
-          Imagine if you could exit your business AND secure your legacy.
-          We invest, partner or acquire businesses to transform and scale them —
-          protecting your most valuable asset, your dedicated team.
-        </motion.p>
+        {/* Thin rule sweeps in */}
+        <div className="overflow-hidden my-8 flex justify-center">
+          <motion.div
+            className="h-px w-24 bg-gradient-to-r from-transparent via-blue-500 to-transparent"
+            initial={{ scaleX: 0, opacity: 0 }}
+            animate={showContent ? { scaleX: 1, opacity: 1 } : { scaleX: 0, opacity: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.45 }}
+          />
+        </div>
 
+        {/* Body copy — clips up */}
+        <div className="overflow-hidden mb-10">
+          <motion.p
+            initial={{ y: "110%" }}
+            animate={showContent ? { y: 0 } : { y: "110%" }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.5 }}
+            className="text-base md:text-lg text-slate-400 max-w-xl mx-auto leading-relaxed"
+          >
+            Exit your business and secure your legacy. We invest, partner, or
+            acquire — then transform and scale — while protecting your most
+            valuable asset: your team.
+          </motion.p>
+        </div>
+
+        {/* CTAs — fade + slight rise */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={showContent ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.6, delay: 0.7 }}
+          initial={{ opacity: 0, y: 16 }}
+          animate={showContent ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
+          transition={{ duration: 0.7, ease: "easeOut", delay: 0.72 }}
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
           <MagneticButton
             href="/solutions"
             strength={0.25}
-            className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-full transition-all hover:shadow-xl hover:shadow-blue-500/25 inline-block"
+            className="px-9 py-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold tracking-wide rounded-full transition-all hover:shadow-xl hover:shadow-blue-500/25 inline-block"
           >
             Discover Our Approach
           </MagneticButton>
           <MagneticButton
             href="/contact"
             strength={0.25}
-            className="px-8 py-4 border border-slate-600 hover:border-blue-500 text-white font-semibold rounded-full transition-all inline-block"
+            className="px-9 py-4 border border-slate-600 hover:border-blue-400 text-slate-300 hover:text-white font-semibold tracking-wide rounded-full transition-all inline-block"
           >
             Get Started
           </MagneticButton>
         </motion.div>
-      </motion.div>
+      </div>
 
       {/* Scroll indicator */}
       <motion.div
