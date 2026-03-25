@@ -16,7 +16,7 @@ export default function Hero() {
   };
 
   return (
-    <header className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <header className="relative h-screen flex items-center justify-center overflow-hidden">
       {/* Background particle field — visible after intro fades */}
       <ParticleField
         particleCount={90}
@@ -92,92 +92,96 @@ export default function Hero() {
       </AnimatePresence>
 
       {/* ═══ MAIN HERO CONTENT ════════════════════════════════════ */}
-      <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
+      {/*
+        pb-28 clears the absolute scroll indicator (bottom-8 = 32px + its height).
+        h-screen on the header means this div is always centred within the viewport
+        with no risk of overflowing into the next section.
+      */}
+      <div className="relative z-10 w-full max-w-6xl mx-auto px-6 text-center pb-28">
 
-        {/* Eyebrow — clips up */}
-        <div className="overflow-hidden mb-8">
+        {/* Eyebrow */}
+        <div className="overflow-hidden mb-7">
           <motion.p
             initial={{ y: "110%" }}
             animate={showContent ? { y: 0 } : { y: "110%" }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="text-blue-400 text-xs tracking-[0.4em] uppercase font-medium"
+            className="text-blue-400 text-[10px] tracking-[0.5em] uppercase font-medium"
           >
             Invest &nbsp;·&nbsp; Partner &nbsp;·&nbsp; Acquire
           </motion.p>
         </div>
 
-        {/* H1 — each line clips up independently */}
+        {/* H1 — three lines, each clips up from overflow-hidden wrapper */}
         <h1
-          className="font-bold leading-[1.0] mb-4"
-          style={{ fontFamily: "var(--font-serif)" }}
+          className="font-bold mb-8"
+          style={{
+            fontFamily: "var(--font-serif)",
+            lineHeight: 0.92,
+          }}
         >
-          {/* Line 1 */}
           <div className="overflow-hidden">
             <motion.span
-              className="block text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-white"
+              className="block text-[clamp(2.8rem,8vw,7.5rem)] text-white"
               initial={{ y: "110%" }}
               animate={showContent ? { y: 0 } : { y: "110%" }}
-              transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.08 }}
+              transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1], delay: 0.06 }}
             >
               We invest in
             </motion.span>
           </div>
-          {/* Line 2 */}
           <div className="overflow-hidden">
             <motion.span
-              className="block text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-white"
+              className="block text-[clamp(2.8rem,8vw,7.5rem)] text-white"
               initial={{ y: "110%" }}
               animate={showContent ? { y: 0 } : { y: "110%" }}
-              transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+              transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1], delay: 0.18 }}
             >
-              businesses{" "}
-              <em className="gradient-text not-italic">like yours.</em>
+              businesses
+            </motion.span>
+          </div>
+          <div className="overflow-hidden">
+            <motion.span
+              className="block text-[clamp(2.8rem,8vw,7.5rem)] italic gradient-text"
+              initial={{ y: "110%" }}
+              animate={showContent ? { y: 0 } : { y: "110%" }}
+              transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
+            >
+              like yours.
             </motion.span>
           </div>
         </h1>
 
-        {/* Thin rule sweeps in */}
-        <div className="overflow-hidden my-8 flex justify-center">
-          <motion.div
-            className="h-px w-24 bg-gradient-to-r from-transparent via-blue-500 to-transparent"
-            initial={{ scaleX: 0, opacity: 0 }}
-            animate={showContent ? { scaleX: 1, opacity: 1 } : { scaleX: 0, opacity: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.45 }}
-          />
-        </div>
-
-        {/* Body copy — clips up */}
+        {/* Body — clips up */}
         <div className="overflow-hidden mb-10">
           <motion.p
             initial={{ y: "110%" }}
             animate={showContent ? { y: 0 } : { y: "110%" }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.5 }}
-            className="text-base md:text-lg text-slate-400 max-w-xl mx-auto leading-relaxed"
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.46 }}
+            className="text-sm md:text-base text-slate-400 max-w-lg mx-auto leading-relaxed tracking-wide"
           >
             Exit your business and secure your legacy. We invest, partner, or
-            acquire — then transform and scale — while protecting your most
-            valuable asset: your team.
+            acquire — then transform and scale — protecting your team throughout.
           </motion.p>
         </div>
 
-        {/* CTAs — fade + slight rise */}
+        {/* CTAs */}
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={showContent ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }}
-          transition={{ duration: 0.7, ease: "easeOut", delay: 0.72 }}
+          initial={{ opacity: 0, y: 14 }}
+          animate={showContent ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
+          transition={{ duration: 0.7, ease: "easeOut", delay: 0.64 }}
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
           <MagneticButton
             href="/solutions"
             strength={0.25}
-            className="px-9 py-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold tracking-wide rounded-full transition-all hover:shadow-xl hover:shadow-blue-500/25 inline-block"
+            className="px-9 py-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold tracking-wide rounded-full transition-all hover:shadow-xl hover:shadow-blue-500/25 inline-block text-sm"
           >
             Discover Our Approach
           </MagneticButton>
           <MagneticButton
             href="/contact"
             strength={0.25}
-            className="px-9 py-4 border border-slate-600 hover:border-blue-400 text-slate-300 hover:text-white font-semibold tracking-wide rounded-full transition-all inline-block"
+            className="px-9 py-4 border border-slate-700 hover:border-blue-400 text-slate-400 hover:text-white font-semibold tracking-wide rounded-full transition-all inline-block text-sm"
           >
             Get Started
           </MagneticButton>
