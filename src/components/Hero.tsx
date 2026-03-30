@@ -170,45 +170,44 @@ function HeroContent({ show }: { show: boolean }) {
           style={{
             fontFamily: '"DM Serif Display", "Playfair Display", serif',
             fontSize: "clamp(2.6rem, 6.8vw, 7.5rem)",
-            lineHeight: 1.02,
+            lineHeight: 1.1,
             color: "white",
             fontWeight: 400,
           }}
         >
           {["We", "invest", "in"].map((word, i) => (
-            <span key={word} className="overflow-hidden pb-[0.15em] mr-[0.22em] last:mr-0">
-              <motion.span
-                className="inline-block"
-                initial={{ y: "120%", rotateX: 18, opacity: 0 }}
-                animate={
-                  show
-                    ? { y: 0, rotateX: 0, opacity: 1 }
-                    : { y: "120%", rotateX: 18, opacity: 0 }
-                }
-                transition={{
-                  duration: 1,
-                  ease: [0.16, 1, 0.3, 1],
-                  delay: 0.04 + i * 0.11,
-                }}
-              >
-                {word}
-              </motion.span>
-            </span>
+            <motion.span
+              key={word}
+              className="inline-block mr-[0.22em] last:mr-0"
+              initial={{ y: 30, rotateX: 18, opacity: 0 }}
+              animate={
+                show
+                  ? { y: 0, rotateX: 0, opacity: 1 }
+                  : { y: 30, rotateX: 18, opacity: 0 }
+              }
+              transition={{
+                duration: 1,
+                ease: [0.16, 1, 0.3, 1],
+                delay: 0.04 + i * 0.11,
+              }}
+            >
+              {word}
+            </motion.span>
           ))}
         </div>
       </div>
 
       {/* ── LINE 2: "BUSINESSES" — Bebas Neue, character scramble + shimmer ── */}
-      <div className="overflow-hidden pb-[0.1em] pr-[0.1em]">
+      <div className="py-[0.05em]">
         <motion.div
-          initial={{ y: "105%", opacity: 0 }}
-          animate={show ? { y: 0, opacity: 1 } : { y: "105%", opacity: 0 }}
+          initial={{ opacity: 0, y: 40 }}
+          animate={show ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
           transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
           className="leading-none"
           style={{
             fontFamily: '"Bebas Neue", "DM Serif Display", serif',
             fontSize: "clamp(5rem, 17vw, 19rem)",
-            lineHeight: 0.88,
+            lineHeight: 0.92,
             letterSpacing: "0.06em",
           }}
         >
@@ -217,16 +216,16 @@ function HeroContent({ show }: { show: boolean }) {
       </div>
 
       {/* ── LINE 3: "like yours." — italic DM Serif, flowing gradient ── */}
-      <div className="overflow-hidden pb-[0.5em] mb-10">
+      <div className="pt-[0.1em] pb-[0.5em] mb-10">
         <motion.span
           className="block italic"
-          initial={{ y: "120%" }}
-          animate={show ? { y: 0 } : { y: "120%" }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={show ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.44 }}
           style={{
             fontFamily: '"DM Serif Display", "Playfair Display", serif',
             fontSize: "clamp(2.6rem, 6.8vw, 7.5rem)",
-            lineHeight: 1.05,
+            lineHeight: 1.15,
           }}
         >
           <span className="gradient-text-flow">like yours.</span>

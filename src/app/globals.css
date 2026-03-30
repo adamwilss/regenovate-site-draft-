@@ -40,8 +40,8 @@ html {
 }
 
 body {
-  background-color: var(--color-slate-950);
-  background-image: radial-gradient(ellipse 110% 55% at 70% -5%, #0c1e48 0%, transparent 55%);
+  background-color: #0d1b3e;
+  background-image: radial-gradient(ellipse 110% 55% at 70% -5%, #1a3666 0%, transparent 55%);
   color: var(--color-slate-200);
   font-family: var(--font-sans);
 }

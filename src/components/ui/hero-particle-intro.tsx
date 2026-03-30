@@ -53,8 +53,25 @@ class P {
     this.tx    = this.x + Math.cos(a) * 3000
     this.ty    = this.y + Math.sin(a) * 3000
     this.sr    = this.r | 0; this.sg = this.g | 0; this.sb = this.b | 0
-    this.tr    = 2; this.tg = 6; this.tb = 23   // fade to bg colour
+    this.tr    = 13; this.tg = 27; this.tb = 62  // fade to new bg colour
     this.blend = 0
+  }
+
+  // Radial explosion from centre — used for the final transition blast
+  explodeFrom(cx: number, cy: number) {
+    const dx = this.x - cx
+    const dy = this.y - cy
+    const a  = Math.atan2(dy, dx)
+    const spd = 20 + Math.random() * 30
+    this.vx  = Math.cos(a) * spd
+    this.vy  = Math.sin(a) * spd
+    this.frc = 0.02          // near-zero friction — particles fly freely
+    this.spd = 1
+    this.tx  = cx + Math.cos(a) * 5000
+    this.ty  = cy + Math.sin(a) * 5000
+    // Keep colour bright — trails look great against the dark bg
+    this.blend = 1
+    this.dead  = true
   }
 }
 
@@ -108,7 +125,7 @@ export function HeroParticleIntro({ onWordFormed, onComplete }: Props) {
     canvas.height = H
 
     const ctx = canvas.getContext("2d")!
-    ctx.fillStyle = "rgb(2,6,23)"
+    ctx.fillStyle = "rgb(13,27,62)"
     ctx.fillRect(0, 0, W, H)
 
     const particles: P[] = []
@@ -123,8 +140,8 @@ export function HeroParticleIntro({ onWordFormed, onComplete }: Props) {
     const BLUE:  [number, number, number] = [96,  165, 250]
 
     // ── Phase thresholds ─────────────────────────────────────────
-    // 0 forming → 1 hold → 2 burst → 3 reform → 4 hold2 → 5 done
-    const T = { hold: 155, burst: 205, reform: 240, hold2: 430, done: 520 }
+    // 0 forming → 1 hold → 2 burst → 3 reform → 4 hold2 → 5 explode → 6 done
+    const T = { hold: 155, burst: 205, reform: 240, hold2: 430, explode: 475, done: 515 }
 
     // ── Build source words ────────────────────────────────────────
     const formWords = () => {
@@ -189,7 +206,13 @@ export function HeroParticleIntro({ onWordFormed, onComplete }: Props) {
     let rafId = 0
 
     const tick = () => {
-      ctx.fillStyle = "rgba(2,6,23,0.22)"
+      // During explosion use a very faint trail so streaks persist beautifully;
+      // all other phases use the standard trail fill.
+      if (phase >= 5) {
+        ctx.fillStyle = "rgba(13,27,62,0.04)"
+      } else {
+        ctx.fillStyle = "rgba(13,27,62,0.22)"
+      }
       ctx.fillRect(0, 0, W, H)
 
       for (let i = particles.length - 1; i >= 0; i--) {
@@ -198,18 +221,28 @@ export function HeroParticleIntro({ onWordFormed, onComplete }: Props) {
         ctx.fillStyle = `rgb(${p.r | 0},${p.g | 0},${p.b | 0})`
         ctx.fillRect(p.x | 0, p.y | 0, 2, 2)
 
-        // Only prune once we're past hold2 — during burst/reform keep ALL particles
+        // Prune off-screen particles during and after the explosion
         if (phase >= 4 && p.dead &&
             (p.x < -200 || p.x > W + 200 || p.y < -200 || p.y > H + 200))
           particles.splice(i, 1)
       }
 
       frame++
-      if (phase === 0 && frame >= T.hold)   phase = 1
-      if (phase === 1 && frame >= T.burst)  { phase = 2; particles.forEach(p => p.burst()) }
-      if (phase === 2 && frame >= T.reform) { phase = 3; reformWord() }
-      if (phase === 3 && frame >= T.hold2)  { phase = 4; onFormedRef.current() }
-      if (phase === 4 && frame >= T.done && !done) { done = true; onCompleteRef.current() }
+      if (phase === 0 && frame >= T.hold)    phase = 1
+      if (phase === 1 && frame >= T.burst)   { phase = 2; particles.forEach(p => p.burst()) }
+      if (phase === 2 && frame >= T.reform)  { phase = 3; reformWord() }
+      if (phase === 3 && frame >= T.hold2)   { phase = 4; onFormedRef.current() }
+      if (phase === 4 && frame >= T.explode) {
+        // Radial explosion from the centre of the canvas (where Regenovate sits)
+        phase = 5
+        const cx = W * 0.5
+        const cy = H * 0.5
+        particles.forEach(p => p.explodeFrom(cx, cy))
+      }
+      if (phase === 5 && frame >= T.done && !done) {
+        done = true
+        onCompleteRef.current()
+      }
 
       rafId = requestAnimationFrame(tick)
     }
