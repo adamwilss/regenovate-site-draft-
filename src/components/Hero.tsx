@@ -166,7 +166,7 @@ function HeroContent({ show }: { show: boolean }) {
       {/* ── LINE 1: "We invest in" — per-word 3D flip reveal ── */}
       <div className="mb-0" style={{ perspective: "1200px" }}>
         <div
-          className="flex flex-wrap justify-center"
+          className="flex flex-nowrap justify-center"
           style={{
             fontFamily: '"DM Serif Display", "Playfair Display", serif',
             fontSize: "clamp(2.6rem, 6.8vw, 7.5rem)",
@@ -199,7 +199,7 @@ function HeroContent({ show }: { show: boolean }) {
       </div>
 
       {/* ── LINE 2: "BUSINESSES" — Bebas Neue, character scramble + shimmer ── */}
-      <div className="overflow-hidden pb-[0.02em]">
+      <div className="overflow-hidden pb-[0.1em]">
         <motion.div
           initial={{ y: "105%", opacity: 0 }}
           animate={show ? { y: 0, opacity: 1 } : { y: "105%", opacity: 0 }}
