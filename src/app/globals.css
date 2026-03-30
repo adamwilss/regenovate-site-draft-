@@ -147,6 +147,44 @@ body {
   bottom: -1px;
 }
 
+/* Flowing gradient text — used on hero "like yours." */
+@keyframes gradient-flow {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+.gradient-text-flow {
+  background: linear-gradient(90deg, #60a5fa, #4169e1, #34d399, #2dd4bf, #a78bfa, #60a5fa);
+  background-size: 400% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-flow 5s linear infinite;
+}
+
+/* Shimmer sweep used on BUSINESSES */
+@keyframes shimmer-sweep {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.businesses-text {
+  background: linear-gradient(
+    105deg,
+    #ffffff 0%,
+    #93c5fd 30%,
+    #ffffff 50%,
+    #4169e1 70%,
+    #34d399 90%,
+    #ffffff 100%
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer-sweep 4s linear infinite;
+}
+
 /* Shimmer effect for loading/hover states */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
