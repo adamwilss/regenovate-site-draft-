@@ -53,7 +53,7 @@ function useScramble(text: string, active: boolean, startDelay = 0) {
 
 /* ─── Hero ──────────────────────────────────────────────────────── */
 export default function Hero() {
-  const [showContent, setShowContent] = useState(false);
+  const [introPhase, setIntroPhase] = useState<'intro' | 'settling' | 'done'>('intro');
 
   return (
     <header className="relative h-screen flex items-center justify-center overflow-hidden">
@@ -89,23 +89,25 @@ export default function Hero() {
 
       {/* ═══ PARTICLE INTRO ════════════════════════════════════════ */}
       <AnimatePresence>
-        {!showContent && (
+        {introPhase !== 'done' && (
           <motion.div
             key="intro"
+            animate={{ opacity: introPhase === 'intro' ? 1 : 0 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 1.5 }}
+            transition={{ duration: 1.5, ease: 'easeOut' }}
             className="absolute inset-0 z-[10]"
           >
             <HeroParticleIntro
               onWordFormed={() => {}}
-              onComplete={() => setShowContent(true)}
+              onSettleBegin={() => setIntroPhase('settling')}
+              onComplete={() => setIntroPhase('done')}
             />
             <div className="absolute inset-0 flex flex-col items-center justify-end pb-10 pointer-events-none select-none">
               <motion.button
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 2 }}
-                onClick={() => setShowContent(true)}
+                onClick={() => setIntroPhase('done')}
                 className="text-xs transition-colors tracking-wider uppercase pointer-events-auto cursor-pointer"
                 style={{ color: "var(--text-faint)" }}
               >
@@ -117,12 +119,12 @@ export default function Hero() {
       </AnimatePresence>
 
       {/* ═══ MAIN HERO CONTENT ════════════════════════════════════ */}
-      <HeroContent show={showContent} />
+      <HeroContent show={introPhase === 'done'} />
 
       {/* Scroll indicator */}
       <motion.div
         initial={{ opacity: 0 }}
-        animate={{ opacity: showContent ? 1 : 0 }}
+        animate={{ opacity: introPhase === 'done' ? 1 : 0 }}
         transition={{ delay: 1.6, duration: 0.6 }}
         className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 z-10"
       >

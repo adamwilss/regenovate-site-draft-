@@ -12,6 +12,7 @@ class P {
   blend = 1; rate = 0.025
   spd = 8; frc = 0.4
   dead = false
+  sz = 2  // draw size — shrinks to 1 during settle
 
   update() {
     const dx = this.tx - this.x
@@ -40,8 +41,6 @@ class P {
     this.blend = 0; this.dead = false
   }
 
-  // Burst outward from current position — target stays far away so
-  // particles keep moving until reformWord() redirects them.
   burst() {
     if (this.dead) return
     this.dead = true
@@ -49,15 +48,14 @@ class P {
     const spd  = 8 + Math.random() * 7
     this.vx    = Math.cos(a) * spd
     this.vy    = Math.sin(a) * spd
-    // Far target in same direction → steering force sustains velocity
     this.tx    = this.x + Math.cos(a) * 3000
     this.ty    = this.y + Math.sin(a) * 3000
     this.sr    = this.r | 0; this.sg = this.g | 0; this.sb = this.b | 0
-    this.tr    = 13; this.tg = 27; this.tb = 62  // fade to new bg colour
+    this.tr    = 13; this.tg = 27; this.tb = 62
     this.blend = 0
   }
 
-  // Radial explosion from centre — used for the final transition blast
+  // Radial explosion from centre
   explodeFrom(cx: number, cy: number) {
     const dx = this.x - cx
     const dy = this.y - cy
@@ -65,13 +63,29 @@ class P {
     const spd = 20 + Math.random() * 30
     this.vx  = Math.cos(a) * spd
     this.vy  = Math.sin(a) * spd
-    this.frc = 0.02          // near-zero friction — particles fly freely
+    this.frc = 0.02
     this.spd = 1
     this.tx  = cx + Math.cos(a) * 5000
     this.ty  = cy + Math.sin(a) * 5000
-    // Keep colour bright — trails look great against the dark bg
     this.blend = 1
     this.dead  = true
+  }
+
+  // Decelerate mid-flight to a scatter position — illusion of becoming background dots
+  settleToAmbient(tx: number, ty: number) {
+    this.tx   = tx
+    this.ty   = ty
+    this.frc  = 0.06    // friction decelerates into place
+    this.spd  = 0.4     // very low attraction — drifts, doesn't snap
+    this.rate = 0.008   // slow colour blend
+    this.sz   = 1       // shrink to 1px — matches real ParticleField dots
+    // Target: ParticleField blue (hsl ~225, 70%, 65% → approx rgb)
+    this.sr = this.r | 0; this.sg = this.g | 0; this.sb = this.b | 0
+    this.tr = 70  + Math.random() * 40
+    this.tg = 155 + Math.random() * 20
+    this.tb = 245 + Math.random() * 10
+    this.blend = 0
+    this.dead  = false   // re-activate so update() keeps running
   }
 }
 
@@ -104,16 +118,19 @@ function shuffle<T>(a: T[]): T[] {
 
 // ─── Component ─────────────────────────────────────────────────────
 interface Props {
-  onWordFormed: () => void
-  onComplete:   () => void
+  onWordFormed:    () => void
+  onComplete:      () => void
+  onSettleBegin?:  () => void
 }
 
-export function HeroParticleIntro({ onWordFormed, onComplete }: Props) {
-  const canvasRef     = useRef<HTMLCanvasElement>(null)
-  const onFormedRef   = useRef(onWordFormed)
-  const onCompleteRef = useRef(onComplete)
-  onFormedRef.current   = onWordFormed
-  onCompleteRef.current = onComplete
+export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin }: Props) {
+  const canvasRef        = useRef<HTMLCanvasElement>(null)
+  const onFormedRef      = useRef(onWordFormed)
+  const onCompleteRef    = useRef(onComplete)
+  const onSettleBeginRef = useRef(onSettleBegin)
+  onFormedRef.current      = onWordFormed
+  onCompleteRef.current    = onComplete
+  onSettleBeginRef.current = onSettleBegin
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -133,15 +150,14 @@ export function HeroParticleIntro({ onWordFormed, onComplete }: Props) {
     const STEP = mob ? 7 : 9
 
     const fSrc = Math.min(Math.max((W / (mob ? 10 : 20)) | 0, 30), 90)
-    // Final word same density as source — the SAME dots reform it
     const fFin = Math.min(Math.max((W / (mob ? 8  : 15)) | 0, 36), 100)
 
     const WHITE: [number, number, number] = [255, 255, 255]
     const BLUE:  [number, number, number] = [96,  165, 250]
 
     // ── Phase thresholds ─────────────────────────────────────────
-    // 0 forming → 1 hold → 2 burst → 3 reform → 4 hold2 → 5 explode → 6 done
-    const T = { hold: 155, burst: 205, reform: 240, hold2: 430, explode: 475, done: 515 }
+    // 0 forming → 1 hold → 2 burst → 3 reform → 4 hold2 → 5 explode → 6 settle → done
+    const T = { hold: 155, burst: 205, reform: 240, hold2: 420, explode: 460, settle: 490, done: 600 }
 
     // ── Build source words ────────────────────────────────────────
     const formWords = () => {
@@ -177,26 +193,27 @@ export function HeroParticleIntro({ onWordFormed, onComplete }: Props) {
     const reformWord = () => {
       const pts = shuffle(textPositions("Regenovate", W * 0.5, H * 0.5, fFin, W, H, STEP))
 
-      // Redirect existing particles (including mid-burst ones)
       for (let i = 0; i < Math.min(pts.length, particles.length); i++) {
         const p  = particles[i]
         const pos = pts[i]
-        p.spd    = Math.random() * 5 + 12  // fast so they snap back
+        p.spd    = Math.random() * 5 + 12
         p.frc    = p.spd * 0.08
         p.rate   = Math.random() * 0.02 + 0.015
         p.setTarget(pos.x, pos.y, 255, 255, 255)
       }
 
-      // Excess particles (source had more than Regenovate needs) → fade out
       for (let i = pts.length; i < particles.length; i++) {
         const p = particles[i]
         if (!p.dead) p.burst()
-        // Move target off-screen so they leave permanently
         const a = Math.random() * Math.PI * 2
         p.tx = W / 2 + Math.cos(a) * (W + 200)
         p.ty = H / 2 + Math.sin(a) * (H + 200)
       }
     }
+
+    // Pre-compute scatter targets for settle phase
+    const settleTargets = Array.from({ length: 2000 },
+      () => ({ x: Math.random() * W, y: Math.random() * H }))
 
     formWords()
 
@@ -204,14 +221,17 @@ export function HeroParticleIntro({ onWordFormed, onComplete }: Props) {
     let frame = 0
     let done  = false
     let rafId = 0
+    const cx = W * 0.5
+    const cy = H * 0.5
 
     const tick = () => {
-      // During explosion use a very faint trail so streaks persist beautifully;
-      // all other phases use the standard trail fill.
-      if (phase >= 5) {
-        ctx.fillStyle = "rgba(13,27,62,0.04)"
+      // Trail alpha varies by phase
+      if (phase >= 6) {
+        ctx.fillStyle = "rgba(13,27,62,0.12)"   // dust fade during settle
+      } else if (phase === 5) {
+        ctx.fillStyle = "rgba(13,27,62,0.04)"   // near-transparent streaks during explosion
       } else {
-        ctx.fillStyle = "rgba(13,27,62,0.22)"
+        ctx.fillStyle = "rgba(13,27,62,0.22)"   // normal
       }
       ctx.fillRect(0, 0, W, H)
 
@@ -219,27 +239,34 @@ export function HeroParticleIntro({ onWordFormed, onComplete }: Props) {
         const p = particles[i]
         p.update()
         ctx.fillStyle = `rgb(${p.r | 0},${p.g | 0},${p.b | 0})`
-        ctx.fillRect(p.x | 0, p.y | 0, 2, 2)
+        ctx.fillRect(p.x | 0, p.y | 0, p.sz, p.sz)
 
-        // Prune off-screen particles during and after the explosion
+        // Only prune during/after hold2
         if (phase >= 4 && p.dead &&
             (p.x < -200 || p.x > W + 200 || p.y < -200 || p.y > H + 200))
           particles.splice(i, 1)
       }
 
       frame++
-      if (phase === 0 && frame >= T.hold)    phase = 1
-      if (phase === 1 && frame >= T.burst)   { phase = 2; particles.forEach(p => p.burst()) }
-      if (phase === 2 && frame >= T.reform)  { phase = 3; reformWord() }
-      if (phase === 3 && frame >= T.hold2)   { phase = 4; onFormedRef.current() }
+      if (phase === 0 && frame >= T.hold)   phase = 1
+      if (phase === 1 && frame >= T.burst)  { phase = 2; particles.forEach(p => p.burst()) }
+      if (phase === 2 && frame >= T.reform) { phase = 3; reformWord() }
+      if (phase === 3 && frame >= T.hold2)  { phase = 4; onFormedRef.current() }
       if (phase === 4 && frame >= T.explode) {
-        // Radial explosion from the centre of the canvas (where Regenovate sits)
         phase = 5
-        const cx = W * 0.5
-        const cy = H * 0.5
         particles.forEach(p => p.explodeFrom(cx, cy))
       }
-      if (phase === 5 && frame >= T.done && !done) {
+      if (phase === 5 && frame >= T.settle) {
+        phase = 6
+        // Assign scatter targets to all particles
+        shuffle(settleTargets)
+        particles.forEach((p, i) => {
+          const t = settleTargets[i % settleTargets.length]
+          p.settleToAmbient(t.x, t.y)
+        })
+        onSettleBeginRef.current?.()
+      }
+      if (phase === 6 && frame >= T.done && !done) {
         done = true
         onCompleteRef.current()
       }
