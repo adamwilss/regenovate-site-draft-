@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef } from "react";
+import Link from "next/link";
 import { TextReveal } from "@/components/ui/text-reveal";
 
 export default function About() {
@@ -27,15 +28,34 @@ export default function About() {
             >
               <TextReveal delay={0.2}>20+ years perfecting business transformation</TextReveal>
             </h2>
-            <div className="flex gap-6 mt-8">
-              <div className="p-5 rounded-xl border border-slate-800 bg-slate-900/50 flex-1 text-center">
-                <div className="text-2xl font-bold text-blue-400 mb-1">10</div>
-                <p className="text-slate-400 text-xs">Businesses Owned &amp; Operated</p>
-              </div>
-              <div className="p-5 rounded-xl border border-slate-800 bg-slate-900/50 flex-1 text-center">
-                <div className="text-2xl font-bold text-blue-400 mb-1">4</div>
-                <p className="text-slate-400 text-xs">Sectors: Manufacturing, Software, Display, Engineering</p>
-              </div>
+            <div className="flex gap-4 mt-8 flex-wrap">
+              {[
+                { value: "10", label: "Businesses Owned\n& Operated", accent: "from-blue-400 to-blue-600" },
+                { value: "4", label: "Core Sectors", accent: "from-blue-400 to-blue-600" },
+                { value: "20+", label: "Years'\nExperience", accent: "from-emerald-400 to-teal-500" },
+              ].map((stat) => (
+                <div key={stat.label} className="p-5 rounded-xl border border-slate-800 hover:border-slate-700 bg-slate-900/50 flex-1 min-w-[90px] text-center transition-colors">
+                  <div
+                    className={`text-3xl font-bold bg-gradient-to-br ${stat.accent} bg-clip-text text-transparent mb-1`}
+                    style={{ fontFamily: '"DM Serif Display", serif' }}
+                  >
+                    {stat.value}
+                  </div>
+                  <p className="text-slate-500 text-[11px] leading-tight whitespace-pre-line">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-10">
+              <Link
+                href="/contact"
+                className="inline-flex items-center gap-2 px-7 py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm tracking-wide rounded-xl transition-all hover:shadow-lg hover:shadow-blue-500/25"
+              >
+                Start the Conversation
+                <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4">
+                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </Link>
             </div>
           </motion.div>
 

@@ -2,6 +2,7 @@
 
 import { type ReactNode } from "react";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
+import { MobileCTA } from "@/components/MobileCTA";
 
 export default function ClientShell({ children }: { children: ReactNode }) {
   return (
@@ -17,6 +18,7 @@ export default function ClientShell({ children }: { children: ReactNode }) {
         }}
       />
       {children}
+      <MobileCTA />
     </>
   );
 }

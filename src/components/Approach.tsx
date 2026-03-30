@@ -2,6 +2,7 @@
 
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import Link from "next/link";
 import { TextReveal } from "@/components/ui/text-reveal";
 
 const steps = [
@@ -122,6 +123,27 @@ export default function Approach() {
             ))}
           </div>
         </div>
+
+        {/* CTA strip */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.8 }}
+          className="mt-20 flex flex-col sm:flex-row items-center justify-center gap-4"
+        >
+          <Link
+            href="/contact"
+            className="px-9 py-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm tracking-wide rounded-xl transition-all hover:shadow-xl hover:shadow-blue-500/25"
+          >
+            Request a Confidential Call
+          </Link>
+          <Link
+            href="/about"
+            className="px-9 py-4 border border-slate-700 hover:border-blue-400/40 text-slate-400 hover:text-white font-semibold text-sm tracking-wide rounded-xl transition-all"
+          >
+            Learn About Us
+          </Link>
+        </motion.div>
       </div>
     </section>
   );

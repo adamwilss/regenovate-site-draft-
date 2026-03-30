@@ -32,7 +32,7 @@
   --color-slate-950: #020617;
 
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+  --font-serif: "DM Serif Display", "Playfair Display", ui-serif, Georgia, serif;
 }
 
 html {
@@ -185,6 +185,21 @@ body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   animation: shimmer-sweep 4s linear infinite;
+}
+
+/* Marquee track — used by SectorBar */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.marquee-track {
+  animation: marquee 30s linear infinite;
+  width: max-content;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
 }
 
 /* Shimmer effect for loading/hover states */
