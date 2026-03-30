@@ -9,19 +9,25 @@ const testimonials = [
     quote:
       "Selling Tech Innovations Ltd. was a significant decision for me. Regenovate not only facilitated a seamless transition but also ensured the welfare of my incredible team. Their dedication to preserving the legacy of the business while driving it to new heights is unparalleled.",
     name: "John Turner",
-    role: "Former CEO, Tech Innovations Ltd.",
+    role: "Former CEO",
+    company: "Tech Innovations Ltd.",
+    initial: "JT",
   },
   {
     quote:
-      "Selling GreenScape Eco Solutions was a journey of mixed emotions, but Regenovate turned it into a success story. They understood the value we had built and worked tirelessly to highlight our strengths. The transition was not just a transaction; it was a collaborative effort.",
+      "Selling GreenScape Eco Solutions was a journey of mixed emotions, but Regenovate turned it into a success story. They understood the value we had built and worked tirelessly to highlight our strengths. The transition was not just a transaction — it was a collaborative effort.",
     name: "Eleanor Harper",
-    role: "Founder, GreenScape Eco Solutions",
+    role: "Founder",
+    company: "GreenScape Eco Solutions",
+    initial: "EH",
   },
   {
     quote:
       "Choosing Regenovate to guide us through the sale of Precision Manufacturing Solutions was the best decision we made. Their meticulous approach and Business Transformation Programme ensured a smooth and lucrative transition. They became more than advisors — they were partners.",
     name: "David Mitchell",
-    role: "MD, Precision Manufacturing Solutions",
+    role: "Managing Director",
+    company: "Precision Manufacturing Solutions",
+    initial: "DM",
   },
 ];
 
@@ -30,7 +36,6 @@ export default function Testimonials() {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [active, setActive] = useState(0);
 
-  // Auto-rotate every 6 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setActive((prev) => (prev + 1) % testimonials.length);
@@ -38,82 +43,123 @@ export default function Testimonials() {
     return () => clearInterval(interval);
   }, []);
 
-  return (
-    <section className="py-32 relative" ref={ref}>
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+  const t = testimonials[active];
 
-      <div className="max-w-4xl mx-auto px-6">
+  return (
+    <section className="py-32 relative overflow-hidden" ref={ref}>
+      {/* Ambient glow */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div className="w-[700px] h-[500px] rounded-full bg-blue-600/6 blur-3xl" />
+      </div>
+
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-px bg-gradient-to-r from-transparent via-blue-500/40 to-transparent" />
+
+      <div className="max-w-5xl mx-auto px-6 relative">
+
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="text-center mb-16"
         >
-          <p className="text-blue-400 text-sm font-semibold tracking-[0.15em] uppercase mb-4">
-            Testimonials
+          <p className="text-blue-400 text-[10px] font-medium tracking-[0.5em] uppercase mb-5">
+            Client stories
           </p>
           <h2
-            className="text-3xl md:text-4xl font-bold text-white"
-            style={{ fontFamily: "var(--font-serif)" }}
+            className="text-4xl md:text-5xl font-bold text-white"
+            style={{ fontFamily: '"DM Serif Display", "Playfair Display", serif' }}
           >
-            <TextReveal delay={0.1}>What people are saying about Regenovate</TextReveal>
+            <TextReveal delay={0.1}>What people are saying</TextReveal>
           </h2>
         </motion.div>
 
+        {/* Card */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 24 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="relative"
         >
-          <div className="p-8 md:p-12 rounded-2xl border border-slate-800 bg-slate-900/50 text-center overflow-hidden">
-            <div className="text-blue-500/30 text-7xl leading-none mb-6">&ldquo;</div>
+          <div className="relative rounded-3xl border border-slate-800 bg-slate-900/50 backdrop-blur-sm overflow-hidden p-10 md:p-16">
+            {/* Subtle gradient tint */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-transparent pointer-events-none" />
 
-            <div className="relative min-h-[160px] flex items-center justify-center">
+            {/* Big decorative quote mark */}
+            <div
+              className="absolute top-6 left-10 text-[10rem] leading-none text-blue-400/8 select-none pointer-events-none"
+              style={{ fontFamily: '"DM Serif Display", serif' }}
+              aria-hidden
+            >
+              &ldquo;
+            </div>
+
+            <div className="relative">
+              {/* Quote text */}
+              <div className="relative min-h-[180px] flex items-center justify-center mb-12">
+                <AnimatePresence mode="wait">
+                  <motion.p
+                    key={active}
+                    initial={{ opacity: 0, y: 18, filter: "blur(6px)" }}
+                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                    exit={{ opacity: 0, y: -18, filter: "blur(6px)" }}
+                    transition={{ duration: 0.55 }}
+                    className="text-lg md:text-xl lg:text-2xl text-slate-200 leading-relaxed text-center font-light"
+                    style={{ fontFamily: '"DM Serif Display", "Playfair Display", serif' }}
+                  >
+                    {t.quote}
+                  </motion.p>
+                </AnimatePresence>
+              </div>
+
+              {/* Author */}
               <AnimatePresence mode="wait">
                 <motion.div
-                  key={active}
-                  initial={{ opacity: 0, y: 20, filter: "blur(4px)" }}
-                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  exit={{ opacity: 0, y: -20, filter: "blur(4px)" }}
-                  transition={{ duration: 0.6 }}
+                  key={`author-${active}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="flex items-center justify-center gap-4"
                 >
-                  <p
-                    className="text-lg md:text-xl text-slate-300 leading-relaxed mb-8"
-                    style={{ fontFamily: "var(--font-serif)" }}
-                  >
-                    {testimonials[active].quote}
-                  </p>
-                  <div>
-                    <p className="text-white font-semibold">{testimonials[active].name}</p>
-                    <p className="text-slate-500 text-sm">{testimonials[active].role}</p>
+                  {/* Avatar initial */}
+                  <div className="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
+                    {t.initial}
+                  </div>
+                  <div className="text-left">
+                    <p className="text-white font-semibold text-sm">{t.name}</p>
+                    <p className="text-slate-500 text-xs">{t.role}, {t.company}</p>
                   </div>
                 </motion.div>
               </AnimatePresence>
             </div>
+          </div>
 
-            {/* Progress dots */}
-            <div className="flex gap-2 justify-center mt-8">
-              {testimonials.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setActive(i)}
-                  className="relative h-2.5 rounded-full transition-all overflow-hidden"
-                  style={{ width: active === i ? 32 : 10 }}
-                  aria-label={`Testimonial ${i + 1}`}
-                >
-                  <div className={`absolute inset-0 rounded-full ${active === i ? "bg-blue-600" : "bg-slate-700 hover:bg-slate-600"}`} />
-                  {active === i && (
-                    <motion.div
-                      initial={{ scaleX: 0 }}
-                      animate={{ scaleX: 1 }}
-                      transition={{ duration: 6, ease: "linear" }}
-                      className="absolute inset-0 rounded-full bg-blue-400 origin-left"
-                    />
-                  )}
-                </button>
-              ))}
-            </div>
+          {/* Progress dots */}
+          <div className="flex gap-2.5 justify-center mt-8">
+            {testimonials.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setActive(i)}
+                className="relative h-2 rounded-full transition-all duration-300 overflow-hidden"
+                style={{ width: active === i ? 36 : 10 }}
+                aria-label={`Testimonial ${i + 1}`}
+              >
+                <div
+                  className={`absolute inset-0 rounded-full transition-colors ${
+                    active === i ? "bg-blue-600" : "bg-slate-700 hover:bg-slate-500"
+                  }`}
+                />
+                {active === i && (
+                  <motion.div
+                    key={active}
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ duration: 6, ease: "linear" }}
+                    className="absolute inset-0 rounded-full bg-blue-400 origin-left"
+                  />
+                )}
+              </button>
+            ))}
           </div>
         </motion.div>
       </div>

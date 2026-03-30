@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const links = [
   { href: "/about", label: "About Us" },
@@ -35,13 +36,8 @@ export default function Footer() {
       <footer className="border-t border-slate-800 py-12">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-8">
-            <Link href="/" className="flex items-center gap-3">
-              <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold text-sm">
-                R
-              </span>
-              <span className="text-lg font-semibold text-white tracking-tight">
-                Regenovate
-              </span>
+            <Link href="/" className="flex items-center opacity-80 hover:opacity-100 transition-opacity">
+              <Image src="/logo.png" alt="Regenovate" width={140} height={36} className="object-contain" />
             </Link>
             <div className="flex flex-wrap gap-6 justify-center">
               {links.map((link) => (
