@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 
 const navLinks = [
@@ -37,13 +38,23 @@ export default function Navbar() {
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 group">
-            <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold text-lg group-hover:scale-110 transition-transform">
-              R
-            </span>
-            <span className="text-xl font-semibold text-white tracking-tight">
-              Regenovate
-            </span>
+          <Link href="/" className="flex items-center group">
+            {/* Full wordmark on desktop */}
+            <Image
+              src="/logo.png"
+              alt="Regenovate"
+              width={160}
+              height={40}
+              className="hidden md:block object-contain group-hover:opacity-90 transition-opacity"
+            />
+            {/* Icon only on mobile */}
+            <Image
+              src="/logo-icon.png"
+              alt="Regenovate"
+              width={40}
+              height={40}
+              className="md:hidden group-hover:scale-110 transition-transform"
+            />
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
