@@ -112,6 +112,49 @@ body {
 ::-webkit-scrollbar-thumb  { background: var(--scrollbar-thumb); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { filter: brightness(1.2); }
 
+/* ─── Light theme: override hardcoded dark Tailwind classes ────── */
+/* Components use dark-mode Tailwind utilities directly.
+   These rules flip them to CSS-variable-aware equivalents. */
+[data-theme="light"] .text-white               { color: var(--text-primary) !important; }
+[data-theme="light"] .text-slate-200           { color: var(--text-primary) !important; }
+[data-theme="light"] .text-slate-300           { color: var(--text-primary) !important; }
+[data-theme="light"] .text-slate-400           { color: var(--text-muted)   !important; }
+[data-theme="light"] .text-slate-500           { color: var(--text-faint)   !important; }
+[data-theme="light"] .text-slate-600           { color: var(--text-faint)   !important; }
+
+/* Card/surface backgrounds */
+[data-theme="light"] .bg-slate-900\/40,
+[data-theme="light"] .bg-slate-900\/50         { background: rgba(255,255,255,0.7)  !important; }
+[data-theme="light"] .bg-slate-950\/95         { background: rgba(240,244,255,0.95) !important; }
+[data-theme="light"] .bg-slate-950             { background: #f0f4ff !important; }
+[data-theme="light"] .bg-slate-900             { background: #e8eeff !important; }
+
+/* Borders */
+[data-theme="light"] .border-slate-800         { border-color: rgba(15,23,42,0.12) !important; }
+[data-theme="light"] .border-slate-700         { border-color: rgba(15,23,42,0.16) !important; }
+[data-theme="light"] .border-slate-600         { border-color: rgba(15,23,42,0.20) !important; }
+
+/* Hover border */
+[data-theme="light"] .hover\:border-slate-700:hover { border-color: rgba(15,23,42,0.22) !important; }
+
+/* Glass override */
+[data-theme="light"] .glass {
+  background: rgba(240,244,255,0.88) !important;
+  border-color: rgba(15,23,42,0.1) !important;
+}
+
+/* Mobile menu overlay */
+[data-theme="light"] .backdrop-blur-xl[class*="bg-slate"] {
+  background: rgba(240,244,255,0.95) !important;
+}
+
+/* Gradient border bg fix */
+[data-theme="light"] .gradient-border {
+  background-image:
+    linear-gradient(var(--bg-base), var(--bg-base)),
+    conic-gradient(from var(--border-angle), var(--color-blue-600), var(--color-emerald-400), var(--color-blue-400), var(--color-blue-600)) !important;
+}
+
 /* ─── Utilities ────────────────────────────────────────────────── */
 .gradient-text {
   background: linear-gradient(135deg, var(--color-blue-400), var(--color-blue-500), var(--color-emerald-400));
