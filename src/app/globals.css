@@ -35,15 +35,70 @@
   --font-serif: "DM Serif Display", "Playfair Display", ui-serif, Georgia, serif;
 }
 
+/* ─── Theme tokens ─────────────────────────────────────────────── */
+:root,
+[data-theme="dark"] {
+  --bg-base:          #0d1b3e;
+  --bg-gradient:      radial-gradient(ellipse 110% 55% at 70% -5%, #1a3666 0%, transparent 55%);
+  --text-primary:     #e2e8f0;
+  --text-muted:       #94a3b8;
+  --text-faint:       #475569;
+  --surface-glass:    rgba(13, 27, 62, 0.65);
+  --border-subtle:    rgba(148, 163, 184, 0.1);
+  --hero-display:     #ffffff;
+  --hero-sub:         #e2e8f0;
+  --scrollbar-track:  #0f172a;
+  --scrollbar-thumb:  #334155;
+  --orb-primary:      rgba(59, 95, 199, 0.25);
+  --orb-secondary:    rgba(59, 130, 246, 0.12);
+  --orb-tertiary:     rgba(52, 211, 153, 0.08);
+}
+
+[data-theme="light"] {
+  --bg-base:          #f0f4ff;
+  --bg-gradient:      radial-gradient(ellipse 110% 55% at 70% -5%, #dbeafe 0%, transparent 55%);
+  --text-primary:     #0f172a;
+  --text-muted:       #334155;
+  --text-faint:       #64748b;
+  --surface-glass:    rgba(255, 255, 255, 0.82);
+  --border-subtle:    rgba(15, 23, 42, 0.1);
+  --hero-display:     #0f172a;
+  --hero-sub:         #1e293b;
+  --scrollbar-track:  #e2e8f0;
+  --scrollbar-thumb:  #94a3b8;
+  --orb-primary:      rgba(59, 95, 199, 0.18);
+  --orb-secondary:    rgba(59, 130, 246, 0.10);
+  --orb-tertiary:     rgba(52, 211, 153, 0.07);
+}
+
+[data-theme="midnight"] {
+  --bg-base:          #05091a;
+  --bg-gradient:      radial-gradient(ellipse 120% 60% at 65% -5%, #1a0b4e 0%, #0d1560 35%, transparent 65%);
+  --text-primary:     #e0e7ff;
+  --text-muted:       #a5b4fc;
+  --text-faint:       #6366f1;
+  --surface-glass:    rgba(5, 9, 26, 0.75);
+  --border-subtle:    rgba(99, 102, 241, 0.18);
+  --hero-display:     #ffffff;
+  --hero-sub:         #e0e7ff;
+  --scrollbar-track:  #0d0f2a;
+  --scrollbar-thumb:  #3730a3;
+  --orb-primary:      rgba(99, 102, 241, 0.30);
+  --orb-secondary:    rgba(139, 92, 246, 0.18);
+  --orb-tertiary:     rgba(59, 130, 246, 0.12);
+}
+
+/* ─── Base ─────────────────────────────────────────────────────── */
 html {
   scroll-behavior: smooth;
 }
 
 body {
-  background-color: #0d1b3e;
-  background-image: radial-gradient(ellipse 110% 55% at 70% -5%, #1a3666 0%, transparent 55%);
-  color: var(--color-slate-200);
+  background-color: var(--bg-base);
+  background-image: var(--bg-gradient);
+  color: var(--text-primary);
   font-family: var(--font-sans);
+  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 ::selection {
@@ -52,21 +107,12 @@ body {
 }
 
 /* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: var(--color-slate-900);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--color-slate-700);
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-slate-600);
-}
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track  { background: var(--scrollbar-track); }
+::-webkit-scrollbar-thumb  { background: var(--scrollbar-thumb); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { filter: brightness(1.2); }
 
-/* Animated gradient text */
+/* ─── Utilities ────────────────────────────────────────────────── */
 .gradient-text {
   background: linear-gradient(135deg, var(--color-blue-400), var(--color-blue-500), var(--color-emerald-400));
   -webkit-background-clip: text;
@@ -74,28 +120,25 @@ body {
   background-clip: text;
 }
 
-/* Glow effect */
 .glow {
   box-shadow: 0 0 40px rgba(65, 105, 225, 0.15), 0 0 80px rgba(65, 105, 225, 0.05);
 }
 
-/* Glass effect */
 .glass {
-  background: rgba(15, 23, 42, 0.6);
+  background: var(--surface-glass);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(148, 163, 184, 0.1);
+  border: 1px solid var(--border-subtle);
 }
 
-/* Animated orb */
+/* ─── Orbs ─────────────────────────────────────────────────────── */
 @keyframes float {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(30px, -30px) scale(1.05); }
-  66% { transform: translate(-20px, 20px) scale(0.95); }
+  33%       { transform: translate(30px, -30px) scale(1.05); }
+  66%       { transform: translate(-20px, 20px) scale(0.95); }
 }
-
 @keyframes pulse-slow {
   0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.7; }
+  50%       { opacity: 0.7; }
 }
 
 .orb {
@@ -104,52 +147,94 @@ body {
   filter: blur(80px);
   will-change: transform;
   animation: float 20s ease-in-out infinite, pulse-slow 8s ease-in-out infinite;
+  transition: background-color 0.4s ease;
 }
 
-/* Animated gradient border */
+/* ─── Gradient border ──────────────────────────────────────────── */
 @keyframes border-rotate {
-  0% { --border-angle: 0deg; }
+  0%   { --border-angle: 0deg; }
   100% { --border-angle: 360deg; }
 }
-
 @property --border-angle {
   syntax: "<angle>";
   initial-value: 0deg;
   inherits: false;
 }
-
 .gradient-border {
   --border-angle: 0deg;
   border: 1px solid transparent;
   background-image:
-    linear-gradient(var(--color-slate-900), var(--color-slate-900)),
+    linear-gradient(var(--bg-base), var(--bg-base)),
     conic-gradient(from var(--border-angle), var(--color-blue-600), var(--color-emerald-400), var(--color-blue-400), var(--color-blue-600));
   background-origin: border-box;
   background-clip: padding-box, border-box;
   animation: border-rotate 4s linear infinite;
 }
 
-/* Wave section divider */
-.wave-divider {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 80px;
-  overflow: hidden;
-}
-.wave-divider svg {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-}
-.wave-divider.top {
-  top: -1px;
-}
-.wave-divider.bottom {
-  bottom: -1px;
+/* ─── Wave divider ─────────────────────────────────────────────── */
+.wave-divider          { position: absolute; left: 0; right: 0; height: 80px; overflow: hidden; }
+.wave-divider svg      { position: absolute; width: 100%; height: 100%; }
+.wave-divider.top      { top: -1px; }
+.wave-divider.bottom   { bottom: -1px; }
+
+/* ─── Hero INVEST shimmer ──────────────────────────────────────── */
+@keyframes shimmer-sweep {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
-/* Flowing gradient text — used on hero "like yours." */
+.invest-text {
+  background: linear-gradient(
+    105deg,
+    #e2e8f0 0%,
+    #ffffff 22%,
+    #cbd5e1 42%,
+    #ffffff 52%,
+    #bfdbfe 75%,
+    #e2e8f0 100%
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer-sweep 12s linear infinite;
+}
+
+[data-theme="light"] .invest-text {
+  background: linear-gradient(
+    105deg,
+    #0f172a 0%,
+    #1e3a7a 22%,
+    #0f172a 42%,
+    #2d4a9e 55%,
+    #0f172a 80%,
+    #0f172a 100%
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer-sweep 14s linear infinite;
+}
+
+[data-theme="midnight"] .invest-text {
+  background: linear-gradient(
+    105deg,
+    #c7d2fe 0%,
+    #ffffff 22%,
+    #a5b4fc 42%,
+    #ffffff 52%,
+    #818cf8 75%,
+    #c7d2fe 100%
+  );
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer-sweep 12s linear infinite;
+}
+
+/* ─── Hero "like yours." gradient flow ─────────────────────────── */
 @keyframes gradient-flow {
   0%   { background-position: 0% 50%; }
   100% { background-position: 200% 50%; }
@@ -164,57 +249,39 @@ body {
   animation: gradient-flow 14s linear infinite;
 }
 
-/* Shimmer sweep used on BUSINESSES */
-@keyframes shimmer-sweep {
-  0%   { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-.businesses-text {
-  background: linear-gradient(
-    105deg,
-    #e2e8f0 0%,
-    #ffffff 25%,
-    #cbd5e1 45%,
-    #ffffff 55%,
-    #bfdbfe 80%,
-    #e2e8f0 100%
-  );
-  background-size: 300% 100%;
+[data-theme="light"] .gradient-text-flow {
+  background: linear-gradient(90deg, #334155, #3b5fc7, #4169e1, #2d4a9e, #3b5fc7, #334155);
+  background-size: 400% 100%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: shimmer-sweep 12s linear infinite;
+  animation: gradient-flow 14s linear infinite;
 }
 
-/* Marquee track — used by SectorBar */
+[data-theme="midnight"] .gradient-text-flow {
+  background: linear-gradient(90deg, #a5b4fc, #818cf8, #c4b5fd, #8b5cf6, #818cf8, #a5b4fc);
+  background-size: 400% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-flow 14s linear infinite;
+}
+
+/* ─── Marquee ───────────────────────────────────────────────────── */
 @keyframes marquee {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
 }
+.marquee-track { animation: marquee 30s linear infinite; width: max-content; }
+.marquee-track:hover { animation-play-state: paused; }
 
-.marquee-track {
-  animation: marquee 30s linear infinite;
-  width: max-content;
-}
-
-.marquee-track:hover {
-  animation-play-state: paused;
-}
-
-/* Shimmer effect for loading/hover states */
+/* ─── Shimmer hover ─────────────────────────────────────────────── */
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
+  0%   { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
-
 .shimmer {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(65, 105, 225, 0.06) 50%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg, transparent 0%, rgba(65, 105, 225, 0.06) 50%, transparent 100%);
   background-size: 200% 100%;
   animation: shimmer 3s ease-in-out infinite;
 }

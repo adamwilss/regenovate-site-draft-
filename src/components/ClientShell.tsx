@@ -3,10 +3,11 @@
 import { type ReactNode } from "react";
 import { ScrollProgress } from "@/components/ui/scroll-progress";
 import { MobileCTA } from "@/components/MobileCTA";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 export default function ClientShell({ children }: { children: ReactNode }) {
   return (
-    <>
+    <ThemeProvider>
       <ScrollProgress />
       {/* Noise texture overlay for depth */}
       <div
@@ -19,6 +20,6 @@ export default function ClientShell({ children }: { children: ReactNode }) {
       />
       {children}
       <MobileCTA />
-    </>
+    </ThemeProvider>
   );
 }
