@@ -1,141 +1,80 @@
-# REGENOVATE — Project Brief & Improvement Framework
+# Agent Instructions
 
-## What is this project?
-Regenovate is a premium B2B corporate website for a business investment and transformation company. They invest in, partner with, and acquire small-to-medium businesses, then transform and scale them through a proven "Business Transformation Programme" (BTP). Key focus areas: acquisition, cloud modernisation, marketing innovation, and preserving teams through transitions.
+You're working inside the **WAT framework** (Workflows, Agents, Tools). This architecture separates concerns so that probabilistic AI handles reasoning while deterministic code handles execution. That separation is what makes this system reliable.
 
-## Tech Stack
-- **Framework**: Next.js (App Router, multi-page)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS v4 (`@theme {}` block in `globals.css` — no `tailwind.config.js`)
-- **Animations**: Framer Motion
-- **Deployment**: Vercel (auto-deploys on push to `master`)
-- **Repo**: `git@github.com:adamwilss/regenovate-site-draft-.git` — push to `master`
+## The WAT Architecture
 
-## Pages
-- `/` — Home: Hero → Stats → Pillars → Testimonials → Quote
-- `/about` — Company story, 20+ years, 4 sectors
-- `/solutions` — 4 service cards (Acquisition, Marketing, Cloud, BTP)
-- `/contact` — Contact form → `POST /api/contact`
+**Layer 1: Workflows (The Instructions)**
+- Markdown SOPs stored in `workflows/`
+- Each workflow defines the objective, required inputs, which tools to use, expected outputs, and how to handle edge cases
+- Written in plain language, the same way you'd brief someone on your team
 
-## Key Components
-| Component | Purpose |
-|---|---|
-| `Hero.tsx` | Full-screen hero: canvas particle intro + editorial line-clip content reveal |
-| `Navbar.tsx` | Fixed nav, glass effect on scroll, mobile hamburger, animated underline |
-| `Stats.tsx` | Animated counters (200+ clients, £300M+ revenue, etc.), DM Serif Display |
-| `Pillars.tsx` | 3-pillar philosophy: Stabilise → Systemise → Scale — scroll-jacked wire animation |
-| `Testimonials.tsx` | Stacked featured testimonial layout with author avatars |
-| `Contact.tsx` | Form with validation and API submission |
-| `ui/hero-particle-intro.tsx` | Canvas particle intro: "Regenerate" + "Innovate" burst and reform as "Regenovate". Same particles redirect — no new ones created. Phases: form → hold → burst → reform → hold → done |
-| `ui/particle-field.tsx` | Mouse-interactive canvas particle system (hero background) |
-| `ui/particle-text-effect.tsx` | Generic canvas particle-to-text effect (word cycling) |
-| `ui/gooey-text-morphing.tsx` | SVG filter morphing between text strings |
-| `ui/magnetic-button.tsx` | Spring-physics cursor-tracking buttons |
-| `ui/tilt-card.tsx` | 3D perspective hover effect |
-| `ui/text-reveal.tsx` | Word/letter clip-up reveal with useInView |
-| `ui/scroll-progress.tsx` | Fixed top progress bar using useScroll + useSpring |
+**Layer 2: Agents (The Decision-Maker)**
+- This is your role. You're responsible for intelligent coordination.
+- Read the relevant workflow, run tools in the correct sequence, handle failures gracefully, and ask clarifying questions when needed
+- You connect intent to execution without trying to do everything yourself
+- Example: If you need to pull data from a website, don't attempt it directly. Read `workflows/scrape_website.md`, figure out the required inputs, then execute `tools/scrape_single_site.py`
 
-## Hero Animation — How it works
-1. Canvas fills the screen. "Regenerate" particles assemble from the left, "Innovate" from the right.
-2. Both words hold briefly, then every particle bursts outward with a random velocity.
-3. The exact same particles are redirected mid-flight to form "Regenovate" at centre.
-4. Canvas fades out → editorial line-clip content reveal (each headline line slides up from overflow-hidden wrapper, staggered).
-5. "We invest in" — per-word 3D rotateX flip reveal. "BUSINESSES" — Bebas Neue + character scramble. "like yours." — italic DM Serif + animated flowing gradient.
+**Layer 3: Tools (The Execution)**
+- Python scripts in `tools/` that do the actual work
+- API calls, data transformations, file operations, database queries
+- Credentials and API keys are stored in `.env`
+- These scripts are consistent, testable, and fast
 
-## Pillars Animation — Implemented
-- Desktop: `h-[280vh]` outer + `sticky top-0 h-screen` inner for scroll-jacking
-- `useScroll` + `useTransform` drive: SVG `motion.path` wire draw (`pathLength`), greyscale→colour filter activation per card
-- Box 1 activates at 3–22%, Wire 1 draws at 17–45%, Box 2 activates at 40–60%, Wire 2 at 55–75%, Box 3 at 70–92%
-- Mobile: regular stacked card grid reveal (no scroll-jack)
+**Why this matters:** When AI tries to handle every step directly, accuracy drops fast. If each step is 90% accurate, you're down to 59% success after just five steps. By offloading execution to deterministic scripts, you stay focused on orchestration and decision-making where you excel.
 
-## Design System
-- **Background**: Near-black `#020617` + radial gradient cobalt bleed top-right
-- **Primary**: Cornflower blue `#4169e1`
-- **Accents**: Emerald green `#34d399`, Teal `#2dd4bf`
-- **Fonts**: Inter (body) · DM Serif Display (display serif) · Bebas Neue (impact headlines)
-- **Effects**: Frosted glass, gradient borders, animated orbs, shimmer
-- **CSS utilities**: `.gradient-text`, `.gradient-text-flow`, `.businesses-text`, `.glass`, `.glow`, `.orb`, `.shimmer`, `.gradient-border`, `.wave-divider`
+## How to Operate
 
-## Animation Patterns in Use
-- **Canvas RAF loops** — hero particle intro, background particle field
-- **Framer Motion declarative** — most section animations
-- **useInView** — triggers fade/slide when element enters viewport
-- **useScroll + useSpring** — scroll progress bar
-- **useScroll + useTransform** — Pillars scroll-jack; `pathLength` on `motion.path` for wire draw
-- **Line-clip reveal** — `overflow-hidden` wrapper + `y: "110%" → 0` (Hero, Quote)
-- **Character scramble** — `useEffect` cycling random chars before settling (Hero "BUSINESSES")
-- **layoutId underline** — animated nav active indicator
+**1. Look for existing tools first**
+Before building anything new, check `tools/` based on what your workflow requires. Only create new scripts when nothing exists for that task.
 
-## Notes for Claude
-- **Never regress the hero particle intro** — flagship feature, always protect it
-- Keep animations performant — canvas/SVG preferred over heavy DOM animation
-- Mobile-first responsive design throughout
-- Contact API at `/api/contact` currently just logs; ready for email service integration
+**2. Learn and adapt when things fail**
+When you hit an error:
+- Read the full error message and trace
+- Fix the script and retest (if it uses paid API calls or credits, check with me before running again)
+- Document what you learned in the workflow (rate limits, timing quirks, unexpected behavior)
+- Example: You get rate-limited on an API, so you dig into the docs, discover a batch endpoint, refactor the tool to use it, verify it works, then update the workflow so this never happens again
 
----
+**3. Keep workflows current**
+Workflows should evolve as you learn. When you find better methods, discover constraints, or encounter recurring issues, update the workflow. That said, don't create or overwrite workflows without asking unless I explicitly tell you to. These are your instructions and need to be preserved and refined, not tossed after one use.
 
-## Iterative Improvement Framework
+## The Self-Improvement Loop
 
-### Improvement Philosophy
-Every iteration should answer: **does this make the site more credible and compelling to a business owner considering selling their company?**
+Every failure is a chance to make the system stronger:
+1. Identify what broke
+2. Fix the tool
+3. Verify the fix works
+4. Update the workflow with the new approach
+5. Move on with a more robust system
 
-Categories:
-- **Visual** — typography, motion, colour, layout, density
-- **Content** — copy, data, testimonials, case studies
-- **Functional** — forms, integrations, analytics, performance
+This loop is how the framework improves over time.
 
-### The Loop
+## File Structure
+
+**What goes where:**
+- **Deliverables**: Final outputs go to cloud services (Google Sheets, Slides, etc.) where I can access them directly
+- **Intermediates**: Temporary processing files that can be regenerated
+
+**Directory layout:**
 ```
-AUDIT → RESEARCH → PLAN → BUILD → SHIP → LEARN → repeat
+.tmp/           # Temporary files (scraped data, intermediate exports). Regenerated as needed.
+tools/          # Python scripts for deterministic execution
+workflows/      # Markdown SOPs defining what to do and how
+.env            # API keys and environment variables (NEVER store secrets anywhere else)
+credentials.json, token.json  # Google OAuth (gitignored)
 ```
 
-1. **Audit**: Vercel Analytics, Lighthouse, DevTools, manual mobile review
-2. **Research**: Awwwards, dark.design, lapa.ninja, competitor PE firm sites (Blackstone, KKR, Bain)
-3. **Plan**: state component, goal, dependencies, mobile behaviour before coding
-4. **Build**: edit component → `npx next build` → test locally → check mobile
-5. **Ship**: `git add <files> && git commit -m "..." && git push origin master`
+**Core principle:** Local files are just for processing. Anything I need to see or use lives in cloud services. Everything in `.tmp/` is disposable.
 
-### Active Improvement Backlog
+## Deployment
 
-**High Priority**
-- [ ] **Performance** — `logo-icon.png` is 2MB; re-export at 80×80px
-- [ ] **Contact form** — connect to Resend for transactional email
-- [ ] **SEO** — add OG image, LocalBusiness structured data schema
-- [ ] **Mobile hero** — verify particle intro on low-end mobile
-- [ ] **Cookie consent** — UK/EU compliance
+**After every change, push to GitHub.**
+- Remote: `git@github.com:adamwilss/regenovate-site-draft-.git`
+- Always commit and push at the end of each working session or after completing a task
+- Use descriptive commit messages summarising what changed
 
-**Medium Priority**
-- [ ] **About page** — team photos, timeline, story arc
-- [ ] **Solutions page** — expand service cards + case study snippets
-- [ ] **Case studies** — real before/after transformation stories
-- [ ] **Calendly integration** — book-a-call CTA on contact page
-- [ ] **Hotjar / Clarity** — session recordings + heatmaps
+## Bottom Line
 
-**Stretch**
-- [ ] **Video background** — short hero reel for emotional impact
-- [ ] **Blog/Insights** — thought leadership + SEO
-- [ ] **Interactive BTP explorer** — diagram of transformation programme
+You sit between what I want (workflows) and what actually gets done (tools). Your job is to read instructions, make smart decisions, call the right tools, recover from errors, and keep improving the system as you go.
 
-### External APIs & Integrations
-
-| Service | Purpose | Priority |
-|---|---|---|
-| **Resend** | Contact form email | High |
-| **Vercel Analytics** | Page views, user flow | High |
-| **Google Search Console** | SEO health | High |
-| **Hotjar / Clarity** | Session recordings, heatmaps | Medium |
-| **Airtable / Notion API** | CMS for testimonials/case studies | Medium |
-| **Calendly** | Book-a-call embed | Medium |
-
-### Useful Prompts for Future Sessions
-- `"Improve [Component] — research what top PE/investment sites do and apply it"`
-- `"Optimise performance: [specific issue]"`
-- `"Add [feature] to contact page — integrate with [service]"`
-- `"Make mobile experience of [section] better"`
-
-### Deployment Checklist
-- [ ] `npx next build` passes with zero errors
-- [ ] All pages tested on mobile (375px) and tablet (768px)
-- [ ] Animations work on `prefers-reduced-motion`
-- [ ] No console errors in production build
-- [ ] Contact form tested end-to-end
+Stay pragmatic. Stay reliable. Keep learning.

@@ -199,7 +199,7 @@ function HeroContent({ show }: { show: boolean }) {
       </div>
 
       {/* ── LINE 2: "BUSINESSES" — Bebas Neue, character scramble + shimmer ── */}
-      <div className="overflow-hidden pb-[0.1em]">
+      <div className="overflow-hidden pb-[0.1em] pr-[0.1em]">
         <motion.div
           initial={{ y: "105%", opacity: 0 }}
           animate={show ? { y: 0, opacity: 1 } : { y: "105%", opacity: 0 }}
@@ -217,7 +217,7 @@ function HeroContent({ show }: { show: boolean }) {
       </div>
 
       {/* ── LINE 3: "like yours." — italic DM Serif, flowing gradient ── */}
-      <div className="overflow-hidden pb-[0.3em] mb-10">
+      <div className="overflow-hidden pb-[0.5em] mb-10">
         <motion.span
           className="block italic"
           initial={{ y: "120%" }}

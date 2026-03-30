@@ -156,12 +156,12 @@ body {
 }
 
 .gradient-text-flow {
-  background: linear-gradient(90deg, #60a5fa, #4169e1, #34d399, #2dd4bf, #a78bfa, #60a5fa);
+  background: linear-gradient(90deg, #94a3b8, #60a5fa, #7dd3fc, #a5b4fc, #60a5fa, #94a3b8);
   background-size: 400% 100%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: gradient-flow 5s linear infinite;
+  animation: gradient-flow 14s linear infinite;
 }
 
 /* Shimmer sweep used on BUSINESSES */
@@ -173,18 +173,18 @@ body {
 .businesses-text {
   background: linear-gradient(
     105deg,
-    #ffffff 0%,
-    #93c5fd 30%,
-    #ffffff 50%,
-    #4169e1 70%,
-    #34d399 90%,
-    #ffffff 100%
+    #e2e8f0 0%,
+    #ffffff 25%,
+    #cbd5e1 45%,
+    #ffffff 55%,
+    #bfdbfe 80%,
+    #e2e8f0 100%
   );
   background-size: 300% 100%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: shimmer-sweep 4s linear infinite;
+  animation: shimmer-sweep 12s linear infinite;
 }
 
 /* Marquee track — used by SectorBar */
