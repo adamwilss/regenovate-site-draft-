@@ -256,14 +256,14 @@ function HeroContent({ show }: { show: boolean }) {
         <MagneticButton
           href="/solutions"
           strength={0.25}
-          className="px-9 py-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold tracking-wide rounded-full transition-all hover:shadow-xl hover:shadow-blue-500/30 inline-block text-sm"
+          className="px-9 py-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold tracking-wide rounded-xl transition-all hover:shadow-xl hover:shadow-blue-500/30 inline-block text-sm"
         >
           Discover Our Approach
         </MagneticButton>
         <MagneticButton
           href="/contact"
           strength={0.25}
-          className="px-9 py-4 border border-slate-700 hover:border-blue-400/50 text-slate-400 hover:text-white font-semibold tracking-wide rounded-full transition-all inline-block text-sm"
+          className="px-9 py-4 border border-slate-700 hover:border-blue-400/50 text-slate-400 hover:text-white font-semibold tracking-wide rounded-xl transition-all inline-block text-sm"
         >
           Get Started
         </MagneticButton>

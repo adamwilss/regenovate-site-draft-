@@ -61,14 +61,14 @@ export default function Stats() {
           Proven results
         </motion.p>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-y lg:divide-y-0 divide-slate-800/70">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((stat, i) => (
             <motion.div
               key={stat.label}
               initial={{ opacity: 0, y: 32 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.1 * i, ease: [0.16, 1, 0.3, 1] }}
-              className="px-8 py-8 text-center group"
+              className="px-8 py-10 text-center rounded-2xl border border-slate-800/80 hover:border-slate-700/80 hover:bg-slate-900/30 transition-all duration-300 group"
             >
               <div
                 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-3 leading-none"
@@ -87,6 +87,16 @@ export default function Stats() {
             </motion.div>
           ))}
         </div>
+
+        {/* Proof line */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : {}}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          className="text-center text-[10px] text-slate-600 tracking-[0.35em] uppercase mt-10"
+        >
+          Across all managed clients and portfolios
+        </motion.p>
       </div>
     </section>
   );

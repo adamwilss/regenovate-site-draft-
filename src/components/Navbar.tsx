@@ -37,7 +37,7 @@ export default function Navbar() {
           scrolled ? "glass shadow-lg shadow-black/20" : "bg-transparent"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className={`max-w-7xl mx-auto px-6 flex items-center justify-between transition-all duration-300 ${scrolled ? "py-3" : "py-4"}`}>
           <Link href="/" className="flex items-center group">
             {/* Full wordmark on desktop */}
             <Image
@@ -62,18 +62,25 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`text-sm font-medium transition-colors ${
+                className={`relative text-sm font-medium tracking-[0.08em] transition-colors ${
                   pathname === link.href
                     ? "text-white"
                     : "text-slate-400 hover:text-white"
                 }`}
               >
                 {link.label}
+                {pathname === link.href && (
+                  <motion.span
+                    layoutId="nav-underline"
+                    className="absolute -bottom-1 left-0 right-0 h-px bg-blue-400"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
               </Link>
             ))}
             <Link
               href="/contact"
-              className={`px-5 py-2.5 text-white text-sm font-medium rounded-full transition-all ${
+              className={`px-5 py-2.5 text-white text-sm font-medium tracking-[0.06em] rounded-xl transition-all ${
                 pathname === "/contact"
                   ? "bg-blue-500 shadow-lg shadow-blue-500/25"
                   : "bg-blue-600 hover:bg-blue-500 hover:shadow-lg hover:shadow-blue-500/25"
