@@ -23,7 +23,6 @@ const CW = 220;
 const CH = 100;
 // Straight horizontal line at y=50
 const CONN_PATH = "M 0 50 L 220 50";
-const ARROW_PATH = `M ${CW - 22} 36 L ${CW} 50 L ${CW - 22} 64`;
 
 function NodeConnector({
   progress,
@@ -49,9 +48,6 @@ function NodeConnector({
   const beamProgress = useTransform(progress, [0.05, 0.88], [0, 1]);
   const travelT      = useTransform(progress, [0.05, 0.88], [0, 1]);
   const trailOp      = useTransform(beamProgress, v => v * 0.25);
-  const arrowOp      = useTransform(progress, [0.76, 1.0], [0, 1]);
-  const burstOp      = useTransform(progress, [0.78, 0.95], [0, 1]);
-  const burstR       = useTransform(progress, [0.78, 0.95], [4, 22]);
 
   useMotionValueEvent(travelT, "change", t => {
     if (!pathRef.current || pathLen === 0) return;
@@ -143,45 +139,6 @@ function NodeConnector({
           }}
         />
 
-        {/* Arrival burst — expanding ring */}
-        <motion.circle
-          cx={CW}
-          cy={50}
-          r={burstR}
-          fill="none"
-          stroke={toColor}
-          strokeWidth="1"
-          style={{
-            opacity: burstOp,
-            filter: `drop-shadow(0 0 10px ${toColor})`,
-          }}
-        />
-
-        {/* Arrival burst — bright inner dot */}
-        <motion.circle
-          cx={CW}
-          cy={50}
-          r={3}
-          fill={toColor}
-          style={{
-            opacity: burstOp,
-            filter: `drop-shadow(0 0 8px ${toColor}) drop-shadow(0 0 16px ${toColor})`,
-          }}
-        />
-
-        {/* Directional arrowhead */}
-        <motion.path
-          d={ARROW_PATH}
-          stroke={toColor}
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-          style={{
-            opacity: arrowOp,
-            filter: `drop-shadow(0 0 6px ${toColor}) drop-shadow(0 0 12px ${toColor})`,
-          }}
-        />
       </svg>
     </div>
   );
@@ -570,7 +527,6 @@ function PillarsDesktop() {
    MOBILE — stacked cards with straight vertical connectors
    ═══════════════════════════════════════════════════════════════════════ */
 const MOBILE_MEANDER = "M 20 0 L 20 72";
-const MOBILE_ARROW   = "M 0 62 L 6 72 L 12 62";
 
 function PillarsMobile() {
   const ref = useRef<HTMLDivElement>(null);
@@ -708,16 +664,6 @@ function PillarsMobile() {
                       strokeWidth="1.5"
                       strokeLinecap="round"
                       fill="none"
-                    />
-                    {/* Arrow at bottom */}
-                    <path
-                      d={MOBILE_ARROW}
-                      stroke={pillars[pi + 1].letterColor}
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      fill="none"
-                      style={{ filter: `drop-shadow(0 0 4px ${pillars[pi + 1].letterColor})` }}
                     />
                   </svg>
                 </motion.div>
