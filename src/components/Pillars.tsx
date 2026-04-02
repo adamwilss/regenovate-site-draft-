@@ -94,7 +94,7 @@ function NodeConnector({
   return (
     <div
       className="flex-shrink-0 self-center flex items-center justify-center"
-      style={{ width: 96 }}
+      style={{ width: 116 }}
     >
       <svg
         width="100%"
@@ -488,17 +488,17 @@ function PillarsDesktop() {
   });
 
   useMotionValueEvent(scrollYProgress, "change", v => {
-    if (v >= 0.62) setActiveStage(2);
-    else if (v >= 0.32) setActiveStage(1);
+    if (v >= 0.78) setActiveStage(2);
+    else if (v >= 0.44) setActiveStage(1);
     else setActiveStage(0);
   });
 
-  // Node activation windows
+  // Node activation windows — cards 2 and 3 start AFTER each explosion lands
   const box1  = useTransform(scrollYProgress, [0.00, 0.20], [0, 1]);
-  const conn1 = useTransform(scrollYProgress, [0.16, 0.44], [0, 1]);
-  const box2  = useTransform(scrollYProgress, [0.34, 0.56], [0, 1]);
-  const conn2 = useTransform(scrollYProgress, [0.52, 0.74], [0, 1]);
-  const box3  = useTransform(scrollYProgress, [0.66, 0.92], [0, 1]);
+  const conn1 = useTransform(scrollYProgress, [0.16, 0.46], [0, 1]);
+  const box2  = useTransform(scrollYProgress, [0.44, 0.64], [0, 1]); // starts as conn1 explosion completes
+  const conn2 = useTransform(scrollYProgress, [0.60, 0.80], [0, 1]);
+  const box3  = useTransform(scrollYProgress, [0.78, 0.96], [0, 1]); // starts as conn2 explosion completes
 
   return (
     <div
