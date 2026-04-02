@@ -363,7 +363,8 @@ function SystemiseGlitchLetter({ char, index, progress }: { char: string, index:
   });
   
   const y = useTransform(progress, [0.15, threshold], [20, 0]);
-  const opacity = useTransform(progress, [0.15, Math.min(0.3, threshold/2)], [0, 1]);
+  const endOpacity = Math.max(0.16, Math.min(0.3, threshold * 0.7));
+  const opacity = useTransform(progress, [0.15, endOpacity], [0, 1]);
 
   return (
     <motion.span
