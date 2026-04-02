@@ -1,7 +1,7 @@
 "use client";
 
-import { motion, useScroll, useTransform, useInView, MotionValue } from "framer-motion";
-import { useRef } from "react";
+import { motion, useScroll, useTransform, useInView, useMotionValue, useMotionValueEvent, MotionValue } from "framer-motion";
+import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 
 /* ─── Data ─────────────────────────────────────────────────────── */
@@ -71,87 +71,138 @@ const steps = [
   },
 ];
 
-/* ─── Straight line SVG path connector ──────────────────────────── */
-function MeanderConnector({
+/* ─── Connector constants ────────────────────────────────────────── */
+const ACW = 180;
+const ACH = 80;
+const ACONN_PATH = "M 0 40 L 180 40";
+const ARAD   = [0, 45, 90, 135, 180, 225, 270, 315].map(d => d * Math.PI / 180);
+const ASIZES = [7, 4.5, 8, 4.5, 7, 4.5, 8, 4.5];
+
+/* ─── Approach connector — orb + beam + particle burst ──────────── */
+function ApproachConnector({
   progress,
   fromColor,
   toColor,
+  id,
 }: {
   progress: MotionValue<number>;
   fromColor: string;
   toColor: string;
+  id: string;
 }) {
-  const beam   = useTransform(progress, [0.1, 0.85], [0, 1]);
-  const dotOp  = useTransform(progress, [0.5, 0.8], [0, 1]);
-  const arrowOp = useTransform(progress, [0.75, 1.0], [0, 1]);
-  const id = `meander-${fromColor.replace("#","")}-${toColor.replace("#","")}`;
+  const pathRef = useRef<SVGPathElement>(null);
+  const [pathLen, setPathLen] = useState(0);
+  const dotX = useMotionValue(0);
+  const dotY = useMotionValue(40);
 
-  // Straight vertical line centered at x=50
-  const path = "M 50 0 L 50 300";
+  useEffect(() => {
+    if (pathRef.current) setPathLen(pathRef.current.getTotalLength());
+  }, []);
+
+  const beamProgress  = useTransform(progress, [0.05, 0.88], [0, 1]);
+  const travelT       = useTransform(progress, [0.05, 0.88], [0, 1]);
+  const orbOp         = useTransform(progress, [0.05, 0.74, 0.84], [0, 1, 0]);
+
+  const burstProgress = useTransform(progress, [0.80, 1.0], [0, 1]);
+  const flashOp       = useTransform(burstProgress, [0, 0.10, 0.30], [0, 1, 0]);
+  const flashR        = useTransform(burstProgress, [0, 0.35], [0, 55]);
+  const burstR        = useTransform(burstProgress, p => p * 130);
+  const burstOp       = useTransform(burstProgress, p =>
+    p < 0.25 ? p / 0.25 : 1 - (p - 0.25) / 0.75
+  );
+
+  // 8 particle positions — fixed count, all at hook level
+  const bp0x = useTransform(burstR, r => ACW + Math.cos(ARAD[0]) * r);
+  const bp0y = useTransform(burstR, r => 40  + Math.sin(ARAD[0]) * r);
+  const bp1x = useTransform(burstR, r => ACW + Math.cos(ARAD[1]) * r);
+  const bp1y = useTransform(burstR, r => 40  + Math.sin(ARAD[1]) * r);
+  const bp2x = useTransform(burstR, r => ACW + Math.cos(ARAD[2]) * r);
+  const bp2y = useTransform(burstR, r => 40  + Math.sin(ARAD[2]) * r);
+  const bp3x = useTransform(burstR, r => ACW + Math.cos(ARAD[3]) * r);
+  const bp3y = useTransform(burstR, r => 40  + Math.sin(ARAD[3]) * r);
+  const bp4x = useTransform(burstR, r => ACW + Math.cos(ARAD[4]) * r);
+  const bp4y = useTransform(burstR, r => 40  + Math.sin(ARAD[4]) * r);
+  const bp5x = useTransform(burstR, r => ACW + Math.cos(ARAD[5]) * r);
+  const bp5y = useTransform(burstR, r => 40  + Math.sin(ARAD[5]) * r);
+  const bp6x = useTransform(burstR, r => ACW + Math.cos(ARAD[6]) * r);
+  const bp6y = useTransform(burstR, r => 40  + Math.sin(ARAD[6]) * r);
+  const bp7x = useTransform(burstR, r => ACW + Math.cos(ARAD[7]) * r);
+  const bp7y = useTransform(burstR, r => 40  + Math.sin(ARAD[7]) * r);
+
+  useMotionValueEvent(travelT, "change", t => {
+    if (!pathRef.current || pathLen === 0) return;
+    const pt = pathRef.current.getPointAtLength(t * pathLen);
+    dotX.set(pt.x);
+    dotY.set(pt.y);
+  });
+
+  const particles: [typeof bp0x, typeof bp0y][] = [
+    [bp0x, bp0y], [bp1x, bp1y], [bp2x, bp2y], [bp3x, bp3y],
+    [bp4x, bp4y], [bp5x, bp5y], [bp6x, bp6y], [bp7x, bp7y],
+  ];
 
   return (
-    <div className="flex items-center justify-center w-24 flex-shrink-0 self-stretch relative">
+    <div className="flex-shrink-0 self-center flex items-center justify-center" style={{ width: 100 }}>
       <svg
-        width="100"
-        height="100%"
-        viewBox="0 0 100 300"
-        preserveAspectRatio="none"
-        className="absolute inset-0 w-full h-full"
-        style={{ overflow: "visible" }}
+        width="100%"
+        height={ACH}
+        viewBox={`0 0 ${ACW} ${ACH}`}
+        style={{ overflow: "visible", display: "block" }}
       >
         <defs>
-          <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stopColor={fromColor} stopOpacity="0.3"/>
-            <stop offset="50%"  stopColor={toColor}   stopOpacity="0.7"/>
-            <stop offset="100%" stopColor={toColor}   stopOpacity="0.2"/>
+          <linearGradient id={`acg-${id}`} x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor={fromColor} stopOpacity="0.85" />
+            <stop offset="100%" stopColor={toColor} stopOpacity="1" />
           </linearGradient>
+          <filter id={`acf-${id}`} x="-80%" y="-80%" width="260%" height="260%">
+            <feGaussianBlur stdDeviation="3" result="inner" />
+            <feGaussianBlur stdDeviation="7" in="SourceGraphic" result="outer" />
+            <feMerge>
+              <feMergeNode in="outer" />
+              <feMergeNode in="inner" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
         </defs>
-        {/* Static dotted track */}
-        <path d={path} stroke="var(--border-subtle)" strokeWidth="1" fill="none" strokeDasharray="3 7"/>
-        {/* Animated flowing beam */}
+
+        {/* Resting thread */}
+        <path d={ACONN_PATH} stroke={fromColor} strokeWidth="1" fill="none"
+          style={{ opacity: 0.12, filter: `drop-shadow(0 0 3px ${fromColor})` }} />
+
+        {/* Beam — draws left to right behind orb */}
         <motion.path
-          d={path}
-          stroke={`url(#${id})`}
-          strokeWidth="2.5"
+          ref={pathRef}
+          d={ACONN_PATH}
+          stroke={`url(#acg-${id})`}
+          strokeWidth="3"
           strokeLinecap="round"
           fill="none"
-          style={{ pathLength: beam }}
+          filter={`url(#acf-${id})`}
+          style={{ pathLength: beamProgress }}
         />
-        {/* Pulsing node at midpoint */}
-        <motion.circle
-          cx={50}
-          cy={150}
-          r={4}
-          fill="none"
-          stroke={toColor}
-          strokeWidth="1.5"
-          style={{ opacity: dotOp, filter: `drop-shadow(0 0 6px ${toColor})` }}
-        />
-        <motion.circle
-          cx={50}
-          cy={150}
-          r={1.5}
-          fill={toColor}
-          style={{ opacity: dotOp }}
-        />
-      </svg>
 
-      {/* Arrow at end */}
-      <motion.div
-        style={{ opacity: arrowOp }}
-        className="absolute bottom-4 left-1/2 -translate-x-1/2"
-      >
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path
-            d="M8 2v12M3 9l5 5 5-5"
-            stroke={toColor}
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            style={{ filter: `drop-shadow(0 0 5px ${toColor})` }}
+        {/* Orb — outer glow ring */}
+        <motion.circle cx={dotX} cy={dotY} r={11} fill="none" stroke={toColor} strokeWidth="2"
+          style={{ opacity: orbOp, filter: `drop-shadow(0 0 10px ${toColor}) drop-shadow(0 0 22px ${toColor})` }}
+        />
+        {/* Orb — white-hot core */}
+        <motion.circle cx={dotX} cy={dotY} r={5} fill="#ffffff"
+          style={{ opacity: orbOp, filter: `drop-shadow(0 0 8px ${toColor}) drop-shadow(0 0 16px ${toColor})` }}
+        />
+
+        {/* Impact flash */}
+        <motion.circle cx={ACW} cy={40} r={flashR} fill={toColor}
+          style={{ opacity: flashOp, filter: `drop-shadow(0 0 18px ${toColor}) drop-shadow(0 0 36px ${toColor})` }}
+        />
+
+        {/* 8 scatter particles */}
+        {particles.map(([cx, cy], i) => (
+          <motion.circle key={i} cx={cx} cy={cy} r={ASIZES[i]}
+            fill={i % 2 === 0 ? toColor : "#ffffff"}
+            style={{ opacity: burstOp, filter: `drop-shadow(0 0 ${i % 2 === 0 ? 10 : 5}px ${toColor})` }}
           />
-        </svg>
-      </motion.div>
+        ))}
+      </svg>
     </div>
   );
 }
@@ -297,13 +348,14 @@ function ApproachDesktop() {
     offset: ["start start", "end end"],
   });
 
-  const s1  = useTransform(scrollYProgress, [0.02, 0.24], [0, 1]);
-  const c1  = useTransform(scrollYProgress, [0.18, 0.42], [0, 1]);
-  const s2  = useTransform(scrollYProgress, [0.36, 0.56], [0, 1]);
-  const c2  = useTransform(scrollYProgress, [0.50, 0.68], [0, 1]);
-  const s3  = useTransform(scrollYProgress, [0.62, 0.80], [0, 1]);
-  const c3  = useTransform(scrollYProgress, [0.74, 0.88], [0, 1]);
-  const s4  = useTransform(scrollYProgress, [0.82, 1.00], [0, 1]);
+  // Cards appear before each explosion; connectors wider for slower travel
+  const s1  = useTransform(scrollYProgress, [0.02, 0.22], [0, 1]);
+  const c1  = useTransform(scrollYProgress, [0.14, 0.44], [0, 1]);
+  const s2  = useTransform(scrollYProgress, [0.26, 0.48], [0, 1]);
+  const c2  = useTransform(scrollYProgress, [0.44, 0.68], [0, 1]);
+  const s3  = useTransform(scrollYProgress, [0.56, 0.76], [0, 1]);
+  const c3  = useTransform(scrollYProgress, [0.70, 0.90], [0, 1]);
+  const s4  = useTransform(scrollYProgress, [0.78, 0.98], [0, 1]);
 
   return (
     <div ref={containerRef} id="approach" className="relative hidden lg:block" style={{ height: "360vh" }}>
@@ -313,14 +365,14 @@ function ApproachDesktop() {
         <div className="w-full px-8 xl:px-16 max-w-[1700px] mx-auto pt-6">
           <Header visible={isInView} />
 
-          {/* 4 cards + 3 straight connectors */}
-          <div className="flex items-stretch gap-0 mt-6" style={{ minHeight: "440px" }}>
+          {/* 4 cards + 3 connectors */}
+          <div className="flex items-center gap-0 mt-6">
             <StepCard step={steps[0]} progress={s1} />
-            <MeanderConnector progress={c1} fromColor={steps[0].color} toColor={steps[1].color} />
+            <ApproachConnector progress={c1} fromColor={steps[0].color} toColor={steps[1].color} id="a1" />
             <StepCard step={steps[1]} progress={s2} />
-            <MeanderConnector progress={c2} fromColor={steps[1].color} toColor={steps[2].color} />
+            <ApproachConnector progress={c2} fromColor={steps[1].color} toColor={steps[2].color} id="a2" />
             <StepCard step={steps[2]} progress={s3} />
-            <MeanderConnector progress={c3} fromColor={steps[2].color} toColor={steps[3].color} />
+            <ApproachConnector progress={c3} fromColor={steps[2].color} toColor={steps[3].color} id="a3" />
             <StepCard step={steps[3]} progress={s4} />
           </div>
 
