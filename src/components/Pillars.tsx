@@ -17,19 +17,12 @@ function hexToRgb(hex: string) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   HORIZONTAL NODE CONNECTOR — 2.5-wave meander
+   HORIZONTAL NODE CONNECTOR — straight line
    ═══════════════════════════════════════════════════════════════════════ */
 const CW = 220;
 const CH = 100;
-// 5-segment bezier: oscillates y=25↔y=75 with 4 direction changes, exits at center
-const CONN_PATH = [
-  "M 0 50",
-  "C 14 50, 18 25, 44 25",     // rise to y=25
-  "C 70 25, 62 75, 88 75",     // sweep down to y=75
-  "C 114 75, 106 25, 132 25",  // arc back up to y=25
-  "C 158 25, 150 75, 176 75",  // sweep down to y=75
-  "C 196 75, 194 50, 220 50",  // settle to center
-].join(" ");
+// Straight horizontal line at y=50
+const CONN_PATH = "M 0 50 L 220 50";
 const ARROW_PATH = `M ${CW - 22} 36 L ${CW} 50 L ${CW - 22} 64`;
 
 function NodeConnector({
@@ -539,7 +532,7 @@ function PillarsDesktop() {
         <div className="w-full px-8 xl:px-16 max-w-[1680px] mx-auto">
           <SectionHeader visible={isInView} activeStage={activeStage} />
 
-          {/* Three nodes connected by meandering beams */}
+          {/* Three nodes connected by straight beams */}
           <div className="flex items-center mt-6">
             <NodeCard pillar={pillars[0]} progress={box1} step="01" />
             <NodeConnector
@@ -574,9 +567,9 @@ function PillarsDesktop() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   MOBILE — stacked cards with SVG meander connectors
+   MOBILE — stacked cards with straight vertical connectors
    ═══════════════════════════════════════════════════════════════════════ */
-const MOBILE_MEANDER = "M 20 0 C 20 16, 34 20, 34 36 C 34 52, 6 56, 6 72";
+const MOBILE_MEANDER = "M 20 0 L 20 72";
 const MOBILE_ARROW   = "M 0 62 L 6 72 L 12 62";
 
 function PillarsMobile() {
@@ -685,7 +678,7 @@ function PillarsMobile() {
                 </div>
               </motion.div>
 
-              {/* Meandering vertical connector */}
+              {/* Straight vertical connector */}
               {pi < 2 && (
                 <motion.div
                   initial={{ opacity: 0 }}
