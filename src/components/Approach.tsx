@@ -88,10 +88,8 @@ function MeanderConnector({
   const arrowOp = useTransform(progress, [0.75, 1.0], [0, 1]);
   const id = `meander-${fromColor.replace("#","")}-${toColor.replace("#","")}`;
 
-  // Meandering bezier — curves depending on flip direction
-  const path = flip
-    ? "M 60 0 C 60 40, 20 60, 20 100 C 20 140, 80 160, 80 200 C 80 240, 40 260, 40 300"
-    : "M 40 0 C 40 40, 80 60, 80 100 C 80 140, 20 160, 20 200 C 20 240, 60 260, 60 300";
+  // Straight line connector — same for both directions
+  const path = "M 50 0 L 50 300";
 
   return (
     <div className="flex items-center justify-center w-24 flex-shrink-0 self-stretch relative">
