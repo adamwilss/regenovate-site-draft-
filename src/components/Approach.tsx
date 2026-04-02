@@ -71,24 +71,22 @@ const steps = [
   },
 ];
 
-/* ─── Meandering SVG path connector ─────────────────────────────── */
+/* ─── Straight line SVG path connector ──────────────────────────── */
 function MeanderConnector({
   progress,
   fromColor,
   toColor,
-  flip,
 }: {
   progress: MotionValue<number>;
   fromColor: string;
   toColor: string;
-  flip: boolean;
 }) {
   const beam   = useTransform(progress, [0.1, 0.85], [0, 1]);
   const dotOp  = useTransform(progress, [0.5, 0.8], [0, 1]);
   const arrowOp = useTransform(progress, [0.75, 1.0], [0, 1]);
   const id = `meander-${fromColor.replace("#","")}-${toColor.replace("#","")}`;
 
-  // Straight line connector — same for both directions
+  // Straight vertical line centered at x=50
   const path = "M 50 0 L 50 300";
 
   return (
@@ -121,7 +119,7 @@ function MeanderConnector({
         />
         {/* Pulsing node at midpoint */}
         <motion.circle
-          cx={flip ? 20 : 80}
+          cx={50}
           cy={150}
           r={4}
           fill="none"
@@ -130,7 +128,7 @@ function MeanderConnector({
           style={{ opacity: dotOp, filter: `drop-shadow(0 0 6px ${toColor})` }}
         />
         <motion.circle
-          cx={flip ? 20 : 80}
+          cx={50}
           cy={150}
           r={1.5}
           fill={toColor}
@@ -315,14 +313,14 @@ function ApproachDesktop() {
         <div className="w-full px-8 xl:px-16 max-w-[1700px] mx-auto pt-6">
           <Header visible={isInView} />
 
-          {/* 4 cards + 3 meandering connectors */}
+          {/* 4 cards + 3 straight connectors */}
           <div className="flex items-stretch gap-0 mt-6" style={{ minHeight: "440px" }}>
             <StepCard step={steps[0]} progress={s1} />
-            <MeanderConnector progress={c1} fromColor={steps[0].color} toColor={steps[1].color} flip={false} />
+            <MeanderConnector progress={c1} fromColor={steps[0].color} toColor={steps[1].color} />
             <StepCard step={steps[1]} progress={s2} />
-            <MeanderConnector progress={c2} fromColor={steps[1].color} toColor={steps[2].color} flip={true} />
+            <MeanderConnector progress={c2} fromColor={steps[1].color} toColor={steps[2].color} />
             <StepCard step={steps[2]} progress={s3} />
-            <MeanderConnector progress={c3} fromColor={steps[2].color} toColor={steps[3].color} flip={false} />
+            <MeanderConnector progress={c3} fromColor={steps[2].color} toColor={steps[3].color} />
             <StepCard step={steps[3]} progress={s4} />
           </div>
 
