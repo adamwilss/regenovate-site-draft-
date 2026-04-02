@@ -186,6 +186,162 @@ function NodeConnector({
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
+   PILL CONNECTOR — mini orb+beam+burst for the stage indicator pills
+   ═══════════════════════════════════════════════════════════════════════ */
+const PCW = 40;
+const PCH = 16;
+const PCONN_PATH = "M 0 8 L 40 8";
+const PRAD   = [0, 45, 90, 135, 180, 225, 270, 315].map(d => d * Math.PI / 180);
+const PSIZES = [3, 2, 3.5, 2, 3, 2, 3.5, 2];
+
+function PillConnector({
+  progress,
+  fromColor,
+  toColor,
+  id,
+}: {
+  progress: MotionValue<number>;
+  fromColor: string;
+  toColor: string;
+  id: string;
+}) {
+  const pathRef = useRef<SVGPathElement>(null);
+  const [pathLen, setPathLen] = useState(0);
+  const dotX = useMotionValue(0);
+  const dotY = useMotionValue(8);
+
+  useEffect(() => {
+    if (pathRef.current) setPathLen(pathRef.current.getTotalLength());
+  }, []);
+
+  const beamProgress  = useTransform(progress, [0.05, 0.88], [0, 1]);
+  const travelT       = useTransform(progress, [0.05, 0.88], [0, 1]);
+  const orbOp         = useTransform(progress, [0.05, 0.74, 0.84], [0, 1, 0]);
+  const burstProgress = useTransform(progress, [0.80, 1.0], [0, 1]);
+  const flashOp       = useTransform(burstProgress, [0, 0.10, 0.30], [0, 1, 0]);
+  const flashR        = useTransform(burstProgress, [0, 0.35], [0, 14]);
+  const burstR        = useTransform(burstProgress, p => p * 28);
+  const burstOp       = useTransform(burstProgress, p =>
+    p < 0.25 ? p / 0.25 : 1 - (p - 0.25) / 0.75
+  );
+
+  const bp0x = useTransform(burstR, r => PCW + Math.cos(PRAD[0]) * r);
+  const bp0y = useTransform(burstR, r => 8 + Math.sin(PRAD[0]) * r);
+  const bp1x = useTransform(burstR, r => PCW + Math.cos(PRAD[1]) * r);
+  const bp1y = useTransform(burstR, r => 8 + Math.sin(PRAD[1]) * r);
+  const bp2x = useTransform(burstR, r => PCW + Math.cos(PRAD[2]) * r);
+  const bp2y = useTransform(burstR, r => 8 + Math.sin(PRAD[2]) * r);
+  const bp3x = useTransform(burstR, r => PCW + Math.cos(PRAD[3]) * r);
+  const bp3y = useTransform(burstR, r => 8 + Math.sin(PRAD[3]) * r);
+  const bp4x = useTransform(burstR, r => PCW + Math.cos(PRAD[4]) * r);
+  const bp4y = useTransform(burstR, r => 8 + Math.sin(PRAD[4]) * r);
+  const bp5x = useTransform(burstR, r => PCW + Math.cos(PRAD[5]) * r);
+  const bp5y = useTransform(burstR, r => 8 + Math.sin(PRAD[5]) * r);
+  const bp6x = useTransform(burstR, r => PCW + Math.cos(PRAD[6]) * r);
+  const bp6y = useTransform(burstR, r => 8 + Math.sin(PRAD[6]) * r);
+  const bp7x = useTransform(burstR, r => PCW + Math.cos(PRAD[7]) * r);
+  const bp7y = useTransform(burstR, r => 8 + Math.sin(PRAD[7]) * r);
+
+  useMotionValueEvent(travelT, "change", t => {
+    if (!pathRef.current || pathLen === 0) return;
+    const pt = pathRef.current.getPointAtLength(t * pathLen);
+    dotX.set(pt.x);
+    dotY.set(pt.y);
+  });
+
+  const particles: [typeof bp0x, typeof bp0y][] = [
+    [bp0x, bp0y], [bp1x, bp1y], [bp2x, bp2y], [bp3x, bp3y],
+    [bp4x, bp4y], [bp5x, bp5y], [bp6x, bp6y], [bp7x, bp7y],
+  ];
+
+  return (
+    <svg
+      width={PCW}
+      height={PCH}
+      viewBox={`0 0 ${PCW} ${PCH}`}
+      style={{ overflow: "visible", display: "block" }}
+    >
+      <defs>
+        <linearGradient id={`pcg-${id}`} x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor={fromColor} stopOpacity="0.85" />
+          <stop offset="100%" stopColor={toColor} stopOpacity="1" />
+        </linearGradient>
+        <filter id={`pcf-${id}`} x="-100%" y="-100%" width="300%" height="300%">
+          <feGaussianBlur stdDeviation="1.5" result="inner" />
+          <feGaussianBlur stdDeviation="3" in="SourceGraphic" result="outer" />
+          <feMerge>
+            <feMergeNode in="outer" />
+            <feMergeNode in="inner" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      {/* Resting thread */}
+      <path
+        d={PCONN_PATH}
+        stroke={fromColor}
+        strokeWidth="1"
+        fill="none"
+        style={{ opacity: 0.12, filter: `drop-shadow(0 0 2px ${fromColor})` }}
+      />
+
+      {/* Beam */}
+      <motion.path
+        ref={pathRef}
+        d={PCONN_PATH}
+        stroke={`url(#pcg-${id})`}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        fill="none"
+        filter={`url(#pcf-${id})`}
+        style={{ pathLength: beamProgress }}
+      />
+
+      {/* Orb — outer glow ring */}
+      <motion.circle
+        cx={dotX} cy={dotY} r={5}
+        fill="none" stroke={toColor} strokeWidth="1.5"
+        style={{
+          opacity: orbOp,
+          filter: `drop-shadow(0 0 4px ${toColor}) drop-shadow(0 0 8px ${toColor})`,
+        }}
+      />
+      {/* Orb — core */}
+      <motion.circle
+        cx={dotX} cy={dotY} r={2.5}
+        fill="#ffffff"
+        style={{
+          opacity: orbOp,
+          filter: `drop-shadow(0 0 4px ${toColor}) drop-shadow(0 0 8px ${toColor})`,
+        }}
+      />
+
+      {/* Impact flash */}
+      <motion.circle
+        cx={PCW} cy={8} r={flashR}
+        fill={toColor}
+        style={{ opacity: flashOp, filter: `drop-shadow(0 0 8px ${toColor}) drop-shadow(0 0 16px ${toColor})` }}
+      />
+
+      {/* 8 scatter particles */}
+      {particles.map(([cx, cy], i) => (
+        <motion.circle
+          key={i}
+          cx={cx} cy={cy}
+          r={PSIZES[i]}
+          fill={i % 2 === 0 ? toColor : "#ffffff"}
+          style={{
+            opacity: burstOp,
+            filter: `drop-shadow(0 0 ${i % 2 === 0 ? 5 : 3}px ${toColor})`,
+          }}
+        />
+      ))}
+    </svg>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
    NODE CARD — strong ghost→active contrast
    ═══════════════════════════════════════════════════════════════════════ */
 function NodeCard({
@@ -393,9 +549,13 @@ const STAGE_COLORS = pillars.map(p => p.letterColor);
 function SectionHeader({
   visible,
   activeStage,
+  pillConn1,
+  pillConn2,
 }: {
   visible: boolean;
   activeStage: number;
+  pillConn1?: MotionValue<number>;
+  pillConn2?: MotionValue<number>;
 }) {
   return (
     <motion.div
@@ -454,17 +614,23 @@ function SectionHeader({
 
             {/* Connector line lives only in the gap between pills */}
             {i < 2 && (
-              <div className="w-10 flex items-center justify-center">
-                <motion.div
-                  className="h-px w-full"
-                  animate={{
-                    opacity: activeStage > i ? 0.7 : 0.15,
-                    background: activeStage > i
-                      ? `linear-gradient(to right, ${STAGE_COLORS[i]}, ${STAGE_COLORS[i + 1]})`
-                      : "var(--border-subtle)",
-                  }}
-                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                />
+              <div className="w-10 flex items-center justify-center" style={{ overflow: "visible" }}>
+                {i === 0 && pillConn1 ? (
+                  <PillConnector progress={pillConn1} fromColor={STAGE_COLORS[0]} toColor={STAGE_COLORS[1]} id="pc1" />
+                ) : i === 1 && pillConn2 ? (
+                  <PillConnector progress={pillConn2} fromColor={STAGE_COLORS[1]} toColor={STAGE_COLORS[2]} id="pc2" />
+                ) : (
+                  <motion.div
+                    className="h-px w-full"
+                    animate={{
+                      opacity: activeStage > i ? 0.7 : 0.15,
+                      background: activeStage > i
+                        ? `linear-gradient(to right, ${STAGE_COLORS[i]}, ${STAGE_COLORS[i + 1]})`
+                        : "var(--border-subtle)",
+                    }}
+                    transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                  />
+                )}
               </div>
             )}
           </div>
@@ -519,7 +685,7 @@ function PillarsDesktop() {
         />
 
         <div className="w-full px-8 xl:px-16 max-w-[1680px] mx-auto">
-          <SectionHeader visible={isInView} activeStage={activeStage} />
+          <SectionHeader visible={isInView} activeStage={activeStage} pillConn1={conn1} pillConn2={conn2} />
 
           {/* Three nodes connected by straight beams */}
           <div className="flex items-center mt-6">
