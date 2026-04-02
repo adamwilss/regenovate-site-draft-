@@ -9,6 +9,8 @@ class P {
   r = 255; g = 255; b = 255
   tr = 255; tg = 255; tb = 255
   sr = 255; sg = 255; sb = 255
+  // Source word color — preserved through reform so REGENOVATE inherits mixed hues
+  srcR = 255; srcG = 255; srcB = 255
   blend = 1; rate = 0.025
   spd = 8; frc = 0.4
   dead = false
@@ -183,6 +185,7 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin }: P
         p.r = p.sr = p.tr = pos.c[0]
         p.g = p.sg = p.tg = pos.c[1]
         p.b = p.sb = p.tb = pos.c[2]
+        p.srcR = pos.c[0]; p.srcG = pos.c[1]; p.srcB = pos.c[2]
         p.blend   = 1
         p.setTarget(pos.x, pos.y, pos.c[0], pos.c[1], pos.c[2])
         particles.push(p)
@@ -199,7 +202,7 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin }: P
         p.spd    = Math.random() * 5 + 12
         p.frc    = p.spd * 0.08
         p.rate   = Math.random() * 0.02 + 0.015
-        p.setTarget(pos.x, pos.y, 255, 255, 255)
+        p.setTarget(pos.x, pos.y, p.srcR, p.srcG, p.srcB)
       }
 
       for (let i = pts.length; i < particles.length; i++) {
