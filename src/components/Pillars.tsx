@@ -21,8 +21,10 @@ function hexToRgb(hex: string) {
    ═══════════════════════════════════════════════════════════════════════ */
 const CW = 220;
 const CH = 100;
-// Straight horizontal line at y=50
 const CONN_PATH = "M 0 50 L 220 50";
+// Particle burst — 8 directions at 45° intervals, alternating sizes
+const RAD   = [0, 45, 90, 135, 180, 225, 270, 315].map(d => d * Math.PI / 180);
+const SIZES = [4, 2.5, 4.5, 2.5, 4, 2.5, 4.5, 2.5];
 
 function NodeConnector({
   progress,
@@ -37,33 +39,55 @@ function NodeConnector({
 }) {
   const pathRef = useRef<SVGPathElement>(null);
   const [pathLen, setPathLen] = useState(0);
-  const dotX   = useMotionValue(0);
-  const dotY   = useMotionValue(50);
-  const trailX = useMotionValue(0);
+  const dotX = useMotionValue(0);
+  const dotY = useMotionValue(50);
 
   useEffect(() => {
     if (pathRef.current) setPathLen(pathRef.current.getTotalLength());
   }, []);
 
-  // All hooks at top level — never in JSX
-  const beamProgress = useTransform(progress, [0.05, 0.88], [0, 1]);
-  const travelT      = useTransform(progress, [0.05, 0.88], [0, 1]);
-  const trailOp      = useTransform(beamProgress, v => v * 0.6);
-  // Explosion burst — two staggered rings on arrival
-  const burstOp1 = useTransform(progress, [0.86, 0.98], [1, 0]);
-  const burstR1  = useTransform(progress, [0.86, 1.00], [0, 30]);
-  const burstOp2 = useTransform(progress, [0.89, 1.00], [0.7, 0]);
-  const burstR2  = useTransform(progress, [0.89, 1.00], [0, 18]);
+  // ── Core motion values ────────────────────────────────────────────
+  const beamProgress  = useTransform(progress, [0.05, 0.88], [0, 1]);
+  const travelT       = useTransform(progress, [0.05, 0.88], [0, 1]);
+
+  // ── Burst on arrival ─────────────────────────────────────────────
+  const burstProgress = useTransform(progress, [0.86, 1.0], [0, 1]);
+  const flashOp       = useTransform(burstProgress, [0, 0.15, 0.4], [0, 1, 0]);
+  const flashR        = useTransform(burstProgress, [0, 0.3], [0, 16]);
+  const burstR        = useTransform(burstProgress, p => p * 48);
+  const burstOp       = useTransform(burstProgress, p =>
+    p < 0.35 ? p / 0.35 : 1 - (p - 0.35) / 0.65
+  );
+
+  // ── 8 particle positions — explicit hooks (fixed count, never conditional) ──
+  const bp0x = useTransform(burstR, r => CW + Math.cos(RAD[0]) * r);
+  const bp0y = useTransform(burstR, r => 50 + Math.sin(RAD[0]) * r);
+  const bp1x = useTransform(burstR, r => CW + Math.cos(RAD[1]) * r);
+  const bp1y = useTransform(burstR, r => 50 + Math.sin(RAD[1]) * r);
+  const bp2x = useTransform(burstR, r => CW + Math.cos(RAD[2]) * r);
+  const bp2y = useTransform(burstR, r => 50 + Math.sin(RAD[2]) * r);
+  const bp3x = useTransform(burstR, r => CW + Math.cos(RAD[3]) * r);
+  const bp3y = useTransform(burstR, r => 50 + Math.sin(RAD[3]) * r);
+  const bp4x = useTransform(burstR, r => CW + Math.cos(RAD[4]) * r);
+  const bp4y = useTransform(burstR, r => 50 + Math.sin(RAD[4]) * r);
+  const bp5x = useTransform(burstR, r => CW + Math.cos(RAD[5]) * r);
+  const bp5y = useTransform(burstR, r => 50 + Math.sin(RAD[5]) * r);
+  const bp6x = useTransform(burstR, r => CW + Math.cos(RAD[6]) * r);
+  const bp6y = useTransform(burstR, r => 50 + Math.sin(RAD[6]) * r);
+  const bp7x = useTransform(burstR, r => CW + Math.cos(RAD[7]) * r);
+  const bp7y = useTransform(burstR, r => 50 + Math.sin(RAD[7]) * r);
 
   useMotionValueEvent(travelT, "change", t => {
     if (!pathRef.current || pathLen === 0) return;
     const pt = pathRef.current.getPointAtLength(t * pathLen);
     dotX.set(pt.x);
     dotY.set(pt.y);
-    // Trail tip sits 15% behind the dot along the path
-    const tp = pathRef.current.getPointAtLength(Math.max(0, t - 0.15) * pathLen);
-    trailX.set(tp.x);
   });
+
+  const particles: [typeof bp0x, typeof bp0y][] = [
+    [bp0x, bp0y], [bp1x, bp1y], [bp2x, bp2y], [bp3x, bp3y],
+    [bp4x, bp4y], [bp5x, bp5y], [bp6x, bp6y], [bp7x, bp7y],
+  ];
 
   return (
     <div
@@ -81,7 +105,7 @@ function NodeConnector({
             <stop offset="0%" stopColor={fromColor} stopOpacity="0.85" />
             <stop offset="100%" stopColor={toColor} stopOpacity="1" />
           </linearGradient>
-          {/* Beam bloom — dual blur merge */}
+          {/* Beam bloom */}
           <filter id={`cf-${id}`} x="-80%" y="-80%" width="260%" height="260%">
             <feGaussianBlur stdDeviation="4" result="inner" />
             <feGaussianBlur stdDeviation="8" in="SourceGraphic" result="outer" />
@@ -91,27 +115,18 @@ function NodeConnector({
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
-          {/* Spark point light */}
-          <filter id={`sf-${id}`} x="-200%" y="-200%" width="500%" height="500%">
-            <feGaussianBlur stdDeviation="6" result="glow" />
-            <feMerge>
-              <feMergeNode in="glow" />
-              <feMergeNode in="glow" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
         </defs>
 
-        {/* Ghost track */}
+        {/* Resting thread — always visible, glows faintly */}
         <path
           d={CONN_PATH}
-          stroke="rgba(255,255,255,0.07)"
-          strokeWidth="1.2"
-          strokeDasharray="4 10"
+          stroke={fromColor}
+          strokeWidth="1"
           fill="none"
+          style={{ opacity: 0.12, filter: `drop-shadow(0 0 3px ${fromColor})` }}
         />
 
-        {/* Animated beam — draws left to right */}
+        {/* Beam — draws behind the orb as it travels */}
         <motion.path
           ref={pathRef}
           d={CONN_PATH}
@@ -123,45 +138,45 @@ function NodeConnector({
           style={{ pathLength: beamProgress }}
         />
 
-        {/* Arrow chevron trail — two lines converging from behind to dot tip */}
-        <motion.line
-          x1={trailX} y1={44}
-          x2={dotX}   y2={50}
-          stroke={toColor} strokeWidth="1.5" strokeLinecap="round"
-          style={{ opacity: trailOp, filter: `drop-shadow(0 0 4px ${toColor})` }}
-        />
-        <motion.line
-          x1={trailX} y1={56}
-          x2={dotX}   y2={50}
-          stroke={toColor} strokeWidth="1.5" strokeLinecap="round"
-          style={{ opacity: trailOp, filter: `drop-shadow(0 0 4px ${toColor})` }}
-        />
-
-        {/* Traveling spark dot — white-hot core */}
+        {/* Orb — outer glow ring */}
         <motion.circle
-          cx={dotX}
-          cy={dotY}
-          r={6}
-          fill="#ffffff"
-          filter={`url(#sf-${id})`}
+          cx={dotX} cy={dotY} r={9}
+          fill="none" stroke={toColor} strokeWidth="2"
           style={{
             opacity: beamProgress,
-            filter: `drop-shadow(0 0 6px ${toColor}) drop-shadow(0 0 14px ${toColor}) drop-shadow(0 0 22px ${toColor})`,
+            filter: `drop-shadow(0 0 8px ${toColor}) drop-shadow(0 0 18px ${toColor})`,
+          }}
+        />
+        {/* Orb — white-hot core */}
+        <motion.circle
+          cx={dotX} cy={dotY} r={4}
+          fill="#ffffff"
+          style={{
+            opacity: beamProgress,
+            filter: `drop-shadow(0 0 6px ${toColor}) drop-shadow(0 0 14px ${toColor})`,
           }}
         />
 
-        {/* Explosion ring 1 — fast expand on arrival */}
+        {/* Impact flash */}
         <motion.circle
-          cx={CW} cy={50} r={burstR1}
-          fill="none" stroke={toColor} strokeWidth="1.5"
-          style={{ opacity: burstOp1, filter: `drop-shadow(0 0 8px ${toColor})` }}
+          cx={CW} cy={50} r={flashR}
+          fill={toColor}
+          style={{ opacity: flashOp, filter: `drop-shadow(0 0 12px ${toColor})` }}
         />
-        {/* Explosion ring 2 — slower, fades later */}
-        <motion.circle
-          cx={CW} cy={50} r={burstR2}
-          fill="none" stroke={toColor} strokeWidth="1"
-          style={{ opacity: burstOp2, filter: `drop-shadow(0 0 5px ${toColor})` }}
-        />
+
+        {/* 8 scatter particles */}
+        {particles.map(([cx, cy], i) => (
+          <motion.circle
+            key={i}
+            cx={cx} cy={cy}
+            r={SIZES[i]}
+            fill={i % 2 === 0 ? toColor : "#ffffff"}
+            style={{
+              opacity: burstOp,
+              filter: `drop-shadow(0 0 ${i % 2 === 0 ? 8 : 4}px ${toColor})`,
+            }}
+          />
+        ))}
 
       </svg>
     </div>
