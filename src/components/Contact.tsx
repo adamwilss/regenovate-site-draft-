@@ -29,7 +29,7 @@ const trustItems = [
   },
   {
     title: "No Obligation",
-    desc: "A conversation costs nothing — ever.",
+    desc: "A conversation costs nothing. Ever.",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5" stroke="currentColor" strokeWidth="1.5">
         <path d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round" />
@@ -144,8 +144,8 @@ export default function Contact() {
               <span className="italic gradient-text-flow">your business.</span>
             </h2>
             <p className="text-slate-400 leading-relaxed mb-10 max-w-md">
-              Whether you&rsquo;re considering an exit, looking to scale, or simply
-              exploring what&rsquo;s possible — we&rsquo;d love to hear your story. No
+              Whether you are considering an exit, looking to scale, or simply
+              exploring what is possible, we would love to hear your story. No
               pitch decks, no pressure. Just a conversation.
             </p>
 

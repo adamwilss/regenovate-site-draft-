@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: {
-    default: "Regenovate — We Invest in Businesses Like Yours",
+    default: "Regenovate | We Invest in Businesses Like Yours",
     template: "%s | Regenovate",
   },
   description:
@@ -22,9 +22,9 @@ export const metadata: Metadata = {
     "business legacy",
   ],
   openGraph: {
-    title: "Regenovate — We Invest in Businesses Like Yours",
+    title: "Regenovate | We Invest in Businesses Like Yours",
     description:
-      "We invest, partner or acquire businesses to transform and scale them — protecting your most valuable asset, your dedicated team.",
+      "We invest, partner or acquire businesses to transform and scale them, protecting your most valuable asset: your dedicated team.",
     url: "https://www.regenovate.co",
     siteName: "Regenovate",
     type: "website",
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Regenovate — We Invest in Businesses Like Yours",
+    title: "Regenovate | We Invest in Businesses Like Yours",
     description:
       "Business transformation through acquisition, cloud technology and proven growth strategies.",
   },

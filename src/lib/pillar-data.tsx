@@ -82,7 +82,7 @@ export const pillars: PillarDef[] = [
       { letter: "B", word: "Blueprint", desc: "Document every core process. Define what 'good' looks like before you try to replicate it." },
       { letter: "U", word: "Unify",     desc: "Eliminate silos by connecting workflows across departments into a single coherent system." },
       { letter: "I", word: "Integrate", desc: "Deploy ERP, cloud platforms and data infrastructure that talk to each other seamlessly." },
-      { letter: "L", word: "Leverage",  desc: "Turn your data into decisions — use real-time insights to continuously optimise." },
+      { letter: "L", word: "Leverage",  desc: "Turn your data into decisions. Use real-time insights to continuously optimise." },
       { letter: "D", word: "Define",    desc: "Set the KPIs, metrics and dashboards that keep the whole business accountable." },
     ],
     icon: (
@@ -102,7 +102,7 @@ export const pillars: PillarDef[] = [
     acronym: "CHART",
     tagline: "Turn a strong business into a market force.",
     outcome: "Scalable, high-performance growth engine",
-    desc: "We know how to generate perfect customers — people who want your products, from you, now, and can afford them. By constantly monitoring what works using the latest technology, we secure market share and create real scale.",
+    desc: "We know how to find perfect customers. People who want your products, from you, now, and can afford them. By constantly monitoring what works using the latest technology, we secure market share and create real scale.",
     gradient: "from-emerald-500/25 via-teal-500/15 to-transparent",
     cardGradient: "from-[#0a2a1e] via-[#0d1b3e] to-[#0a0f2e]",
     numberColor: "from-emerald-400 to-teal-500",
@@ -114,7 +114,7 @@ export const pillars: PillarDef[] = [
       { letter: "H", word: "Harness",    desc: "Extract maximum value from the resources, tools and relationships you already have." },
       { letter: "A", word: "Accelerate", desc: "Unlock revenue through smarter pricing, strategic partnerships and upsell pathways." },
       { letter: "R", word: "Reach",      desc: "Build the brand presence and marketing engine that makes you impossible to ignore." },
-      { letter: "T", word: "Transform",  desc: "Commit to Kaizen — continuous improvement baked into how the whole business operates." },
+      { letter: "T", word: "Transform",  desc: "Commit to Kaizen. Continuous improvement baked into how the whole business operates." },
     ],
     icon: (
       <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">

@@ -72,18 +72,17 @@ export default function About() {
             </p>
             <p>
               Our journey began with a commitment to upgrading systems and
-              empowering teams with innovative tools. One day, during a
-              conversation with a new prospect, a unique idea took root — we
-              proposed not just guiding them through the transformation but
-              acquiring their business, completing the transformation, and
-              offering it back to them.
+              empowering teams with better tools. During a conversation with a
+              new prospect, a unique idea took root. Instead of just guiding them
+              through the transformation, we proposed acquiring the business,
+              completing the work ourselves, and offering it back to them.
             </p>
             <p>
-              While the initial offer wasn&apos;t accepted, the concept of
-              acquiring businesses before transforming them became a cornerstone
-              of our methodology. Today, we proudly own and operate 10 diverse
-              businesses across Manufacturing, Software, Display, and Engineering
-              — thriving synergistically.
+              That first offer was not accepted, but the idea of acquiring
+              businesses before transforming them became a cornerstone of how we
+              work. Today, we proudly own and operate 10 diverse businesses
+              across Manufacturing, Software, Display and Engineering, all
+              thriving together.
             </p>
           </motion.div>
         </div>

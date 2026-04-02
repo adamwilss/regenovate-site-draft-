@@ -91,8 +91,8 @@ export default function HomeCTA() {
               transition={{ duration: 0.6, delay: 0.38 }}
               className="text-slate-400 max-w-lg mx-auto mb-10 text-base leading-relaxed"
             >
-              Whether you&rsquo;re looking to exit, scale, or transform — our team of
-              experts is ready to guide you through the next chapter of your business journey.
+              Whether you are looking to exit, scale or transform, our team is
+              ready to walk with you through the next chapter of your business.
             </motion.p>
 
             {/* CTAs */}

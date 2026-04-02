@@ -1,66 +1,223 @@
-# CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## GitHub
+## CLAUDE.md
 
-**Push all changes to GitHub after every task.**
-- Remote: `git@github.com:adamwilss/regenovate-site-draft-.git`
-- Branch: `master`
-- Commit with a clear message summarising what changed, then push immediately.
+### Project Overview
 
-## Commands
+Regenovate is a high end business transformation and acquisition brand.
 
-```bash
-npm run dev      # start local dev server (localhost:3000)
-npm run build    # production build (run this to catch type/lint errors)
-npm run lint     # ESLint check
-```
+We fix, stabilise, and scale real businesses. No theory.
 
-No test suite exists. Use `npm run build` to validate changes before pushing.
+**Positioning:**
 
-## Stack
+* Invest, partner, or acquire
+* Transform underperforming or fragmented operations
+* Build scalable, systemised, performance driven companies
+* Protect people first
 
-- **Next.js 14** App Router, TypeScript, React 19
-- **Tailwind CSS v4** — utility classes only; no `tailwind.config.js`, config lives in `globals.css` via `@theme`
-- **Framer Motion** — all page/component animations
-- **Canvas API** — particle system and intro animation (no external library)
-- **Fonts** loaded via Google Fonts in `layout.tsx`: Inter (body), DM Serif Display (editorial headings), Bebas Neue (display/hero), Playfair Display (fallback serif)
+**Message:**
+Stabilise. Systemise. Scale.
 
-## Architecture
+**Belief:**
+You cannot scale broken systems or unstable teams.
 
-### Layout shell
-`layout.tsx` wraps every page with `<ClientShell>` → `<Navbar>` → `{children}` → `<Footer>`. `ClientShell` is a thin `"use client"` boundary that lets the server layout coexist with client-only animation components.
+Regenovate is not consultancy.
+It is ownership thinking applied to transformation.
 
-### Pages
-- `/` — `page.tsx` composes the homepage sections in order: Hero → Stats → SectorBar → Pillars → Testimonials → Quote → HomeCTA
-- `/about`, `/solutions`, `/contact` — each is an App Router folder with its own `page.tsx`
+---
 
-### Animation system
-Two layers work together:
+## Regenovate Method
 
-1. **CSS keyframes** (`globals.css`) — `float` (orbs), `shimmer-sweep` (BUSINESSES text), `gradient-flow` ("like yours." text), `marquee` (SectorBar ticker). Classes: `.orb`, `.businesses-text`, `.gradient-text-flow`, `.marquee-track`.
+Three stages: **People. Process. Performance.**
 
-2. **Framer Motion** — used for all enter/exit transitions on text lines, eyebrow pills, CTAs. Pattern throughout: `initial` hidden state, `animate={show ? visible : hidden}`, triggered by a `showContent` boolean that flips after the particle intro completes.
+---
 
-### Hero section (`Hero.tsx`)
-Most complex component. Three layers:
-- `<ParticleField>` canvas background (90 particles, mouse-interactive)
-- `<HeroParticleIntro>` — full-screen canvas that runs a 6-phase animation sequence (form "Regenerate" + "Innovate" → hold → burst → reform "Regenovate" → hold → radial explosion → `onComplete()` fires)
-- `<HeroContent>` — the actual text/CTAs, revealed after the intro completes. Uses a character-scramble hook for "BUSINESSES".
+### 1. Stabilise (People)
 
-The intro canvas and hero content share the same dark navy background (`#0d1b3e`) so the opacity crossfade is seamless.
+**Goal:** Remove fear, retain talent, create alignment
 
-**Text clipping rule:** Never use `overflow-hidden` on wrappers around large display text — it clips descenders and trailing letter-spacing. Use `opacity + y-offset` Framer Motion animations instead of `y: "120%"` slide-from-below.
+If you do not stabilise quickly, your best people leave first.
 
-### UI primitives (`src/components/ui/`)
-- `particle-field.tsx` — canvas particle network, used as hero background
-- `hero-particle-intro.tsx` — standalone canvas intro animation with physics-based particle class
-- `magnetic-button.tsx` — wraps `<a>` tags with cursor-magnetic hover effect
-- `tilt-card.tsx`, `text-reveal.tsx`, `typewriter.tsx` — reusable motion wrappers
+**ALIGN:**
 
-### Styling conventions
-- Dark theme only. Base: `#0d1b3e`. Surface: `slate-900/slate-800`.
-- Custom colour tokens defined in `globals.css` `@theme` block — not in a config file.
-- Animations should feel **slow and confident** — shimmer at 12s+, gradient flows at 14s+. Avoid fast multi-colour sweeps.
-- Logo has black text — always place it on a white/light background (currently a `bg-white/95` pill in Navbar).
+* Assess: Identify key people, performance, risk
+* Lead: Set clear mission, vision, values
+* Inspire: Replace uncertainty with direction
+* Grow: Develop and selectively add talent
+* Nurture: Remove friction, deliver quick wins
+
+**Outcome:**
+A stable, aligned, engaged team
+
+---
+
+### 2. Systemise (Process)
+
+**Goal:** Turn chaos into consistency
+
+Most businesses fail from disconnected systems, not lack of effort.
+
+**BUILD:**
+
+* Blueprint: Map how the business actually runs
+* Unify: Align workflows, remove silos
+* Integrate: Single source of truth, ERP
+* Leverage: Use data to remove inefficiency
+* Define: Set KPIs across all functions
+
+**Outcome:**
+A predictable, efficient business
+
+---
+
+### 3. Scale (Performance)
+
+**Goal:** Grow what works, remove what does not
+
+Scale is repetition, not creativity.
+
+**CHART:**
+
+* Capture: New markets and opportunities
+* Harness: Maximise existing resources
+* Accelerate: Invest in proven growth
+* Reach: Expand brand and visibility
+* Transform: Continuous improvement
+
+**Outcome:**
+A scalable, high performance company
+
+---
+
+## Operational Principles
+
+* Protect talent first
+* Fix fundamentals before growth
+* Systemise before scaling
+* Data over opinion
+* Clarity over complexity
+* Action over theory
+
+**Truth:**
+Businesses fail through inefficiency, not lack of effort.
+
+---
+
+## Deployment Model
+
+* GitHub is source of truth
+* live branch is live production
+* Vercel deploys from live
+* Only production ready code goes to another branch called master
+
+No experimentation on production.
+
+---
+
+## Design System
+
+### Brand Style
+
+Premium, minimal, controlled
+Dark, space driven aesthetic
+Subtle motion
+Confident, not loud
+
+Feels like an experienced operator. Not a startup. Not an agency.
+
+### Colours
+
+**Primary gradient:**
+#0A1F44 → #123A7A → #1F5EDC → #3A7BFF
+
+**Text:**
+#FFFFFF
+#AFC4E8
+
+**Background:**
+#0B0F1A
+
+**CTA:**
+#1F5EDC → #3A7BFF
+
+---
+
+## Logo
+
+* Full: Regenovate
+* Icon: R.
+
+**Rules:**
+
+* Full logo in header and footer
+* Icon for favicon and minimal UI
+* No distortion or recolour
+
+---
+
+
+
+## Core Framework
+
+People → Stabilise
+Process → Systemise
+Performance → Scale
+
+Reinforce:
+You cannot scale broken systems or unstable teams
+
+---
+
+## Capabilities
+
+* Manufacturing
+* Software Development
+* Engineering
+* Cloud ERP
+* Business Transformation
+* Marketing Innovation
+* Acquisition Strategy
+
+---
+
+## UX Principles
+
+* Clear hierarchy
+* Large typography
+* Minimal clutter
+* Smooth transitions
+* Fast load
+* Accessible contrast
+
+Clarity always wins.
+
+---
+
+## Content Tone
+
+Calm, direct, grounded
+No hype, no fluff, no jargon
+
+Write like an operator who has built and rebuilt businesses.
+
+---
+
+## Content Integrity
+
+* No invented claims
+* No inflated language
+* No deviation from philosophy
+
+Everything must reflect reality.
+
+---
+
+## Final Rule
+
+If it does not support:
+
+* clarity
+* trust
+* transformation
+
+Remove it.

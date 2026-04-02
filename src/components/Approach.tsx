@@ -13,7 +13,7 @@ const steps = [
     gradFrom: "from-blue-300",
     gradTo: "to-blue-500",
     glow: "rgba(96,165,250,0.3)",
-    desc: "We thoroughly evaluate your marketplace and your position within it. We review your products, how they meet market demands, and seek new opportunities — ideally ones that create passive revenue streams.",
+    desc: "We take a deep look at your marketplace and where you sit within it. We review your products, how they meet demand, and look for new opportunities, especially those that create passive revenue streams.",
     tags: ["Market Positioning", "Gap Analysis", "Opportunity Mapping"],
     icon: (
       <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
@@ -29,7 +29,7 @@ const steps = [
     gradFrom: "from-blue-400",
     gradTo: "to-blue-600",
     glow: "rgba(65,105,225,0.3)",
-    desc: "We plan the transition from 'As Is' to 'To Be', plotting key milestones and waymarkers. Having completed this process over 100 times, we know exactly where the pitfalls are — and how to avoid them.",
+    desc: "We map the transition from where you are now to where you need to be, plotting key milestones along the way. Having done this over 100 times, we know exactly where the pitfalls are and how to avoid them.",
     tags: ["Milestone Mapping", "Risk Assessment", "Transformation Roadmap"],
     icon: (
       <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
@@ -332,7 +332,7 @@ function Header({ visible }: { visible: boolean }) {
       </h2>
       <p className="max-w-xl mx-auto text-sm leading-relaxed" style={{ color: "var(--text-muted)" }}>
         Predictable. Measurable. Repeatable. Every engagement follows the same
-        four-phase sequence — because sequencing is what makes transformation stick.
+        four-phase sequence, because getting the order right is what makes transformation stick.
       </p>
     </motion.div>
   );

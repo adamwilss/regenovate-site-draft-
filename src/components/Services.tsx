@@ -14,7 +14,7 @@ const solutions = [
       </svg>
     ),
     title: "Acquisition Mastery",
-    desc: "Our expertise lies in identifying small businesses with untapped potential. We acquire these gems and provide them with the resources and expertise they need to thrive. Through strategic growth strategies — including mergers and acquisitions — we seamlessly integrate businesses into our ecosystem.",
+    desc: "We find small businesses with real potential and give them the resources they need to thrive. Through smart growth strategies, including mergers and acquisitions, we bring businesses into our ecosystem and help them flourish.",
   },
   {
     icon: (
@@ -25,7 +25,7 @@ const solutions = [
       </svg>
     ),
     title: "Marketing Innovation",
-    desc: "We don't just market products or services — we craft compelling narratives, build authentic connections with customers, and drive brand loyalty. We deliver constant streams of prospects who want what you sell, from you, now, and can afford it.",
+    desc: "We go beyond traditional marketing. We craft compelling stories, build genuine connections with customers and drive real brand loyalty. We deliver a constant stream of prospects who want what you sell, from you, now, and can afford it.",
   },
   {
     icon: (
@@ -36,7 +36,7 @@ const solutions = [
       </svg>
     ),
     title: "Cloud Technology",
-    desc: "The future of business is in the cloud, and we have been at the forefront for 20 years. Our cutting-edge cloud solutions provide efficiency, scalability, and agility — enabling your business to do more of what works with world-class realtime Business Intelligence.",
+    desc: "The future of business is in the cloud, and we have been at the forefront for over 20 years. Our cloud solutions deliver efficiency, scalability and agility, giving your business the power to do more of what works with world-class real-time Business Intelligence.",
   },
   {
     icon: (
@@ -83,7 +83,7 @@ export default function Services() {
             <TextReveal delay={0.1}>The blueprint for sustainable success</TextReveal>
           </h2>
           <p className="text-slate-400 max-w-2xl mx-auto text-lg">
-            We don&apos;t just transform your business for today — we prepare it for
+            We don&apos;t just transform your business for today. We prepare it for
             the challenges of tomorrow.
           </p>
         </motion.div>

@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Solutions",
   description:
-    "Acquisition Mastery, Marketing Innovation, Cloud Technology and our proven Business Transformation Programme — the blueprint for sustainable success.",
+    "Acquisition Mastery, Marketing Innovation, Cloud Technology and our proven Business Transformation Programme. The blueprint for sustainable success.",
 };
 
 export default function SolutionsPage() {

@@ -36,8 +36,10 @@ export default function Footer() {
       <footer className="border-t border-slate-800 py-12">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-8">
-            <Link href="/" className="flex items-center opacity-80 hover:opacity-100 transition-opacity">
-              <Image src="/logo.png" alt="Regenovate" width={140} height={36} className="object-contain" />
+            <Link href="/" className="flex items-center group">
+              <span className="flex items-center rounded-lg px-3 py-1.5 bg-white/95 group-hover:bg-white transition-colors">
+                <Image src="/logo.png" alt="Regenovate" width={140} height={36} className="object-contain" />
+              </span>
             </Link>
             <div className="flex flex-wrap gap-6 justify-center">
               {links.map((link) => (

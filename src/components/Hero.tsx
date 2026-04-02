@@ -214,8 +214,8 @@ function HeroContent({ show }: { show: boolean }) {
         className="text-sm md:text-base max-w-lg mx-auto leading-relaxed tracking-wide mb-10"
         style={{ color: "var(--text-muted)" }}
       >
-        Exit your business and secure your legacy. We invest, partner, or
-        acquire — then transform and scale — protecting your team throughout.
+        Ready to step back and protect what you have built? We invest, partner
+        or acquire, then transform and scale. Your team stays safe throughout.
       </motion.p>
 
       {/* ── CTAs ── */}

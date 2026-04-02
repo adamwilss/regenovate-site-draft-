@@ -235,7 +235,7 @@ export default function PillarPage({ pillar }: { pillar: PillarDef }) {
       <section className="py-24 max-w-4xl mx-auto px-8">
         <div className="mb-14">
           <p className="text-[10px] tracking-[0.5em] uppercase font-medium mb-3" style={{ color: pillar.letterColor }}>
-            {pillar.acronym} — The {pillar.items.length} Principles
+            {pillar.acronym} | The {pillar.items.length} Principles
           </p>
           <div className="h-px w-16" style={{ background: `linear-gradient(to right, ${pillar.letterColor}60, transparent)` }} />
         </div>

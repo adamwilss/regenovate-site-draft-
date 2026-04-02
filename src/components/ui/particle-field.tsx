@@ -139,12 +139,12 @@ export function ParticleField({
           const cdist = Math.sqrt(cdx * cdx + cdy * cdy)
 
           if (cdist < connectionDistance) {
-            const lineOpacity = (1 - cdist / connectionDistance) * 0.15 * Math.min(p.opacity, p2.opacity) * 2
+            const lineOpacity = (1 - cdist / connectionDistance) * 0.45 * Math.min(p.opacity, p2.opacity) * 2
             ctx.beginPath()
             ctx.moveTo(p.x, p.y)
             ctx.lineTo(p2.x, p2.y)
-            ctx.strokeStyle = `hsla(${(p.hue + p2.hue) / 2}, 60%, 55%, ${lineOpacity})`
-            ctx.lineWidth = 0.5
+            ctx.strokeStyle = `hsla(${(p.hue + p2.hue) / 2}, 75%, 65%, ${lineOpacity})`
+            ctx.lineWidth = 1
             ctx.stroke()
           }
         }

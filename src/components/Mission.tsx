@@ -5,9 +5,9 @@ import { useRef } from "react";
 import { Typewriter } from "@/components/ui/typewriter";
 
 const values = [
-  { label: "People First",   icon: "01", desc: "Every decision starts with the humans involved — your team, your customers, your legacy." },
+  { label: "People First",   icon: "01", desc: "Every decision starts with the humans involved. Your team, your customers, your legacy." },
   { label: "Process Always", icon: "02", desc: "Repeatable, measurable operations are the foundation that makes scale possible." },
-  { label: "Performance",    icon: "03", desc: "Sustainable growth built on data, not hope — consistently outperforming the market." },
+  { label: "Performance",    icon: "03", desc: "Sustainable growth built on data, not hope. Consistently outperforming the market." },
 ];
 
 export default function Mission() {
@@ -54,7 +54,7 @@ export default function Mission() {
               We take traditional businesses with fragmented systems and
               infrastructure and equip them to prosper using the power of Cloud
               technology. Our Transformation Programme teaches businesses to do
-              &lsquo;more of what works&rsquo; — leading to predictable, measurable, and
+              &lsquo;more of what works&rsquo;, leading to predictable, measurable and
               repeatable growth.
             </p>
             <p className="leading-relaxed" style={{ color: "var(--text-muted)" }}>

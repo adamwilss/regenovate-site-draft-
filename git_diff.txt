@@ -1,0 +1,268 @@
+commit 612065c8d227164267fb21ff49831df3c12bd3e3
+Author: AI Assistant <ai@example.com>
+Date:   Thu Apr 2 14:26:18 2026 +0100
+
+    feat: animate Stabilise, Systemise, Scale
+
+diff --git a/src/components/Pillars.tsx b/src/components/Pillars.tsx
+index 1f4c826..615f5fa 100644
+--- a/src/components/Pillars.tsx
++++ b/src/components/Pillars.tsx
+@@ -546,6 +546,63 @@ function NodeCard({
+    ═══════════════════════════════════════════════════════════════════════ */
+ const STAGE_COLORS = pillars.map(p => p.letterColor);
+ 
++/* ── Onomatopoeic word animations ───────────────────────────────────── */
++const SYSTEMISE_LETTERS = "Systemise".split("");
++
++function StabiliseWord({ triggered }: { triggered: boolean }) {
++  return (
++    <span
++      style={{
++        display: "inline-block",
++        animation: triggered ? "rg-stabilise 1.4s cubic-bezier(0.16,1,0.3,1) forwards" : "none",
++        opacity: triggered ? undefined : 0,
++      }}
++    >
++      Stabilise
++    </span>
++  );
++}
++
++function SystemiseWord({ triggered }: { triggered: boolean }) {
++  return (
++    <span style={{ display: "inline-block" }}>
++      {SYSTEMISE_LETTERS.map((char, i) => (
++        <span
++          key={i}
++          style={{
++            display: "inline-block",
++            opacity: triggered ? 1 : 0,
++            transform: triggered ? "translateY(0)" : "translateY(12px)",
++            transition: triggered
++              ? `opacity 0.32s ease ${0.08 + i * 0.055}s, transform 0.32s cubic-bezier(0.16,1,0.3,1) ${0.08 + i * 0.055}s`
++              : "none",
++          }}
++        >
++          {char}
++        </span>
++      ))}
++    </span>
++  );
++}
++
++function ScaleWord({ triggered }: { triggered: boolean }) {
++  return (
++    <span
++      style={{
++        display: "inline-block",
++        opacity: triggered ? 1 : 0,
++        transform: triggered ? "scale(1)" : "scale(0.18)",
++        transformOrigin: "center center",
++        transition: triggered
++          ? "opacity 0.55s ease 0.12s, transform 0.75s cubic-bezier(0.34,1.56,0.64,1) 0.12s"
++          : "none",
++      }}
++    >
++      Scale
++    </span>
++  );
++}
++
+ function SectionHeader({
+   visible,
+   activeStage,
+@@ -557,71 +614,105 @@ function SectionHeader({
+   pillConn1?: MotionValue<number>;
+   pillConn2?: MotionValue<number>;
+ }) {
++  const h2Ref = useRef<HTMLHeadingElement>(null);
++  const [wordTriggered, setWordTriggered] = useState(false);
++
++  useEffect(() => {
++    const el = h2Ref.current;
++    if (!el) return;
++    const obs = new IntersectionObserver(
++      ([entry]) => { if (entry.isIntersecting) { setWordTriggered(true); obs.disconnect(); } },
++      { threshold: 0.5 }
++    );
++    obs.observe(el);
++    return () => obs.disconnect();
++  }, []);
++
+   return (
+-    <motion.div
+-      initial={{ opacity: 0, y: 28 }}
+-      animate={visible ? { opacity: 1, y: 0 } : {}}
+-      transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+-      className="text-center mb-8"
+-    >
+-      <p className="text-blue-400 text-[9px] font-medium tracking-[0.5em] uppercase mb-4">
+-        The Business Transformation Programme
+-      </p>
+-      <h2
+-        className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4"
+-        style={{ fontFamily: '"DM Serif Display", serif', color: "var(--text-primary)" }}
+-      >
+-        Stabilise. Systemise. Scale.
+-      </h2>
+-      <p
+-        className="max-w-xl mx-auto text-sm leading-relaxed mb-8"
+-        style={{ color: "var(--text-muted)" }}
++    <>
++      {/* Keyframes injected once */}
++      <style>{`
++        @keyframes rg-stabilise {
++          0%   { opacity:0; transform: translate(-6px,4px) rotate(-2.5deg) skewX(4deg); filter: blur(2px); }
++          12%  { opacity:1; transform: translate(5px,-3px) rotate(1.8deg) skewX(-3deg); filter: blur(1px); }
++          24%  { transform: translate(-4px,2px) rotate(-1.4deg) skewX(2deg); filter: blur(0.5px); }
++          36%  { transform: translate(3px,-1px) rotate(0.9deg) skewX(-1.5deg); }
++          50%  { transform: translate(-2px,1px) rotate(-0.5deg) skewX(0.8deg); }
++          64%  { transform: translate(1px,-0.5px) rotate(0.2deg); }
++          78%  { transform: translate(-0.5px,0.2px) rotate(-0.05deg); }
++          100% { opacity:1; transform: translate(0,0) rotate(0) skewX(0); filter: blur(0); }
++        }
++      `}</style>
++      <motion.div
++        initial={{ opacity: 0, y: 28 }}
++        animate={visible ? { opacity: 1, y: 0 } : {}}
++        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
++        className="text-center mb-8"
+       >
+-        You cannot scale broken systems or an unstable team. The sequence is
+-        non-negotiable. People first, process second, performance follows.
+-      </p>
+-
+-      {/* Stage progress indicator — gap connectors only, no line through pills */}
+-      <div className="flex items-center justify-center">
+-        {pillars.map((p, i) => (
+-          <div key={p.slug} className="flex items-center">
+-            <motion.div
+-              animate={{
+-                color: activeStage >= i ? STAGE_COLORS[i] : "var(--text-faint)",
+-                scale: activeStage === i ? 1.07 : 1,
+-              }}
+-              transition={{ duration: 0.35, ease: "easeOut" }}
+-              className="flex items-center gap-2 px-4 py-1.5 rounded-full cursor-default select-none"
+-              style={{
+-                border: `1px solid ${activeStage >= i ? STAGE_COLORS[i] + "35" : "var(--border-subtle)"}`,
+-                background: activeStage === i ? `${STAGE_COLORS[i]}0d` : "var(--bg-base)",
+-                boxShadow: activeStage === i ? `0 0 18px ${STAGE_COLORS[i]}25` : "none",
+-                transition: "border-color 0.4s ease, background 0.4s ease, box-shadow 0.4s ease",
+-              }}
+-            >
+-              <span
+-                className="w-1.5 h-1.5 rounded-full flex-shrink-0"
++        <p className="text-blue-400 text-[9px] font-medium tracking-[0.5em] uppercase mb-4">
++          The Business Transformation Programme
++        </p>
++        <h2
++          ref={h2Ref}
++          className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4"
++          style={{ fontFamily: '"DM Serif Display", serif', color: "var(--text-primary)" }}
++        >
++          <StabiliseWord triggered={wordTriggered} />
++          {". "}
++          <SystemiseWord triggered={wordTriggered} />
++          {". "}
++          <ScaleWord triggered={wordTriggered} />
++          {"."}
++        </h2>
++        <p
++          className="max-w-xl mx-auto text-sm leading-relaxed mb-8"
++          style={{ color: "var(--text-muted)" }}
++        >
++          You cannot scale broken systems or an unstable team. The sequence is
++          non-negotiable. People first, process second, performance follows.
++        </p>
++
++        {/* Stage progress indicator — gap connectors only, no line through pills */}
++        <div className="flex items-center justify-center">
++          {pillars.map((p, i) => (
++            <div key={p.slug} className="flex items-center">
++              <motion.div
++                animate={{
++                  color: activeStage >= i ? STAGE_COLORS[i] : "var(--text-faint)",
++                  scale: activeStage === i ? 1.07 : 1,
++                }}
++                transition={{ duration: 0.35, ease: "easeOut" }}
++                className="flex items-center gap-2 px-4 py-1.5 rounded-full cursor-default select-none"
+                 style={{
+-                  background: activeStage >= i ? STAGE_COLORS[i] : "var(--text-faint)",
+-                  boxShadow: activeStage >= i ? `0 0 5px ${STAGE_COLORS[i]}` : "none",
+-                  transition: "background 0.4s ease, box-shadow 0.4s ease",
++                  border: `1px solid ${activeStage >= i ? STAGE_COLORS[i] + "35" : "var(--border-subtle)"}`,
++                  background: activeStage === i ? `${STAGE_COLORS[i]}0d` : "var(--bg-base)",
++                  boxShadow: activeStage === i ? `0 0 18px ${STAGE_COLORS[i]}25` : "none",
++                  transition: "border-color 0.4s ease, background 0.4s ease, box-shadow 0.4s ease",
+                 }}
+-              />
+-              <span className="text-[8px] tracking-[0.45em] uppercase font-semibold">
+-                {p.subtitle}
+-              </span>
+-            </motion.div>
++              >
++                <span
++                  className="w-1.5 h-1.5 rounded-full flex-shrink-0"
++                  style={{
++                    background: activeStage >= i ? STAGE_COLORS[i] : "var(--text-faint)",
++                    boxShadow: activeStage >= i ? `0 0 5px ${STAGE_COLORS[i]}` : "none",
++                    transition: "background 0.4s ease, box-shadow 0.4s ease",
++                  }}
++                />
++                <span className="text-[8px] tracking-[0.45em] uppercase font-semibold">
++                  {p.subtitle}
++                </span>
++              </motion.div>
+ 
+-            {/* Connector line lives only in the gap between pills */}
+-            {i < 2 && (
+-              <div className="w-10 flex items-center justify-center" style={{ overflow: "visible" }}>
+-                {i === 0 && pillConn1 ? (
+-                  <PillConnector progress={pillConn1} fromColor={STAGE_COLORS[0]} toColor={STAGE_COLORS[1]} id="pc1" />
+-                ) : i === 1 && pillConn2 ? (
+-                  <PillConnector progress={pillConn2} fromColor={STAGE_COLORS[1]} toColor={STAGE_COLORS[2]} id="pc2" />
+-                ) : (
+-                  <motion.div
+-                    className="h-px w-full"
++              {/* Connector line lives only in the gap between pills */}
++              {i < 2 && (
++                <div className="w-10 flex items-center justify-center" style={{ overflow: "visible" }}>
++                  {i === 0 && pillConn1 ? (
++                    <PillConnector progress={pillConn1} fromColor={STAGE_COLORS[0]} toColor={STAGE_COLORS[1]} id="pc1" />
++                  ) : i === 1 && pillConn2 ? (
++                    <PillConnector progress={pillConn2} fromColor={STAGE_COLORS[1]} toColor={STAGE_COLORS[2]} id="pc2" />
++                  ) : (
++                    <motion.div
++                      className="h-px w-full"
+                     animate={{
+                       opacity: activeStage > i ? 0.7 : 0.15,
+                       background: activeStage > i
+@@ -637,6 +728,7 @@ function SectionHeader({
+         ))}
+       </div>
+     </motion.div>
++    </>
+   );
+ }
+ 
+
+commit 8b017e6de3b6a606e56a7cdf39d83e0aa37d1d44
+Author: AI Assistant <ai@example.com>
+Date:   Thu Apr 2 13:26:13 2026 +0100
+
+    Fix skip intro button: canvas was blocking pointer events
+    
+    Co-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>
+
+diff --git a/src/components/ui/hero-particle-intro.tsx b/src/components/ui/hero-particle-intro.tsx
+index b510942..5544d9f 100644
+--- a/src/components/ui/hero-particle-intro.tsx
++++ b/src/components/ui/hero-particle-intro.tsx
+@@ -281,5 +281,5 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin }: P
+     return () => cancelAnimationFrame(rafId)
+   }, [])
+ 
+-  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full block" />
++  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full block pointer-events-none" />
+ }
