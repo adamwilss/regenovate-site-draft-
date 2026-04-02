@@ -345,17 +345,18 @@ function PillConnector({
    SCROLL-DRIVEN ONOMATOPOEIC TITLES
    ═══════════════════════════════════════════════════════════════════════ */
 function SystemiseLetter({ char, index, progress }: { char: string, index: number, progress: MotionValue<number> }) {
-  const start = 0.05 + index * 0.035;
-  const end = start + 0.12;
+  const start = 0.05 + index * 0.04;
+  const end = start + 0.15;
   const opacity = useTransform(progress, [start, end], [0, 1]);
-  const y = useTransform(progress, [start, end], [15, 0]);
+  const y = useTransform(progress, [start, end], [25, 0]);
   return <motion.span style={{ display: "inline-block", opacity, y }}>{char}</motion.span>;
 }
 
 function NodeCardTitle({ pillar, progress, titleShadow }: { pillar: any, progress: MotionValue<number>, titleShadow: any }) {
-  const x = useTransform(progress, [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35], [-8, 6, -4, 2, -1, 0.5, 0]);
-  const y = useTransform(progress, [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35], [5, -4, 3, -1.5, 1, -0.5, 0]);
-  const r = useTransform(progress, [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35], [-3, 2, -1.5, 1, -0.5, 0.2, 0]);
+  const x = useTransform(progress, [0.0, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4], [-30, 25, -15, 12, -8, 4, -1, 0]);
+  const y = useTransform(progress, [0.0, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4], [15, -12, 10, -8, 5, -2, 1, 0]);
+  const r = useTransform(progress, [0.0, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4], [-10, 8, -6, 4, -2, 1, -0.5, 0]);
+  const blurValue = useTransform(progress, [0, 0.25, 0.4], ["blur(8px)", "blur(3px)", "blur(0px)"]);
 
   const baseStyle = {
     fontFamily: '"Bebas Neue", serif',
@@ -376,7 +377,7 @@ function NodeCardTitle({ pillar, progress, titleShadow }: { pillar: any, progres
 
   if (pillar.slug === "stabilise") {
     return (
-       <motion.span style={{ ...baseStyle, x, y, rotate: r }}>
+       <motion.span style={{ ...baseStyle, x, y, rotate: r, filter: blurValue }}>
          {pillar.title}
        </motion.span>
     );
@@ -425,8 +426,8 @@ function NodeCard({
   const numOp        = useTransform(progress, [0, 1], [0.04, 0.13]);
   const headerOp     = useTransform(progress, [0.0, 0.28], [0, 1]);
   const headerY      = useTransform(progress, [0.0, 0.28], [18, 0]);
-  const scaleStart   = pillar.slug === "scale" ? 0.3 : 0.88;
-  const titleSc      = useTransform(progress, [0.05, 0.38], [scaleStart, 1]);
+  const scaleStart   = pillar.slug === "scale" ? 0.15 : 0.88;
+  const titleSc      = useTransform(progress, [0.0, 0.45], [scaleStart, 1]);
   const sepOp        = useTransform(progress, [0.24, 0.48], [0, 1]);
   const descOp       = useTransform(progress, [0.32, 0.60], [0, 1]);
   const ctaOp        = useTransform(progress, [0.52, 0.80], [0, 1]);
@@ -710,7 +711,7 @@ function PillarsDesktop() {
       ref={containerRef}
       id="pillars"
       className="relative hidden lg:block"
-      style={{ height: "360vh" }}
+      style={{ height: "800vh" }}
     >
       <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden">
         {/* Ambient glow */}
