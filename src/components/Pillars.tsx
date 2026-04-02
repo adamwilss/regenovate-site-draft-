@@ -24,7 +24,7 @@ const CH = 100;
 const CONN_PATH = "M 0 50 L 220 50";
 // Particle burst — 8 directions at 45° intervals, alternating sizes
 const RAD   = [0, 45, 90, 135, 180, 225, 270, 315].map(d => d * Math.PI / 180);
-const SIZES = [4, 2.5, 4.5, 2.5, 4, 2.5, 4.5, 2.5];
+const SIZES = [7, 4.5, 8, 4.5, 7, 4.5, 8, 4.5];
 
 function NodeConnector({
   progress,
@@ -49,14 +49,16 @@ function NodeConnector({
   // ── Core motion values ────────────────────────────────────────────
   const beamProgress  = useTransform(progress, [0.05, 0.88], [0, 1]);
   const travelT       = useTransform(progress, [0.05, 0.88], [0, 1]);
+  // Orb fades OUT just as burst fires — disappears on impact
+  const orbOp         = useTransform(progress, [0.05, 0.80, 0.91], [0, 1, 0]);
 
   // ── Burst on arrival ─────────────────────────────────────────────
   const burstProgress = useTransform(progress, [0.86, 1.0], [0, 1]);
-  const flashOp       = useTransform(burstProgress, [0, 0.15, 0.4], [0, 1, 0]);
-  const flashR        = useTransform(burstProgress, [0, 0.3], [0, 16]);
-  const burstR        = useTransform(burstProgress, p => p * 48);
+  const flashOp       = useTransform(burstProgress, [0, 0.12, 0.35], [0, 1, 0]);
+  const flashR        = useTransform(burstProgress, [0, 0.3], [0, 36]);
+  const burstR        = useTransform(burstProgress, p => p * 90);
   const burstOp       = useTransform(burstProgress, p =>
-    p < 0.35 ? p / 0.35 : 1 - (p - 0.35) / 0.65
+    p < 0.3 ? p / 0.3 : 1 - (p - 0.3) / 0.7
   );
 
   // ── 8 particle positions — explicit hooks (fixed count, never conditional) ──
@@ -131,29 +133,29 @@ function NodeConnector({
           ref={pathRef}
           d={CONN_PATH}
           stroke={`url(#cg-${id})`}
-          strokeWidth="2.5"
+          strokeWidth="3.5"
           strokeLinecap="round"
           fill="none"
           filter={`url(#cf-${id})`}
           style={{ pathLength: beamProgress }}
         />
 
-        {/* Orb — outer glow ring */}
+        {/* Orb — outer glow ring — fades to zero on impact */}
         <motion.circle
-          cx={dotX} cy={dotY} r={9}
-          fill="none" stroke={toColor} strokeWidth="2"
+          cx={dotX} cy={dotY} r={13}
+          fill="none" stroke={toColor} strokeWidth="2.5"
           style={{
-            opacity: beamProgress,
-            filter: `drop-shadow(0 0 8px ${toColor}) drop-shadow(0 0 18px ${toColor})`,
+            opacity: orbOp,
+            filter: `drop-shadow(0 0 10px ${toColor}) drop-shadow(0 0 24px ${toColor})`,
           }}
         />
-        {/* Orb — white-hot core */}
+        {/* Orb — white-hot core — fades to zero on impact */}
         <motion.circle
-          cx={dotX} cy={dotY} r={4}
+          cx={dotX} cy={dotY} r={6}
           fill="#ffffff"
           style={{
-            opacity: beamProgress,
-            filter: `drop-shadow(0 0 6px ${toColor}) drop-shadow(0 0 14px ${toColor})`,
+            opacity: orbOp,
+            filter: `drop-shadow(0 0 8px ${toColor}) drop-shadow(0 0 18px ${toColor})`,
           }}
         />
 
@@ -161,7 +163,7 @@ function NodeConnector({
         <motion.circle
           cx={CW} cy={50} r={flashR}
           fill={toColor}
-          style={{ opacity: flashOp, filter: `drop-shadow(0 0 12px ${toColor})` }}
+          style={{ opacity: flashOp, filter: `drop-shadow(0 0 20px ${toColor}) drop-shadow(0 0 40px ${toColor})` }}
         />
 
         {/* 8 scatter particles */}
@@ -173,7 +175,7 @@ function NodeConnector({
             fill={i % 2 === 0 ? toColor : "#ffffff"}
             style={{
               opacity: burstOp,
-              filter: `drop-shadow(0 0 ${i % 2 === 0 ? 8 : 4}px ${toColor})`,
+              filter: `drop-shadow(0 0 ${i % 2 === 0 ? 12 : 6}px ${toColor})`,
             }}
           />
         ))}
