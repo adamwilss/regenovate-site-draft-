@@ -50,15 +50,15 @@ function NodeConnector({
   const beamProgress  = useTransform(progress, [0.05, 0.88], [0, 1]);
   const travelT       = useTransform(progress, [0.05, 0.88], [0, 1]);
   // Orb fades OUT just as burst fires — disappears on impact
-  const orbOp         = useTransform(progress, [0.05, 0.80, 0.91], [0, 1, 0]);
+  const orbOp         = useTransform(progress, [0.05, 0.74, 0.84], [0, 1, 0]);
 
-  // ── Burst on arrival ─────────────────────────────────────────────
-  const burstProgress = useTransform(progress, [0.86, 1.0], [0, 1]);
-  const flashOp       = useTransform(burstProgress, [0, 0.12, 0.35], [0, 1, 0]);
-  const flashR        = useTransform(burstProgress, [0, 0.3], [0, 36]);
-  const burstR        = useTransform(burstProgress, p => p * 90);
+  // ── Burst on arrival — starts earlier, wider range = slower & bigger ────
+  const burstProgress = useTransform(progress, [0.80, 1.0], [0, 1]);
+  const flashOp       = useTransform(burstProgress, [0, 0.10, 0.30], [0, 1, 0]);
+  const flashR        = useTransform(burstProgress, [0, 0.35], [0, 60]);
+  const burstR        = useTransform(burstProgress, p => p * 140);
   const burstOp       = useTransform(burstProgress, p =>
-    p < 0.3 ? p / 0.3 : 1 - (p - 0.3) / 0.7
+    p < 0.25 ? p / 0.25 : 1 - (p - 0.25) / 0.75
   );
 
   // ── 8 particle positions — explicit hooks (fixed count, never conditional) ──
@@ -488,17 +488,17 @@ function PillarsDesktop() {
   });
 
   useMotionValueEvent(scrollYProgress, "change", v => {
-    if (v >= 0.78) setActiveStage(2);
-    else if (v >= 0.44) setActiveStage(1);
+    if (v >= 0.60) setActiveStage(2);
+    else if (v >= 0.30) setActiveStage(1);
     else setActiveStage(0);
   });
 
-  // Node activation windows — cards 2 and 3 start AFTER each explosion lands
+  // Node activation windows — cards appear before explosion, which then celebrates their arrival
   const box1  = useTransform(scrollYProgress, [0.00, 0.20], [0, 1]);
-  const conn1 = useTransform(scrollYProgress, [0.16, 0.46], [0, 1]);
-  const box2  = useTransform(scrollYProgress, [0.44, 0.64], [0, 1]); // starts as conn1 explosion completes
-  const conn2 = useTransform(scrollYProgress, [0.60, 0.80], [0, 1]);
-  const box3  = useTransform(scrollYProgress, [0.78, 0.96], [0, 1]); // starts as conn2 explosion completes
+  const conn1 = useTransform(scrollYProgress, [0.14, 0.54], [0, 1]); // wider range = slower travel
+  const box2  = useTransform(scrollYProgress, [0.30, 0.52], [0, 1]); // card mostly there before explosion
+  const conn2 = useTransform(scrollYProgress, [0.48, 0.82], [0, 1]); // wider range = slower travel
+  const box3  = useTransform(scrollYProgress, [0.60, 0.88], [0, 1]); // card mostly there before explosion
 
   return (
     <div
