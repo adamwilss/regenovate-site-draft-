@@ -344,19 +344,11 @@ function PillConnector({
 /* ═══════════════════════════════════════════════════════════════════════
    SCROLL-DRIVEN ONOMATOPOEIC TITLES
    ═══════════════════════════════════════════════════════════════════════ */
-function SystemiseLetter({ char, index, progress }: { char: string, index: number, progress: MotionValue<number> }) {
-  const start = 0.05 + index * 0.04;
-  const end = start + 0.15;
-  const opacity = useTransform(progress, [start, end], [0, 1]);
-  const y = useTransform(progress, [start, end], [25, 0]);
-  return <motion.span style={{ display: "inline-block", opacity, y }}>{char}</motion.span>;
-}
-
 function NodeCardTitle({ pillar, progress, titleShadow }: { pillar: any, progress: MotionValue<number>, titleShadow: any }) {
-  const x = useTransform(progress, [0.0, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4], [-30, 25, -15, 12, -8, 4, -1, 0]);
-  const y = useTransform(progress, [0.0, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4], [15, -12, 10, -8, 5, -2, 1, 0]);
-  const r = useTransform(progress, [0.0, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4], [-10, 8, -6, 4, -2, 1, -0.5, 0]);
-  const blurValue = useTransform(progress, [0, 0.25, 0.4], ["blur(8px)", "blur(3px)", "blur(0px)"]);
+  const [triggered, setTriggered] = useState(false);
+  useMotionValueEvent(progress, "change", v => {
+    if (v > 0.05 && !triggered) setTriggered(true);
+  });
 
   const baseStyle = {
     fontFamily: '"Bebas Neue", serif',
@@ -364,20 +356,36 @@ function NodeCardTitle({ pillar, progress, titleShadow }: { pillar: any, progres
     color: "var(--text-primary)",
     display: "block",
     letterSpacing: "0.02em",
-    textShadow: titleShadow,
+    // Cast to undefined if none, as motion doesn't like passing motionvalues directly to generic span styles without care, but actually textShadow is fine:
+    WebkitTextStroke: "1px rgba(255,255,255,0.05)",
   };
 
   if (pillar.slug === "systemise") {
     return (
-      <span style={baseStyle}>
-        {"Systemise".split("").map((c, i) => <SystemiseLetter key={i} char={c} index={i} progress={progress} />)}
-      </span>
+      <motion.span style={{ ...baseStyle, textShadow: titleShadow }}>
+        {"Systemise".split("").map((c, i) => (
+          <motion.span
+            key={i}
+            initial={{ opacity: 0, y: 35 }}
+            animate={triggered ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: i * 0.08, duration: 0.25, ease: "easeOut" }}
+            style={{ display: "inline-block" }}
+          >
+            {c}
+          </motion.span>
+        ))}
+      </motion.span>
     );
   }
 
   if (pillar.slug === "stabilise") {
     return (
-       <motion.span style={{ ...baseStyle, x, y, rotate: r, filter: blurValue }}>
+       <motion.span
+         style={{ ...baseStyle, textShadow: titleShadow }}
+         initial={{ x: -25, y: 15, rotate: -12, filter: "blur(12px)", opacity: 0 }}
+         animate={triggered ? { x: 0, y: 0, rotate: 0, filter: "blur(0px)", opacity: 1 } : {}}
+         transition={{ type: "spring", stiffness: 120, damping: 6, mass: 0.8 }}
+       >
          {pillar.title}
        </motion.span>
     );
@@ -385,7 +393,12 @@ function NodeCardTitle({ pillar, progress, titleShadow }: { pillar: any, progres
 
   // Scale (or generic fallback)
   return (
-    <motion.span style={baseStyle}>
+    <motion.span
+      style={{ ...baseStyle, textShadow: titleShadow }}
+      initial={{ scale: 0.15, opacity: 0 }}
+      animate={triggered ? { scale: 1, opacity: 1 } : {}}
+      transition={{ type: "spring", stiffness: 100, damping: 10, delay: 0.1 }}
+    >
       {pillar.title}
     </motion.span>
   );
@@ -711,7 +724,7 @@ function PillarsDesktop() {
       ref={containerRef}
       id="pillars"
       className="relative hidden lg:block"
-      style={{ height: "800vh" }}
+      style={{ height: "360vh" }}
     >
       <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden">
         {/* Ambient glow */}
