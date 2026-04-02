@@ -281,5 +281,5 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin }: P
     return () => cancelAnimationFrame(rafId)
   }, [])
 
-  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full block" />
+  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full block pointer-events-none" />
 }
