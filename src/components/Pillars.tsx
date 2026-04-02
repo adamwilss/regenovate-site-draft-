@@ -4,7 +4,7 @@ import {
   motion, useScroll, useTransform, useInView,
   useMotionValue, useMotionValueEvent, type MotionValue,
 } from "framer-motion";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { pillars } from "@/lib/pillar-data";
 
@@ -344,60 +344,104 @@ function PillConnector({
 /* ═══════════════════════════════════════════════════════════════════════
    SCROLL-DRIVEN ONOMATOPOEIC TITLES
    ═══════════════════════════════════════════════════════════════════════ */
-function NodeCardTitle({ pillar, progress, titleShadow }: { pillar: any, progress: MotionValue<number>, titleShadow: any }) {
-  const [triggered, setTriggered] = useState(false);
-  useMotionValueEvent(progress, "change", v => {
-    if (v > 0.05 && !triggered) setTriggered(true);
+const GLITCH_CHARS = "!<>-_\\/[]{}—=+*^?#_";
+
+function SystemiseGlitchLetter({ char, index, progress }: { char: string, index: number, progress: MotionValue<number> }) {
+  const threshold = 0.05 + index * 0.04;
+  
+  // Create a scroll-bound glitch map effect
+  const glitchIndex = useTransform(progress, p => {
+    if (p >= threshold) return -1;
+    return Math.floor(Math.abs(p * 600)) % GLITCH_CHARS.length;
   });
 
+  const [displayChar, setDisplayChar] = useState(char);
+  
+  useMotionValueEvent(glitchIndex, "change", v => {
+    if (v === -1) setDisplayChar(char);
+    else setDisplayChar(GLITCH_CHARS[v] || GLITCH_CHARS[0]);
+  });
+  
+  const y = useTransform(progress, [0, threshold], [20, 0]);
+  const opacity = useTransform(progress, [0, Math.min(0.1, threshold/2)], [0, 1]);
+
+  return (
+    <motion.span
+      style={{ display: "inline-block", minWidth: "0.4em", textAlign: "center", opacity, y }}
+    >
+      {displayChar}
+    </motion.span>
+  );
+}
+
+function StabiliseQuiverLetter({ char, index, progress }: { char: string, index: number, progress: MotionValue<number> }) {
+  // Generate 15 points mapping `progress` 0 -> 0.4 down to 0 displacement
+  const pathData = useMemo(() => {
+     const domain = Array.from({length: 15}, (_, i) => (i / 14) * 0.4);
+     const xRange = Array.from({length: 15}, (_, i) => {
+       if (i === 14) return 0;
+       return (Math.random() > 0.5 ? 1 : -1) * (15 - i) * Math.random() * 2;
+     });
+     const yRange = Array.from({length: 15}, (_, i) => {
+       if (i === 14) return 0;
+       return (Math.random() > 0.5 ? 1 : -1) * (10 - i * 0.6) * Math.random() * 2;
+     });
+     const rRange = Array.from({length: 15}, (_, i) => {
+       if (i === 14) return 0;
+       return (Math.random() > 0.5 ? 1 : -1) * (15 - i) * Math.random() * 1.5;
+     });
+     return { domain, xRange, yRange, rRange };
+  }, []);
+
+  const x = useTransform(progress, pathData.domain, pathData.xRange);
+  const y = useTransform(progress, pathData.domain, pathData.yRange);
+  const rotate = useTransform(progress, pathData.domain, pathData.rRange);
+  const blur = useTransform(progress, [0, 0.4], ["blur(10px)", "blur(0px)"]);
+  const opacity = useTransform(progress, [0, 0.2], [0, 1]);
+
+  return (
+    <motion.span style={{ display: "inline-block", x, y, rotate, filter: blur, opacity }}>
+      {char}
+    </motion.span>
+  );
+}
+
+function NodeCardTitle({ pillar, progress, titleShadow }: { pillar: any, progress: MotionValue<number>, titleShadow: any }) {
   const baseStyle = {
     fontFamily: '"Bebas Neue", serif',
     fontSize: "clamp(3.5rem, 3.6vw, 6rem)",
     color: "var(--text-primary)",
     display: "block",
     letterSpacing: "0.02em",
-    // Cast to undefined if none, as motion doesn't like passing motionvalues directly to generic span styles without care, but actually textShadow is fine:
     WebkitTextStroke: "1px rgba(255,255,255,0.05)",
   };
 
   if (pillar.slug === "systemise") {
     return (
-      <motion.span style={{ ...baseStyle, textShadow: titleShadow }}>
+      <span style={{ ...baseStyle, textShadow: titleShadow }}>
         {"Systemise".split("").map((c, i) => (
-          <motion.span
-            key={i}
-            initial={{ opacity: 0, y: 35 }}
-            animate={triggered ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: i * 0.08, duration: 0.25, ease: "easeOut" }}
-            style={{ display: "inline-block" }}
-          >
-            {c}
-          </motion.span>
+          <SystemiseGlitchLetter key={i} char={c} index={i} progress={progress} />
         ))}
-      </motion.span>
+      </span>
     );
   }
 
   if (pillar.slug === "stabilise") {
     return (
-       <motion.span
-         style={{ ...baseStyle, textShadow: titleShadow }}
-         initial={{ x: -25, y: 15, rotate: -12, filter: "blur(12px)", opacity: 0 }}
-         animate={triggered ? { x: 0, y: 0, rotate: 0, filter: "blur(0px)", opacity: 1 } : {}}
-         transition={{ type: "spring", stiffness: 120, damping: 6, mass: 0.8 }}
-       >
-         {pillar.title}
-       </motion.span>
+       <span style={{ ...baseStyle, textShadow: titleShadow }}>
+         {"Stabilise".split("").map((c, i) => (
+           <StabiliseQuiverLetter key={i} char={c} index={i} progress={progress} />
+         ))}
+       </span>
     );
   }
 
   // Scale (or generic fallback)
+  const scale = useTransform(progress, [0, 0.45], [0.15, 1.0]);
+  const opacity = useTransform(progress, [0, 0.2], [0, 1]);
   return (
     <motion.span
-      style={{ ...baseStyle, textShadow: titleShadow }}
-      initial={{ scale: 0.15, opacity: 0 }}
-      animate={triggered ? { scale: 1, opacity: 1 } : {}}
-      transition={{ type: "spring", stiffness: 100, damping: 10, delay: 0.1 }}
+      style={{ ...baseStyle, textShadow: titleShadow, scale, opacity }}
     >
       {pillar.title}
     </motion.span>
