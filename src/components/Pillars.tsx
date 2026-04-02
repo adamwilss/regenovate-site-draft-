@@ -347,7 +347,7 @@ function PillConnector({
 const GLITCH_CHARS = "!<>-_\\/[]{}—=+*^?#_";
 
 function SystemiseGlitchLetter({ char, index, progress }: { char: string, index: number, progress: MotionValue<number> }) {
-  const threshold = 0.05 + index * 0.04;
+  const threshold = 0.25 + index * 0.06;
   
   // Create a scroll-bound glitch map effect
   const glitchIndex = useTransform(progress, p => {
@@ -362,8 +362,8 @@ function SystemiseGlitchLetter({ char, index, progress }: { char: string, index:
     else setDisplayChar(GLITCH_CHARS[v] || GLITCH_CHARS[0]);
   });
   
-  const y = useTransform(progress, [0, threshold], [20, 0]);
-  const opacity = useTransform(progress, [0, Math.min(0.1, threshold/2)], [0, 1]);
+  const y = useTransform(progress, [0.15, threshold], [20, 0]);
+  const opacity = useTransform(progress, [0.15, Math.min(0.3, threshold/2)], [0, 1]);
 
   return (
     <motion.span
@@ -375,9 +375,9 @@ function SystemiseGlitchLetter({ char, index, progress }: { char: string, index:
 }
 
 function StabiliseQuiverLetter({ char, index, progress }: { char: string, index: number, progress: MotionValue<number> }) {
-  // Generate 15 points mapping `progress` 0 -> 0.4 down to 0 displacement
+  // Generate 15 points mapping `progress` 0.2 -> 0.8 down to 0 displacement
   const pathData = useMemo(() => {
-     const domain = Array.from({length: 15}, (_, i) => (i / 14) * 0.4);
+     const domain = Array.from({length: 15}, (_, i) => 0.2 + (i / 14) * 0.6);
      const xRange = Array.from({length: 15}, (_, i) => {
        if (i === 14) return 0;
        return (Math.random() > 0.5 ? 1 : -1) * (15 - i) * Math.random() * 2;
@@ -396,8 +396,8 @@ function StabiliseQuiverLetter({ char, index, progress }: { char: string, index:
   const x = useTransform(progress, pathData.domain, pathData.xRange);
   const y = useTransform(progress, pathData.domain, pathData.yRange);
   const rotate = useTransform(progress, pathData.domain, pathData.rRange);
-  const blur = useTransform(progress, [0, 0.4], ["blur(10px)", "blur(0px)"]);
-  const opacity = useTransform(progress, [0, 0.2], [0, 1]);
+  const blur = useTransform(progress, [0.2, 0.8], ["blur(10px)", "blur(0px)"]);
+  const opacity = useTransform(progress, [0.15, 0.35], [0, 1]);
 
   return (
     <motion.span style={{ display: "inline-block", x, y, rotate, filter: blur, opacity }}>
@@ -413,6 +413,7 @@ function NodeCardTitle({ pillar, progress, titleShadow }: { pillar: any, progres
     color: "var(--text-primary)",
     display: "block",
     letterSpacing: "0.02em",
+    whiteSpace: "nowrap",
     WebkitTextStroke: "1px rgba(255,255,255,0.05)",
   };
 
@@ -437,8 +438,8 @@ function NodeCardTitle({ pillar, progress, titleShadow }: { pillar: any, progres
   }
 
   // Scale (or generic fallback)
-  const scale = useTransform(progress, [0, 0.45], [0.15, 1.0]);
-  const opacity = useTransform(progress, [0, 0.2], [0, 1]);
+  const scale = useTransform(progress, [0.15, 0.7], [0.15, 1.0]);
+  const opacity = useTransform(progress, [0.15, 0.35], [0, 1]);
   return (
     <motion.span
       style={{ ...baseStyle, textShadow: titleShadow, scale, opacity }}
