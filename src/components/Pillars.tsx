@@ -59,7 +59,7 @@ function NodeConnector({
   return (
     <div
       className="flex-shrink-0 self-center flex items-center justify-center"
-      style={{ width: 172 }}
+      style={{ width: 96 }}
     >
       <svg
         width="100%"
@@ -194,7 +194,7 @@ function NodeCard({
 
   return (
     <motion.div
-      className="relative flex-1 rounded-3xl overflow-hidden flex flex-col"
+      className="relative flex-1 min-w-0 rounded-3xl overflow-hidden flex flex-col"
       style={{
         filter: filterVal,
         boxShadow,
@@ -281,7 +281,7 @@ function NodeCard({
             <motion.span
               style={{
                 fontFamily: '"Bebas Neue", serif',
-                fontSize: "clamp(3.5rem, 5.5vw, 7rem)",
+                fontSize: "clamp(3.5rem, 3.6vw, 6rem)",
                 color: "var(--text-primary)",
                 display: "block",
                 letterSpacing: "0.02em",
