@@ -342,6 +342,55 @@ function PillConnector({
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
+   SCROLL-DRIVEN ONOMATOPOEIC TITLES
+   ═══════════════════════════════════════════════════════════════════════ */
+function SystemiseLetter({ char, index, progress }: { char: string, index: number, progress: MotionValue<number> }) {
+  const start = 0.05 + index * 0.035;
+  const end = start + 0.12;
+  const opacity = useTransform(progress, [start, end], [0, 1]);
+  const y = useTransform(progress, [start, end], [15, 0]);
+  return <motion.span style={{ display: "inline-block", opacity, y }}>{char}</motion.span>;
+}
+
+function NodeCardTitle({ pillar, progress, titleShadow }: { pillar: any, progress: MotionValue<number>, titleShadow: any }) {
+  const x = useTransform(progress, [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35], [-8, 6, -4, 2, -1, 0.5, 0]);
+  const y = useTransform(progress, [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35], [5, -4, 3, -1.5, 1, -0.5, 0]);
+  const r = useTransform(progress, [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35], [-3, 2, -1.5, 1, -0.5, 0.2, 0]);
+
+  const baseStyle = {
+    fontFamily: '"Bebas Neue", serif',
+    fontSize: "clamp(3.5rem, 3.6vw, 6rem)",
+    color: "var(--text-primary)",
+    display: "block",
+    letterSpacing: "0.02em",
+    textShadow: titleShadow,
+  };
+
+  if (pillar.slug === "systemise") {
+    return (
+      <span style={baseStyle}>
+        {"Systemise".split("").map((c, i) => <SystemiseLetter key={i} char={c} index={i} progress={progress} />)}
+      </span>
+    );
+  }
+
+  if (pillar.slug === "stabilise") {
+    return (
+       <motion.span style={{ ...baseStyle, x, y, rotate: r }}>
+         {pillar.title}
+       </motion.span>
+    );
+  }
+
+  // Scale (or generic fallback)
+  return (
+    <motion.span style={baseStyle}>
+      {pillar.title}
+    </motion.span>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
    NODE CARD — strong ghost→active contrast
    ═══════════════════════════════════════════════════════════════════════ */
 function NodeCard({
@@ -376,7 +425,8 @@ function NodeCard({
   const numOp        = useTransform(progress, [0, 1], [0.04, 0.13]);
   const headerOp     = useTransform(progress, [0.0, 0.28], [0, 1]);
   const headerY      = useTransform(progress, [0.0, 0.28], [18, 0]);
-  const titleSc      = useTransform(progress, [0.05, 0.38], [0.88, 1]);
+  const scaleStart   = pillar.slug === "scale" ? 0.3 : 0.88;
+  const titleSc      = useTransform(progress, [0.05, 0.38], [scaleStart, 1]);
   const sepOp        = useTransform(progress, [0.24, 0.48], [0, 1]);
   const descOp       = useTransform(progress, [0.32, 0.60], [0, 1]);
   const ctaOp        = useTransform(progress, [0.52, 0.80], [0, 1]);
@@ -477,18 +527,7 @@ function NodeCard({
             className="leading-none"
             aria-label={pillar.title}
           >
-            <motion.span
-              style={{
-                fontFamily: '"Bebas Neue", serif',
-                fontSize: "clamp(3.5rem, 3.6vw, 6rem)",
-                color: "var(--text-primary)",
-                display: "block",
-                letterSpacing: "0.02em",
-                textShadow: titleShadow,
-              }}
-            >
-              {pillar.title}
-            </motion.span>
+            <NodeCardTitle pillar={pillar} progress={progress} titleShadow={titleShadow} />
           </motion.h3>
         </motion.div>
 
@@ -546,63 +585,6 @@ function NodeCard({
    ═══════════════════════════════════════════════════════════════════════ */
 const STAGE_COLORS = pillars.map(p => p.letterColor);
 
-/* ── Onomatopoeic word animations ───────────────────────────────────── */
-const SYSTEMISE_LETTERS = "Systemise".split("");
-
-function StabiliseWord({ triggered }: { triggered: boolean }) {
-  return (
-    <span
-      style={{
-        display: "inline-block",
-        animation: triggered ? "rg-stabilise 1.4s cubic-bezier(0.16,1,0.3,1) 0.6s both" : "none",
-        opacity: triggered ? undefined : 0,
-      }}
-    >
-      Stabilise
-    </span>
-  );
-}
-
-function SystemiseWord({ triggered }: { triggered: boolean }) {
-  return (
-    <span style={{ display: "inline-block" }}>
-      {SYSTEMISE_LETTERS.map((char, i) => (
-        <span
-          key={i}
-          style={{
-            display: "inline-block",
-            opacity: triggered ? 1 : 0,
-            transform: triggered ? "translateY(0)" : "translateY(12px)",
-            transition: triggered
-              ? `opacity 0.35s ease ${1.5 + i * 0.05}s, transform 0.35s cubic-bezier(0.16,1,0.3,1) ${1.5 + i * 0.05}s`
-              : "none",
-          }}
-        >
-          {char}
-        </span>
-      ))}
-    </span>
-  );
-}
-
-function ScaleWord({ triggered }: { triggered: boolean }) {
-  return (
-    <span
-      style={{
-        display: "inline-block",
-        opacity: triggered ? 1 : 0,
-        transform: triggered ? "scale(1)" : "scale(0.15)",
-        transformOrigin: "center center",
-        transition: triggered
-          ? "opacity 0.6s ease 2.2s, transform 0.8s cubic-bezier(0.34,1.56,0.64,1) 2.2s"
-          : "none",
-      }}
-    >
-      Scale
-    </span>
-  );
-}
-
 function SectionHeader({
   visible,
   activeStage,
@@ -615,40 +597,21 @@ function SectionHeader({
   pillConn2?: MotionValue<number>;
 }) {
   return (
-    <>
-      {/* Keyframes injected once */}
-      <style>{`
-        @keyframes rg-stabilise {
-          0%   { opacity:0; transform: translate(-6px,4px) rotate(-2.5deg) skewX(4deg); filter: blur(2px); }
-          12%  { opacity:1; transform: translate(5px,-3px) rotate(1.8deg) skewX(-3deg); filter: blur(1px); }
-          24%  { transform: translate(-4px,2px) rotate(-1.4deg) skewX(2deg); filter: blur(0.5px); }
-          36%  { transform: translate(3px,-1px) rotate(0.9deg) skewX(-1.5deg); }
-          50%  { transform: translate(-2px,1px) rotate(-0.5deg) skewX(0.8deg); }
-          64%  { transform: translate(1px,-0.5px) rotate(0.2deg); }
-          78%  { transform: translate(-0.5px,0.2px) rotate(-0.05deg); }
-          100% { opacity:1; transform: translate(0,0) rotate(0) skewX(0); filter: blur(0); }
-        }
-      `}</style>
-      <motion.div
-        initial={{ opacity: 0, y: 28 }}
-        animate={visible ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-        className="text-center mb-8"
+    <motion.div
+      initial={{ opacity: 0, y: 28 }}
+      animate={visible ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+      className="text-center mb-8"
+    >
+      <p className="text-blue-400 text-[9px] font-medium tracking-[0.5em] uppercase mb-4">
+        The Business Transformation Programme
+      </p>
+      <h2
+        className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4"
+        style={{ fontFamily: '"DM Serif Display", serif', color: "var(--text-primary)" }}
       >
-        <p className="text-blue-400 text-[9px] font-medium tracking-[0.5em] uppercase mb-4">
-          The Business Transformation Programme
-        </p>
-        <h2
-          className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4"
-          style={{ fontFamily: '"DM Serif Display", serif', color: "var(--text-primary)" }}
-        >
-          <StabiliseWord triggered={visible} />
-          {". "}
-          <SystemiseWord triggered={visible} />
-          {". "}
-          <ScaleWord triggered={visible} />
-          {"."}
-        </h2>
+        Stabilise. Systemise. Scale.
+      </h2>
         <p
           className="max-w-xl mx-auto text-sm leading-relaxed mb-8"
           style={{ color: "var(--text-muted)" }}
@@ -713,7 +676,6 @@ function SectionHeader({
         ))}
       </div>
     </motion.div>
-    </>
   );
 }
 
