@@ -347,7 +347,7 @@ function PillConnector({
 const GLITCH_CHARS = "!<>-_\\/[]{}—=+*^?#_";
 
 function SystemiseGlitchLetter({ char, index, progress }: { char: string, index: number, progress: MotionValue<number> }) {
-  const threshold = 0.25 + index * 0.06;
+  const threshold = 0.25 + index * 0.08;
   
   // Create a scroll-bound glitch map effect
   const glitchIndex = useTransform(progress, p => {
@@ -375,9 +375,9 @@ function SystemiseGlitchLetter({ char, index, progress }: { char: string, index:
 }
 
 function StabiliseQuiverLetter({ char, index, progress }: { char: string, index: number, progress: MotionValue<number> }) {
-  // Generate 15 points mapping `progress` 0.2 -> 0.8 down to 0 displacement
+  // Generate 15 points mapping `progress` 0.2 -> 0.9 down to 0 displacement
   const pathData = useMemo(() => {
-     const domain = Array.from({length: 15}, (_, i) => 0.2 + (i / 14) * 0.6);
+     const domain = Array.from({length: 15}, (_, i) => 0.2 + (i / 14) * 0.7);
      const xRange = Array.from({length: 15}, (_, i) => {
        if (i === 14) return 0;
        return (Math.random() > 0.5 ? 1 : -1) * (15 - i) * Math.random() * 2;
@@ -396,8 +396,8 @@ function StabiliseQuiverLetter({ char, index, progress }: { char: string, index:
   const x = useTransform(progress, pathData.domain, pathData.xRange);
   const y = useTransform(progress, pathData.domain, pathData.yRange);
   const rotate = useTransform(progress, pathData.domain, pathData.rRange);
-  const blur = useTransform(progress, [0.2, 0.8], ["blur(10px)", "blur(0px)"]);
-  const opacity = useTransform(progress, [0.15, 0.35], [0, 1]);
+  const blur = useTransform(progress, [0.2, 0.9], ["blur(10px)", "blur(0px)"]);
+  const opacity = useTransform(progress, [0.15, 0.45], [0, 1]);
 
   return (
     <motion.span style={{ display: "inline-block", x, y, rotate, filter: blur, opacity }}>
@@ -420,7 +420,7 @@ function NodeCardTitle({ pillar, progress, titleShadow }: { pillar: any, progres
   if (pillar.slug === "systemise") {
     return (
       <span style={{ ...baseStyle, textShadow: titleShadow }}>
-        {"Systemise".split("").map((c, i) => (
+        {pillar.title.split("").map((c: string, i: number) => (
           <SystemiseGlitchLetter key={i} char={c} index={i} progress={progress} />
         ))}
       </span>
@@ -430,7 +430,7 @@ function NodeCardTitle({ pillar, progress, titleShadow }: { pillar: any, progres
   if (pillar.slug === "stabilise") {
     return (
        <span style={{ ...baseStyle, textShadow: titleShadow }}>
-         {"Stabilise".split("").map((c, i) => (
+         {pillar.title.split("").map((c: string, i: number) => (
            <StabiliseQuiverLetter key={i} char={c} index={i} progress={progress} />
          ))}
        </span>
@@ -438,8 +438,8 @@ function NodeCardTitle({ pillar, progress, titleShadow }: { pillar: any, progres
   }
 
   // Scale (or generic fallback)
-  const scale = useTransform(progress, [0.15, 0.7], [0.15, 1.0]);
-  const opacity = useTransform(progress, [0.15, 0.35], [0, 1]);
+  const scale = useTransform(progress, [0.15, 0.9], [0.15, 1.0]);
+  const opacity = useTransform(progress, [0.15, 0.45], [0, 1]);
   return (
     <motion.span
       style={{ ...baseStyle, textShadow: titleShadow, scale, opacity }}
