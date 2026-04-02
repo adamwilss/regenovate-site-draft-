@@ -554,7 +554,7 @@ function StabiliseWord({ triggered }: { triggered: boolean }) {
     <span
       style={{
         display: "inline-block",
-        animation: triggered ? "rg-stabilise 1.4s cubic-bezier(0.16,1,0.3,1) forwards" : "none",
+        animation: triggered ? "rg-stabilise 1.4s cubic-bezier(0.16,1,0.3,1) 0.6s both" : "none",
         opacity: triggered ? undefined : 0,
       }}
     >
@@ -574,7 +574,7 @@ function SystemiseWord({ triggered }: { triggered: boolean }) {
             opacity: triggered ? 1 : 0,
             transform: triggered ? "translateY(0)" : "translateY(12px)",
             transition: triggered
-              ? `opacity 0.32s ease ${0.08 + i * 0.055}s, transform 0.32s cubic-bezier(0.16,1,0.3,1) ${0.08 + i * 0.055}s`
+              ? `opacity 0.35s ease ${1.5 + i * 0.05}s, transform 0.35s cubic-bezier(0.16,1,0.3,1) ${1.5 + i * 0.05}s`
               : "none",
           }}
         >
@@ -591,10 +591,10 @@ function ScaleWord({ triggered }: { triggered: boolean }) {
       style={{
         display: "inline-block",
         opacity: triggered ? 1 : 0,
-        transform: triggered ? "scale(1)" : "scale(0.18)",
+        transform: triggered ? "scale(1)" : "scale(0.15)",
         transformOrigin: "center center",
         transition: triggered
-          ? "opacity 0.55s ease 0.12s, transform 0.75s cubic-bezier(0.34,1.56,0.64,1) 0.12s"
+          ? "opacity 0.6s ease 2.2s, transform 0.8s cubic-bezier(0.34,1.56,0.64,1) 2.2s"
           : "none",
       }}
     >
@@ -614,20 +614,6 @@ function SectionHeader({
   pillConn1?: MotionValue<number>;
   pillConn2?: MotionValue<number>;
 }) {
-  const h2Ref = useRef<HTMLHeadingElement>(null);
-  const [wordTriggered, setWordTriggered] = useState(false);
-
-  useEffect(() => {
-    const el = h2Ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setWordTriggered(true); obs.disconnect(); } },
-      { threshold: 0.5 }
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-
   return (
     <>
       {/* Keyframes injected once */}
@@ -653,15 +639,14 @@ function SectionHeader({
           The Business Transformation Programme
         </p>
         <h2
-          ref={h2Ref}
           className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4"
           style={{ fontFamily: '"DM Serif Display", serif', color: "var(--text-primary)" }}
         >
-          <StabiliseWord triggered={wordTriggered} />
+          <StabiliseWord triggered={visible} />
           {". "}
-          <SystemiseWord triggered={wordTriggered} />
+          <SystemiseWord triggered={visible} />
           {". "}
-          <ScaleWord triggered={wordTriggered} />
+          <ScaleWord triggered={visible} />
           {"."}
         </h2>
         <p
