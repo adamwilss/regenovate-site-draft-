@@ -37,8 +37,9 @@ function NodeConnector({
 }) {
   const pathRef = useRef<SVGPathElement>(null);
   const [pathLen, setPathLen] = useState(0);
-  const dotX = useMotionValue(0);
-  const dotY = useMotionValue(50);
+  const dotX   = useMotionValue(0);
+  const dotY   = useMotionValue(50);
+  const trailX = useMotionValue(0);
 
   useEffect(() => {
     if (pathRef.current) setPathLen(pathRef.current.getTotalLength());
@@ -47,13 +48,21 @@ function NodeConnector({
   // All hooks at top level — never in JSX
   const beamProgress = useTransform(progress, [0.05, 0.88], [0, 1]);
   const travelT      = useTransform(progress, [0.05, 0.88], [0, 1]);
-  const trailOp      = useTransform(beamProgress, v => v * 0.25);
+  const trailOp      = useTransform(beamProgress, v => v * 0.6);
+  // Explosion burst — two staggered rings on arrival
+  const burstOp1 = useTransform(progress, [0.86, 0.98], [1, 0]);
+  const burstR1  = useTransform(progress, [0.86, 1.00], [0, 30]);
+  const burstOp2 = useTransform(progress, [0.89, 1.00], [0.7, 0]);
+  const burstR2  = useTransform(progress, [0.89, 1.00], [0, 18]);
 
   useMotionValueEvent(travelT, "change", t => {
     if (!pathRef.current || pathLen === 0) return;
     const pt = pathRef.current.getPointAtLength(t * pathLen);
     dotX.set(pt.x);
     dotY.set(pt.y);
+    // Trail tip sits 15% behind the dot along the path
+    const tp = pathRef.current.getPointAtLength(Math.max(0, t - 0.15) * pathLen);
+    trailX.set(tp.x);
   });
 
   return (
@@ -114,16 +123,18 @@ function NodeConnector({
           style={{ pathLength: beamProgress }}
         />
 
-        {/* Spark glow trail — soft halo behind the dot */}
-        <motion.circle
-          cx={dotX}
-          cy={dotY}
-          r={12}
-          fill={toColor}
-          style={{
-            opacity: trailOp,
-            filter: "blur(6px)",
-          }}
+        {/* Arrow chevron trail — two lines converging from behind to dot tip */}
+        <motion.line
+          x1={trailX} y1={44}
+          x2={dotX}   y2={50}
+          stroke={toColor} strokeWidth="1.5" strokeLinecap="round"
+          style={{ opacity: trailOp, filter: `drop-shadow(0 0 4px ${toColor})` }}
+        />
+        <motion.line
+          x1={trailX} y1={56}
+          x2={dotX}   y2={50}
+          stroke={toColor} strokeWidth="1.5" strokeLinecap="round"
+          style={{ opacity: trailOp, filter: `drop-shadow(0 0 4px ${toColor})` }}
         />
 
         {/* Traveling spark dot — white-hot core */}
@@ -137,6 +148,19 @@ function NodeConnector({
             opacity: beamProgress,
             filter: `drop-shadow(0 0 6px ${toColor}) drop-shadow(0 0 14px ${toColor}) drop-shadow(0 0 22px ${toColor})`,
           }}
+        />
+
+        {/* Explosion ring 1 — fast expand on arrival */}
+        <motion.circle
+          cx={CW} cy={50} r={burstR1}
+          fill="none" stroke={toColor} strokeWidth="1.5"
+          style={{ opacity: burstOp1, filter: `drop-shadow(0 0 8px ${toColor})` }}
+        />
+        {/* Explosion ring 2 — slower, fades later */}
+        <motion.circle
+          cx={CW} cy={50} r={burstR2}
+          fill="none" stroke={toColor} strokeWidth="1"
+          style={{ opacity: burstOp2, filter: `drop-shadow(0 0 5px ${toColor})` }}
         />
 
       </svg>
@@ -164,12 +188,14 @@ function NodeCard({
     p => `grayscale(${(1 - p) * 85}%) brightness(${0.22 + p * 0.78}) blur(${((1 - p) * 0.8).toFixed(1)}px)`
   );
   const boxShadow = useTransform(progress, p => {
-    const bHex = Math.round(p * 55).toString(16).padStart(2, "0");
+    const b1 = Math.round(p * 80).toString(16).padStart(2, "0");
+    const b2 = Math.round(p * 22).toString(16).padStart(2, "0");
     return [
-      `0 0 0 1px ${pillar.letterColor}${bHex}`,
-      `0 0 80px rgba(${rgb}, ${(p * 0.36).toFixed(2)})`,
-      `0 0 120px rgba(${rgb}, ${(p * 0.12).toFixed(2)})`,
-      `inset 0 1px 0 rgba(${rgb}, ${(p * 0.1).toFixed(2)})`,
+      `0 0 0 1px ${pillar.letterColor}${b1}`,
+      `0 0 0 4px ${pillar.letterColor}${b2}`,
+      `0 0 60px rgba(${rgb}, ${(p * 0.4).toFixed(2)})`,
+      `0 0 120px rgba(${rgb}, ${(p * 0.15).toFixed(2)})`,
+      `inset 0 1px 0 rgba(${rgb}, ${(p * 0.15).toFixed(2)})`,
     ].join(", ");
   });
   const cardScale    = useTransform(progress, [0, 1], [0.955, 1]);
@@ -375,35 +401,11 @@ function SectionHeader({
         style={{ color: "var(--text-muted)" }}
       >
         You cannot scale broken systems or an unstable team. The sequence is
-        non-negotiable — people first, process second, performance follows.
+        non-negotiable. People first, process second, performance follows.
       </p>
 
-      {/* Stage progress indicator with connecting line */}
-      <div className="relative flex items-center justify-center">
-        {/* Background track line */}
-        <div
-          className="absolute top-1/2 -translate-y-1/2 h-px pointer-events-none"
-          style={{
-            left: "calc(50% - 180px)",
-            right: "calc(50% - 180px)",
-            background: "var(--border-subtle)",
-            opacity: 0.3,
-          }}
-        />
-        {/* Active progress fill */}
-        <motion.div
-          className="absolute top-1/2 -translate-y-1/2 h-px pointer-events-none origin-left"
-          style={{
-            left: "calc(50% - 180px)",
-            right: "calc(50% - 180px)",
-          }}
-          animate={{
-            scaleX: activeStage === 0 ? 0 : activeStage === 1 ? 0.5 : 1,
-            background: `linear-gradient(to right, ${STAGE_COLORS[0]}, ${STAGE_COLORS[Math.min(activeStage, 2)]})`,
-          }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        />
-
+      {/* Stage progress indicator — gap connectors only, no line through pills */}
+      <div className="flex items-center justify-center">
         {pillars.map((p, i) => (
           <div key={p.slug} className="flex items-center">
             <motion.div
@@ -412,7 +414,7 @@ function SectionHeader({
                 scale: activeStage === i ? 1.07 : 1,
               }}
               transition={{ duration: 0.35, ease: "easeOut" }}
-              className="relative z-10 flex items-center gap-2 px-4 py-1.5 rounded-full cursor-default select-none"
+              className="flex items-center gap-2 px-4 py-1.5 rounded-full cursor-default select-none"
               style={{
                 border: `1px solid ${activeStage >= i ? STAGE_COLORS[i] + "35" : "var(--border-subtle)"}`,
                 background: activeStage === i ? `${STAGE_COLORS[i]}0d` : "var(--bg-base)",
@@ -433,8 +435,21 @@ function SectionHeader({
               </span>
             </motion.div>
 
-            {/* Spacer between pills (line runs behind) */}
-            {i < 2 && <div className="w-10" />}
+            {/* Connector line lives only in the gap between pills */}
+            {i < 2 && (
+              <div className="w-10 flex items-center justify-center">
+                <motion.div
+                  className="h-px w-full"
+                  animate={{
+                    opacity: activeStage > i ? 0.7 : 0.15,
+                    background: activeStage > i
+                      ? `linear-gradient(to right, ${STAGE_COLORS[i]}, ${STAGE_COLORS[i + 1]})`
+                      : "var(--border-subtle)",
+                  }}
+                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                />
+              </div>
+            )}
           </div>
         ))}
       </div>
