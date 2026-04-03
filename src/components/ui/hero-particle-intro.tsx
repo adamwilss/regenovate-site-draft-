@@ -102,10 +102,10 @@ function shuffle<T>(a: T[]): T[] {
 
 // ─── Component ─────────────────────────────────────────────────────
 interface Props {
-  onWordFormed:    () => void
-  onComplete:      () => void
-  onSettleBegin?:  () => void
-  skipRef?:        React.MutableRefObject<(() => void) | null>
+  onWordFormed:   () => void
+  onComplete:     () => void
+  onSettleBegin?: () => void
+  skipRef?:       React.MutableRefObject<(() => void) | null>
 }
 
 export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, skipRef }: Props) {
@@ -141,10 +141,10 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
     const BLUE:  [number, number, number] = [96,  165, 250]
 
     // ── Phase thresholds ─────────────────────────────────────────
-    // 0 forming → 1 hold → 2 burst → 3 reform → 4 hold2 → 5 reformR → 6 holdR → 7 settle → done
+    // 0 forming → 1 hold → 2 burst → 3 reform → 4 hold2
+    // → 5 reformR → 6 holdR → 7 settle → done
     const T = { hold: 155, burst: 205, reform: 240, hold2: 400, reformR: 440, holdR: 560, settle: 600, done: 760 }
 
-    // ── Build source words ────────────────────────────────────────
     const formWords = () => {
       const cx1 = mob ? W * 0.5 : W * 0.28
       const cy1 = mob ? H * 0.37 : H * 0.5
@@ -175,7 +175,6 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
       }
     }
 
-    // ── Reform: redirect particles to REGENOVATE ──────────────────
     const reformWord = () => {
       const pts = shuffle(textPositions("Regenovate", W * 0.5, H * 0.5, fFin, W, H, STEP))
 
@@ -187,7 +186,6 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
         p.rate = Math.random() * 0.02 + 0.015
         p.setTarget(pos.x, pos.y, p.srcR, p.srcG, p.srcB)
       }
-
       for (let i = pts.length; i < particles.length; i++) {
         const p = particles[i]
         if (!p.dead) p.burst()
@@ -197,22 +195,18 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
       }
     }
 
-    // ── Reform to R. icon — right side of screen ─────────────────
     const reformToR = () => {
-      const rFs = Math.min(Math.max((W * 0.30) | 0, 150), 400)
-
-      const mc   = document.createElement("canvas")
-      const mctx = mc.getContext("2d")!
-      mctx.font  = `bold ${rFs}px Arial`
+      const rFs    = Math.min(Math.max((W * 0.30) | 0, 150), 400)
+      const mc     = document.createElement("canvas")
+      const mctx   = mc.getContext("2d")!
+      mctx.font    = `bold ${rFs}px Arial`
       const fullW  = mctx.measureText("R.").width
       const rCharW = mctx.measureText("R").width
-
-      // Centre the R. in the right portion of the screen (mobile: centred)
       const cx     = mob ? W * 0.5 : W * 0.76
       const startX = cx - fullW / 2
 
-      const IR: [number,number,number] = [58, 123, 255]   // brand blue
-      const ID: [number,number,number] = [18, 22, 42]     // near-invisible dot
+      const IR: [number,number,number] = [58, 123, 255]
+      const ID: [number,number,number] = [18, 22, 42]
 
       type Colored = { x: number; y: number; c: [number,number,number] }
       const allPts: Colored[] = [
@@ -229,7 +223,6 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
         p.rate = Math.random() * 0.02 + 0.015
         p.setTarget(pos.x, pos.y, pos.c[0], pos.c[1], pos.c[2])
       }
-
       for (let i = allPts.length; i < particles.length; i++) {
         const p = particles[i]
         if (!p.dead) p.burst()
@@ -239,7 +232,9 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
       }
     }
 
-    // ── Gentle scatter — no explosion ─────────────────────────────
+    const settleTargets = Array.from({ length: 2000 },
+      () => ({ x: Math.random() * W, y: Math.random() * H }))
+
     const settleAll = () => {
       shuffle(settleTargets)
       particles.forEach((p, i) => {
@@ -249,35 +244,62 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
       onSettleBeginRef.current?.()
     }
 
-    // Pre-compute scatter targets
-    const settleTargets = Array.from({ length: 2000 },
-      () => ({ x: Math.random() * W, y: Math.random() * H }))
-
     formWords()
 
-    let phase = 0
-    let frame = 0
-    let done  = false
-    let rafId = 0
+    let phase   = 0
+    let frame   = 0
+    let done    = false
+    let rafId   = 0
+    let bgAlpha = 0.22         // fades to 0 during settle, revealing hero bg
+    let mouseX  = -9999
+    let mouseY  = -9999
+    const MOUSE_RADIUS = 130
 
-    // Skip: jump straight to R. on the right, then settle gently
+    // Mouse tracking via window so hero content doesn't block it
+    const onMouseMove = (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect()
+      mouseX = (e.clientX - rect.left) * (W / rect.width)
+      mouseY = (e.clientY - rect.top)  * (H / rect.height)
+    }
+    window.addEventListener("mousemove", onMouseMove)
+
+    // Skip: jump straight to R. on the right, then settle
     if (skipRef) {
       skipRef.current = () => {
         reformToR()
         phase = 5
-        frame = T.holdR   // triggers settle on the very next tick
+        frame = T.holdR
       }
     }
 
     const tick = () => {
-      ctx.fillStyle = phase >= 7
-        ? "rgba(13,27,62,0.12)"   // gentle fade during settle
-        : "rgba(13,27,62,0.22)"   // normal trail
-      ctx.fillRect(0, 0, W, H)
+      // ── Background — fades out during settle so hero bg shows through ──
+      if (phase >= 7) bgAlpha = Math.max(0, bgAlpha - 0.003)
 
+      if (bgAlpha > 0) {
+        ctx.fillStyle = `rgba(13,27,62,${bgAlpha})`
+        ctx.fillRect(0, 0, W, H)
+      } else {
+        ctx.clearRect(0, 0, W, H)
+      }
+
+      // ── Particles ─────────────────────────────────────────────────
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i]
         p.update()
+
+        // Mouse repulsion — active after settle, creates satisfying ripple
+        if (phase >= 7) {
+          const dx   = p.x - mouseX
+          const dy   = p.y - mouseY
+          const dist = Math.sqrt(dx * dx + dy * dy)
+          if (dist < MOUSE_RADIUS && dist > 0.1) {
+            const strength = (1 - dist / MOUSE_RADIUS) * 2.5
+            p.vx += (dx / dist) * strength
+            p.vy += (dy / dist) * strength
+          }
+        }
+
         ctx.fillStyle = `rgb(${p.r | 0},${p.g | 0},${p.b | 0})`
         ctx.fillRect(p.x | 0, p.y | 0, p.sz, p.sz)
 
@@ -286,6 +308,7 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
           particles.splice(i, 1)
       }
 
+      // ── Phase transitions ──────────────────────────────────────────
       frame++
       if (phase === 0 && frame >= T.hold)    phase = 1
       if (phase === 1 && frame >= T.burst)   { phase = 2; particles.forEach(p => p.burst()) }
@@ -303,8 +326,19 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
     }
 
     rafId = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(rafId)
+    return () => {
+      cancelAnimationFrame(rafId)
+      window.removeEventListener("mousemove", onMouseMove)
+    }
   }, [])
 
-  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full block pointer-events-none" />
+  // Canvas is persistent — no pointer-events-none so mouse events reach it
+  // z-[3]: above orbs/grid, below skip button and hero content
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 w-full h-full block"
+      style={{ zIndex: 3 }}
+    />
+  )
 }
