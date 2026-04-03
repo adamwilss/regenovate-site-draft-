@@ -142,21 +142,40 @@ function HeroContent({ show }: { show: boolean }) {
           Invest &nbsp;·&nbsp; Partner &nbsp;·&nbsp; Acquire
         </motion.p>
 
-        {/* ── Stacked headline ── */}
-        <div className="mb-10">
-          {(["STABILISE.", "SYSTEMISE.", "SCALE."] as const).map((word, i) => (
-            <motion.div key={word} {...fadeUp(0.08 + i * 0.09)} className="leading-none">
+        {/* ── Headline grid: verb + descriptor ── */}
+        <div className="mb-10 flex flex-col gap-1">
+          {([
+            { verb: "STABILISE", noun: "your people"      },
+            { verb: "SYSTEMISE", noun: "your process"     },
+            { verb: "SCALE",     noun: "your performance" },
+          ] as const).map(({ verb, noun }, i) => (
+            <motion.div
+              key={verb}
+              {...fadeUp(0.08 + i * 0.1)}
+              className="flex items-baseline gap-3 md:gap-5 leading-none"
+            >
               <span
-                className="invest-text"
+                className="gradient-text-flow shrink-0"
                 style={{
                   fontFamily: '"Bebas Neue", sans-serif',
-                  fontSize: "clamp(4rem, 10.5vw, 10.5rem)",
+                  fontSize: "clamp(3.8rem, 10vw, 10rem)",
                   letterSpacing: "0.03em",
-                  display: "block",
                   lineHeight: 0.93,
                 }}
               >
-                {word}
+                {verb}
+              </span>
+              <span
+                style={{
+                  fontFamily: '"DM Serif Display", "Playfair Display", serif',
+                  fontSize: "clamp(1.1rem, 2.8vw, 2.8rem)",
+                  fontStyle: "italic",
+                  lineHeight: 1,
+                  color: "var(--text-muted)",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {noun}
               </span>
             </motion.div>
           ))}
