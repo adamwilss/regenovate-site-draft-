@@ -129,12 +129,12 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
     const mob  = W < 700
     const STEP = mob ? 7 : 9
 
-    const fSrc = Math.min(Math.max((W / (mob ? 10 : 20)) | 0, 30), 90)
+    const fSrc = Math.min(Math.max((W / (mob ? 8 : 15)) | 0, 40), 120)  // larger, more standout
     const fFin = Math.min(Math.max((W / (mob ? 8  : 15)) | 0, 36), 100)
 
     // Particle word colours — invert for light theme so they're visible
-    const WHITE: [number, number, number] = isLight ? [20,  58, 140] : [255, 255, 255]
-    const BLUE:  [number, number, number] = isLight ? [59,  95, 199] : [96,  165, 250]
+    const WHITE: [number, number, number] = isLight ? [10,  40, 120] : [255, 255, 255]
+    const BLUE:  [number, number, number] = isLight ? [30,  90, 220] : [56,  189, 248]  // brighter cyan-blue
 
     // ── Phase thresholds ─────────────────────────────────────────
     // 0 forming → 1 hold → 2 burst → 3 reform → 4 hold2
@@ -142,18 +142,19 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
     const T = { hold: 155, burst: 205, reform: 240, hold2: 400, reformR: 440, holdR: 560, settle: 600, done: 760 }
 
     const formWords = () => {
+      // Innovate left, Regenerate right (swapped)
       const cx1 = mob ? W * 0.5 : W * 0.28
       const cy1 = mob ? H * 0.37 : H * 0.5
       const cx2 = mob ? W * 0.5 : W * 0.72
       const cy2 = mob ? H * 0.63 : H * 0.5
 
       type Tagged = { x: number; y: number; c: [number,number,number]; left: boolean }
-      const rPts: Tagged[] = shuffle(textPositions("Regenerate", cx1, cy1, fSrc, W, H, STEP))
-        .map(p => ({ ...p, c: WHITE, left: true  }))
-      const iPts: Tagged[] = shuffle(textPositions("Innovate",   cx2, cy2, fSrc, W, H, STEP))
-        .map(p => ({ ...p, c: BLUE,  left: false }))
+      const iPts: Tagged[] = shuffle(textPositions("Innovate",   cx1, cy1, fSrc, W, H, STEP))
+        .map(p => ({ ...p, c: BLUE,  left: true  }))
+      const rPts: Tagged[] = shuffle(textPositions("Regenerate", cx2, cy2, fSrc, W, H, STEP))
+        .map(p => ({ ...p, c: WHITE, left: false }))
 
-      for (const pos of [...rPts, ...iPts]) {
+      for (const pos of [...iPts, ...rPts]) {
         const p   = new P()
         p.x       = pos.left ? -80 - Math.random() * 80 : W + Math.random() * 80
         p.y       = H * 0.3 + Math.random() * H * 0.4

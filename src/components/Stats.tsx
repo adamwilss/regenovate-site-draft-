@@ -76,14 +76,18 @@ export default function Stats() {
         </div>
 
         {/* Stats grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-slate-800/30 rounded-2xl overflow-hidden border border-slate-800/60">
+        <div
+          className="grid grid-cols-2 lg:grid-cols-4 gap-px rounded-2xl overflow-hidden"
+          style={{ background: 'var(--divider-color)', border: '1px solid var(--divider-color)' }}
+        >
           {stats.map((stat, i) => (
             <motion.div
               key={stat.label}
               initial={{ opacity: 0, y: 28 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.7, delay: 0.15 * i, ease: [0.16, 1, 0.3, 1] }}
-              className="relative px-6 py-14 md:px-10 md:py-16 text-center bg-[#0B0F1A] group"
+              className="relative px-6 py-14 md:px-10 md:py-16 text-center group"
+              style={{ background: 'var(--surface-card)' }}
             >
               {/* Hover glow */}
               <div className="absolute inset-0 bg-gradient-to-b from-blue-500/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -98,8 +102,8 @@ export default function Stats() {
 
               {/* Number */}
               <div
-                className="relative text-4xl md:text-5xl lg:text-[3.5rem] font-bold leading-none text-white mb-4"
-                style={{ fontFamily: '"DM Serif Display", "Playfair Display", serif' }}
+                className="relative text-4xl md:text-5xl lg:text-[3.5rem] font-bold leading-none mb-4"
+                style={{ fontFamily: '"DM Serif Display", "Playfair Display", serif', color: 'var(--text-primary)' }}
               >
                 <AnimatedNumber
                   value={stat.value}
@@ -109,7 +113,7 @@ export default function Stats() {
               </div>
 
               {/* Label */}
-              <p className="relative text-slate-500 text-[11px] tracking-[0.2em] uppercase leading-relaxed group-hover:text-slate-400 transition-colors duration-500">
+              <p className="relative text-[11px] tracking-[0.2em] uppercase leading-relaxed transition-colors duration-500" style={{ color: 'var(--text-muted)' }}>
                 {stat.label}
               </p>
 

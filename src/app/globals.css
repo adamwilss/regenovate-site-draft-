@@ -39,6 +39,8 @@
 :root,
 [data-theme="dark"] {
   --bg-base:          #0d1b3e;
+  --surface-card:     #0B0F1A;
+  --divider-color:    rgba(148,163,184,0.08);
   --bg-gradient:      radial-gradient(ellipse 110% 55% at 70% -5%, #1a3666 0%, transparent 55%);
   --text-primary:     #e2e8f0;
   --text-muted:       #94a3b8;
@@ -56,6 +58,8 @@
 
 [data-theme="light"] {
   --bg-base:          #f0f4ff;
+  --surface-card:     rgba(255,255,255,0.92);
+  --divider-color:    rgba(15,23,42,0.1);
   --bg-gradient:      radial-gradient(ellipse 110% 55% at 70% -5%, #dbeafe 0%, transparent 55%);
   --text-primary:     #0f172a;
   --text-muted:       #334155;
@@ -73,6 +77,8 @@
 
 [data-theme="midnight"] {
   --bg-base:          #05091a;
+  --surface-card:     #070a1c;
+  --divider-color:    rgba(99,102,241,0.1);
   --bg-gradient:      radial-gradient(ellipse 120% 60% at 65% -5%, #1a0b4e 0%, #0d1560 35%, transparent 65%);
   --text-primary:     #e0e7ff;
   --text-muted:       #a5b4fc;
