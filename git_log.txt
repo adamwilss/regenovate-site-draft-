@@ -1,7 +1,0 @@
-commit 8b017e6de3b6a606e56a7cdf39d83e0aa37d1d44
-Author: AI Assistant <ai@example.com>
-Date:   Thu Apr 2 13:26:13 2026 +0100
-
-    Fix skip intro button: canvas was blocking pointer events
-    
-    Co-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>
