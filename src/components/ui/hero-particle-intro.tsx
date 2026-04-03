@@ -9,12 +9,11 @@ class P {
   r = 255; g = 255; b = 255
   tr = 255; tg = 255; tb = 255
   sr = 255; sg = 255; sb = 255
-  // Source word color — preserved through reform so REGENOVATE inherits mixed hues
   srcR = 255; srcG = 255; srcB = 255
   blend = 1; rate = 0.025
   spd = 8; frc = 0.4
   dead = false
-  sz = 2  // draw size — shrinks to 1 during settle
+  sz = 2
 
   update() {
     const dx = this.tx - this.x
@@ -46,64 +45,30 @@ class P {
   burst() {
     if (this.dead) return
     this.dead = true
-    const a    = Math.random() * Math.PI * 2
-    const spd  = 8 + Math.random() * 7
-    this.vx    = Math.cos(a) * spd
-    this.vy    = Math.sin(a) * spd
-    this.tx    = this.x + Math.cos(a) * 3000
-    this.ty    = this.y + Math.sin(a) * 3000
-    this.sr    = this.r | 0; this.sg = this.g | 0; this.sb = this.b | 0
-    this.tr    = 13; this.tg = 27; this.tb = 62
+    const a   = Math.random() * Math.PI * 2
+    const spd = 8 + Math.random() * 7
+    this.vx   = Math.cos(a) * spd
+    this.vy   = Math.sin(a) * spd
+    this.tx   = this.x + Math.cos(a) * 3000
+    this.ty   = this.y + Math.sin(a) * 3000
+    this.sr   = this.r | 0; this.sg = this.g | 0; this.sb = this.b | 0
+    this.tr   = 13; this.tg = 27; this.tb = 62
     this.blend = 0
   }
 
-  // Collapse toward centre before explosion
-  implosion(cx: number, cy: number) {
-    this.tx   = cx + (Math.random() - 0.5) * 20
-    this.ty   = cy + (Math.random() - 0.5) * 20
-    this.spd  = 20 + Math.random() * 14
-    this.frc  = this.spd * 0.12
-    this.rate = 0.07
-    this.sr = this.r | 0; this.sg = this.g | 0; this.sb = this.b | 0
-    this.tr = 200; this.tg = 215; this.tb = 255   // flash bright blue-white
-    this.blend = 0
-    this.dead  = false
-  }
-
-  // Radial explosion from centre — dramatic, long-trail
-  explodeFrom(cx: number, cy: number) {
-    const dx = this.x - cx
-    const dy = this.y - cy
-    const a  = Math.atan2(dy, dx) + (Math.random() - 0.5) * 0.5  // ±~15° organic spread
-    const spd = 40 + Math.random() * 45
-    this.vx  = Math.cos(a) * spd
-    this.vy  = Math.sin(a) * spd
-    this.frc = 0.012   // low friction → long elegant trails
-    this.spd = 0.4
-    this.tx  = cx + Math.cos(a) * 6000
-    this.ty  = cy + Math.sin(a) * 6000
-    this.sr  = 220; this.sg = 230; this.sb = 255   // streak from bright white
-    this.tr  = 13;  this.tg = 27;  this.tb = 62    // fade to background
-    this.rate = 0.018
-    this.blend = 0
-    this.dead  = true
-  }
-
-  // Decelerate mid-flight to a scatter position — illusion of becoming background dots
   settleToAmbient(tx: number, ty: number) {
     this.tx   = tx
     this.ty   = ty
-    this.frc  = 0.06    // friction decelerates into place
-    this.spd  = 0.4     // very low attraction — drifts, doesn't snap
-    this.rate = 0.008   // slow colour blend
-    this.sz   = 1       // shrink to 1px — matches real ParticleField dots
-    // Target: ParticleField blue (hsl ~225, 70%, 65% → approx rgb)
+    this.frc  = 0.06
+    this.spd  = 0.4
+    this.rate = 0.008
+    this.sz   = 1
     this.sr = this.r | 0; this.sg = this.g | 0; this.sb = this.b | 0
     this.tr = 70  + Math.random() * 40
     this.tg = 155 + Math.random() * 20
     this.tb = 245 + Math.random() * 10
     this.blend = 0
-    this.dead  = false   // re-activate so update() keeps running
+    this.dead  = false
   }
 }
 
@@ -176,8 +141,8 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
     const BLUE:  [number, number, number] = [96,  165, 250]
 
     // ── Phase thresholds ─────────────────────────────────────────
-    // 0 forming → 1 hold → 2 burst → 3 reform → 4 hold2 → 5 reformR → 6 holdR → 7 implode → 8 explode → 9 settle → done
-    const T = { hold: 155, burst: 205, reform: 240, hold2: 400, reformR: 440, holdR: 560, implode: 600, explode: 645, settle: 675, done: 800 }
+    // 0 forming → 1 hold → 2 burst → 3 reform → 4 hold2 → 5 reformR → 6 holdR → 7 settle → done
+    const T = { hold: 155, burst: 205, reform: 240, hold2: 400, reformR: 440, holdR: 560, settle: 600, done: 760 }
 
     // ── Build source words ────────────────────────────────────────
     const formWords = () => {
@@ -210,16 +175,16 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
       }
     }
 
-    // ── Reform: redirect the SAME particles to Regenovate ─────────
+    // ── Reform: redirect particles to REGENOVATE ──────────────────
     const reformWord = () => {
       const pts = shuffle(textPositions("Regenovate", W * 0.5, H * 0.5, fFin, W, H, STEP))
 
       for (let i = 0; i < Math.min(pts.length, particles.length); i++) {
-        const p  = particles[i]
+        const p   = particles[i]
         const pos = pts[i]
-        p.spd    = Math.random() * 5 + 12
-        p.frc    = p.spd * 0.08
-        p.rate   = Math.random() * 0.02 + 0.015
+        p.spd  = Math.random() * 5 + 12
+        p.frc  = p.spd * 0.08
+        p.rate = Math.random() * 0.02 + 0.015
         p.setTarget(pos.x, pos.y, p.srcR, p.srcG, p.srcB)
       }
 
@@ -232,24 +197,22 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
       }
     }
 
-    // ── Reform to R. icon — positioned on the right side ────────
+    // ── Reform to R. icon — right side of screen ─────────────────
     const reformToR = () => {
       const rFs = Math.min(Math.max((W * 0.30) | 0, 150), 400)
 
-      // Measure natural glyph widths so R and . can be positioned independently
-      const mc = document.createElement("canvas")
+      const mc   = document.createElement("canvas")
       const mctx = mc.getContext("2d")!
-      mctx.font = `bold ${rFs}px Arial`
+      mctx.font  = `bold ${rFs}px Arial`
       const fullW  = mctx.measureText("R.").width
       const rCharW = mctx.measureText("R").width
 
-      // Position R. centred in the right portion of the screen (desktop),
-      // centred on mobile
+      // Centre the R. in the right portion of the screen (mobile: centred)
       const cx     = mob ? W * 0.5 : W * 0.76
       const startX = cx - fullW / 2
 
       const IR: [number,number,number] = [58, 123, 255]   // brand blue
-      const ID: [number,number,number] = [18, 22, 42]     // near-black dot
+      const ID: [number,number,number] = [18, 22, 42]     // near-invisible dot
 
       type Colored = { x: number; y: number; c: [number,number,number] }
       const allPts: Colored[] = [
@@ -276,7 +239,17 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
       }
     }
 
-    // Pre-compute scatter targets for settle phase
+    // ── Gentle scatter — no explosion ─────────────────────────────
+    const settleAll = () => {
+      shuffle(settleTargets)
+      particles.forEach((p, i) => {
+        const t = settleTargets[i % settleTargets.length]
+        p.settleToAmbient(t.x, t.y)
+      })
+      onSettleBeginRef.current?.()
+    }
+
+    // Pre-compute scatter targets
     const settleTargets = Array.from({ length: 2000 },
       () => ({ x: Math.random() * W, y: Math.random() * H }))
 
@@ -286,30 +259,20 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
     let frame = 0
     let done  = false
     let rafId = 0
-    // Implosion/explosion origin matches the R. position on the right
-    const cx = mob ? W * 0.5 : W * 0.76
-    const cy = H * 0.5
 
-    // Skip: jump straight to R. on the right, then let the rest play
+    // Skip: jump straight to R. on the right, then settle gently
     if (skipRef) {
       skipRef.current = () => {
         reformToR()
-        phase = 5          // R. is now formed — jump to holdR
-        frame = T.holdR    // one tick later it will implode
+        phase = 5
+        frame = T.holdR   // triggers settle on the very next tick
       }
     }
 
     const tick = () => {
-      // Trail alpha varies by phase
-      if (phase >= 9) {
-        ctx.fillStyle = "rgba(13,27,62,0.12)"   // dust fade during settle
-      } else if (phase === 8) {
-        ctx.fillStyle = "rgba(13,27,62,0.04)"   // near-transparent streaks during explosion
-      } else if (phase === 7) {
-        ctx.fillStyle = "rgba(13,27,62,0.16)"   // motion blur during implode rush
-      } else {
-        ctx.fillStyle = "rgba(13,27,62,0.22)"   // normal
-      }
+      ctx.fillStyle = phase >= 7
+        ? "rgba(13,27,62,0.12)"   // gentle fade during settle
+        : "rgba(13,27,62,0.22)"   // normal trail
       ctx.fillRect(0, 0, W, H)
 
       for (let i = particles.length - 1; i >= 0; i--) {
@@ -318,31 +281,20 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
         ctx.fillStyle = `rgb(${p.r | 0},${p.g | 0},${p.b | 0})`
         ctx.fillRect(p.x | 0, p.y | 0, p.sz, p.sz)
 
-        // Only prune during/after hold2
         if (phase >= 4 && p.dead &&
             (p.x < -200 || p.x > W + 200 || p.y < -200 || p.y > H + 200))
           particles.splice(i, 1)
       }
 
       frame++
-      if (phase === 0 && frame >= T.hold)     phase = 1
-      if (phase === 1 && frame >= T.burst)    { phase = 2; particles.forEach(p => p.burst()) }
-      if (phase === 2 && frame >= T.reform)   { phase = 3; reformWord() }
-      if (phase === 3 && frame >= T.hold2)    { phase = 4; onFormedRef.current() }
-      if (phase === 4 && frame >= T.reformR)  { phase = 5; reformToR() }
-      if (phase === 5 && frame >= T.holdR)    phase = 6
-      if (phase === 6 && frame >= T.implode)  { phase = 7; particles.forEach(p => p.implosion(cx, cy)) }
-      if (phase === 7 && frame >= T.explode)  { phase = 8; particles.forEach(p => p.explodeFrom(cx, cy)) }
-      if (phase === 8 && frame >= T.settle) {
-        phase = 9
-        shuffle(settleTargets)
-        particles.forEach((p, i) => {
-          const t = settleTargets[i % settleTargets.length]
-          p.settleToAmbient(t.x, t.y)
-        })
-        onSettleBeginRef.current?.()
-      }
-      if (phase === 9 && frame >= T.done && !done) {
+      if (phase === 0 && frame >= T.hold)    phase = 1
+      if (phase === 1 && frame >= T.burst)   { phase = 2; particles.forEach(p => p.burst()) }
+      if (phase === 2 && frame >= T.reform)  { phase = 3; reformWord() }
+      if (phase === 3 && frame >= T.hold2)   { phase = 4; onFormedRef.current() }
+      if (phase === 4 && frame >= T.reformR) { phase = 5; reformToR() }
+      if (phase === 5 && frame >= T.holdR)   { phase = 6 }
+      if (phase === 6 && frame >= T.settle)  { phase = 7; settleAll() }
+      if (phase >= 7 && frame >= T.done && !done) {
         done = true
         onCompleteRef.current()
       }
