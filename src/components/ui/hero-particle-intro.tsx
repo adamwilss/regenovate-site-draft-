@@ -264,14 +264,20 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
     }
 
     const tick = () => {
-      // ── Background — ease-out decay so fade is smooth with no sudden clear ──
-      if (phase >= 7) bgAlpha = bgAlpha > 0.002 ? bgAlpha * 0.965 : 0
-
-      if (bgAlpha > 0) {
-        ctx.fillStyle = `rgba(${bgR},${bgG},${bgB},${bgAlpha})`
-        ctx.fillRect(0, 0, W, H)
-      } else {
+      // ── Background ────────────────────────────────────────────────
+      if (phase >= 7) {
+        // Settle phase: always clearRect first so mouse-repelled dots
+        // leave no ghost trails. Dark bg then fades out on top.
+        bgAlpha = bgAlpha > 0.002 ? bgAlpha * 0.93 : 0
         ctx.clearRect(0, 0, W, H)
+        if (bgAlpha > 0) {
+          ctx.fillStyle = `rgba(${bgR},${bgG},${bgB},${bgAlpha})`
+          ctx.fillRect(0, 0, W, H)
+        }
+      } else {
+        // Intro phases: semi-transparent fill gives intentional motion-blur trail
+        ctx.fillStyle = `rgba(${bgR},${bgG},${bgB},0.22)`
+        ctx.fillRect(0, 0, W, H)
       }
 
       // ── Particles ─────────────────────────────────────────────────
