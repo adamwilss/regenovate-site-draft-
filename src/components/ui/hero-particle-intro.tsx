@@ -291,10 +291,13 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
           const dy   = p.y - mouseY
           const dist = Math.sqrt(dx * dx + dy * dy)
           if (dist < MOUSE_RADIUS && dist > 0.1) {
-            const strength = (1 - dist / MOUSE_RADIUS) * 3.5
+            const strength = (1 - dist / MOUSE_RADIUS) * 1.6
             p.vx += (dx / dist) * strength
             p.vy += (dy / dist) * strength
           }
+          // Damp velocity so repulsed dots decelerate quickly and don't streak
+          p.vx *= 0.82
+          p.vy *= 0.82
         }
 
         ctx.fillStyle = `rgb(${p.r | 0},${p.g | 0},${p.b | 0})`

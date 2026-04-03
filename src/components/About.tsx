@@ -26,7 +26,7 @@ export default function About() {
               className="text-4xl md:text-5xl font-bold text-white leading-tight mb-6"
               style={{ fontFamily: "var(--font-serif)" }}
             >
-              <TextReveal delay={0.2}>20+ years perfecting business transformation</TextReveal>
+              <TextReveal delay={0.2}>Built in real businesses. Not boardrooms.</TextReveal>
             </h2>
             <div className="flex gap-4 mt-8 flex-wrap">
               {[
@@ -66,23 +66,31 @@ export default function About() {
             className="space-y-6 text-slate-400 leading-relaxed"
           >
             <p className="text-lg text-slate-300">
-              For more than two decades, <strong className="text-white">Regenovate</strong> has
-              been at the forefront of perfecting our Transformation Programme,
-              revolutionising businesses through the adoption of Cloud Technology.
+              Twenty years ago, we didn&apos;t set out to build a methodology.
+              We were just trying to fix broken businesses. Not the obvious kind —
+              the ones that looked fine on the surface but were full of friction underneath.
+              Disconnected systems. Conflicting reports. Good people working hard,
+              but pulling in different directions.
             </p>
             <p>
-              Our journey began with a commitment to upgrading systems and
-              empowering teams with better tools. During a conversation with a
-              new prospect, a unique idea took root. Instead of just guiding them
-              through the transformation, we proposed acquiring the business,
-              completing the work ourselves, and offering it back to them.
+              We came from a background of building and running businesses ourselves,
+              not advising from the sidelines. Through trial, error, and a fair bit
+              of getting it wrong, we learned what actually moves the needle.
+              Not theory. Not trends. What works. That became the foundation of{" "}
+              <strong className="text-white">Regenovate</strong>.
             </p>
             <p>
-              That first offer was not accepted, but the idea of acquiring
-              businesses before transforming them became a cornerstone of how we
-              work. Today, we proudly own and operate 10 diverse businesses
-              across Manufacturing, Software, Display and Engineering, all
-              thriving together.
+              One conversation changed everything. Instead of guiding a client through
+              transformation, we proposed something different: acquire the business,
+              fix it properly, and hand it back better. They didn&apos;t take the offer.
+              But the idea stuck — because it solved a problem most consultants never face.
+              We would live with the consequences.
+            </p>
+            <p>
+              Today, we own and operate multiple businesses across manufacturing,
+              software, display and engineering. We don&apos;t just recommend change —
+              we implement it, test it, and prove it in our own companies.
+              That&apos;s the difference.
             </p>
           </motion.div>
         </div>

@@ -5,9 +5,9 @@ import { useRef } from "react";
 import { Typewriter } from "@/components/ui/typewriter";
 
 const values = [
-  { label: "People First",   icon: "01", desc: "Every decision starts with the humans involved. Your team, your customers, your legacy." },
-  { label: "Process Always", icon: "02", desc: "Repeatable, measurable operations are the foundation that makes scale possible." },
-  { label: "Performance",    icon: "03", desc: "Sustainable growth built on data, not hope. Consistently outperforming the market." },
+  { label: "People First",   icon: "01", desc: "If your team doesn't feel safe, aligned and clear, nothing else sticks. Every decision starts there." },
+  { label: "Process Always", icon: "02", desc: "Repeatable, well-designed processes are what turn effort into results. Consistency before scale." },
+  { label: "Performance",    icon: "03", desc: "Growth should be predictable, not accidental. We build systems that make that possible." },
 ];
 
 export default function Mission() {
@@ -51,16 +51,15 @@ export default function Mission() {
               />
             </h2>
             <p className="leading-relaxed mb-4" style={{ color: "var(--text-muted)" }}>
-              We take traditional businesses with fragmented systems and
-              infrastructure and equip them to prosper using the power of Cloud
-              technology. Our Transformation Programme teaches businesses to do
-              &lsquo;more of what works&rsquo;, leading to predictable, measurable and
-              repeatable growth.
+              We take traditional businesses with fragmented systems and turn them
+              into structured, scalable operations. One version of the truth across
+              the business. Clear, repeatable processes. Data that actually drives
+              decisions. Teams that know where they&apos;re going and why.
             </p>
             <p className="leading-relaxed" style={{ color: "var(--text-muted)" }}>
-              Efficiencies gained through Cloud technology mean our partner
-              businesses can double their volume with the same effort, resulting
-              in significantly improved profits.
+              Most of the businesses we work with can double output without doubling
+              effort. Not through magic — just through clarity and systemisation.
+              Stop wasting effort. Start compounding it.
             </p>
           </motion.div>
 
