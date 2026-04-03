@@ -115,12 +115,8 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
 
     const ctx = canvas.getContext("2d")!
 
-    // ── Theme-aware colours ───────────────────────────────────────
-    const isLight = document.documentElement.getAttribute('data-theme') === 'light'
-    // Background rgb components — canvas trail + initial fill match the page bg
-    const bgR = isLight ? 240 : 13
-    const bgG = isLight ? 244 : 27
-    const bgB = isLight ? 255 : 62
+    // ── Colours — hero is always dark ────────────────────────────
+    const bgR = 13, bgG = 27, bgB = 62
 
     ctx.fillStyle = `rgb(${bgR},${bgG},${bgB})`
     ctx.fillRect(0, 0, W, H)
@@ -132,9 +128,8 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
     const fSrc = Math.min(Math.max((W / (mob ? 8 : 15)) | 0, 40), 120)  // larger, more standout
     const fFin = Math.min(Math.max((W / (mob ? 8  : 15)) | 0, 36), 100)
 
-    // Particle word colours — invert for light theme so they're visible
-    const WHITE: [number, number, number] = isLight ? [10,  40, 120] : [255, 255, 255]
-    const BLUE:  [number, number, number] = isLight ? [30,  90, 220] : [56,  189, 248]  // brighter cyan-blue
+    const WHITE: [number, number, number] = [255, 255, 255]
+    const BLUE:  [number, number, number] = [56,  189, 248]
 
     // ── Phase thresholds ─────────────────────────────────────────
     // 0 forming → 1 hold → 2 burst → 3 reform → 4 hold2
@@ -202,9 +197,8 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
       const cx     = mob ? W * 0.5 : W * 0.76
       const startX = cx - fullW / 2
 
-      // R. colours — visible on both dark and light backgrounds
-      const IR: [number,number,number] = isLight ? [30, 80, 200]  : [58, 123, 255]
-      const ID: [number,number,number] = isLight ? [180, 195, 220] : [18, 22, 42]
+      const IR: [number,number,number] = [58, 123, 255]
+      const ID: [number,number,number] = [18, 22, 42]
 
       type Colored = { x: number; y: number; c: [number,number,number] }
       const allPts: Colored[] = [

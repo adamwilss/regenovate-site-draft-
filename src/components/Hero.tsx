@@ -12,7 +12,11 @@ export default function Hero() {
   const skipRef = useRef<(() => void) | null>(null);
 
   return (
-    <header className="relative h-screen flex items-center overflow-hidden">
+    <header
+      className="relative h-screen flex items-center overflow-hidden"
+      data-theme="dark"
+      style={{ backgroundColor: '#0B0F1A' }}
+    >
 
       {/* Background particle field — deferred until after intro to save GPU */}
       {introPhase !== 'intro' && (
