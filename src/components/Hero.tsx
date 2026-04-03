@@ -14,14 +14,16 @@ export default function Hero() {
   return (
     <header className="relative h-screen flex items-center overflow-hidden">
 
-      {/* Background particle field */}
-      <ParticleField
-        particleCount={90}
-        connectionDistance={130}
-        mouseRadius={160}
-        baseHue={225}
-        className="z-0"
-      />
+      {/* Background particle field — deferred until after intro to save GPU */}
+      {introPhase !== 'intro' && (
+        <ParticleField
+          particleCount={90}
+          connectionDistance={130}
+          mouseRadius={160}
+          baseHue={225}
+          className="z-0"
+        />
+      )}
 
       {/* Ambient orbs */}
       <div className="absolute inset-0 overflow-hidden z-[1]">
@@ -78,7 +80,8 @@ export default function Hero() {
       </AnimatePresence>
 
       {/* ═══ MAIN HERO CONTENT ════════════════════════════════════ */}
-      <HeroContent show={introPhase === 'done'} />
+      {/* show on 'settling' so it crossfades with the canvas bg fade */}
+      <HeroContent show={introPhase !== 'intro'} />
 
       {/* Scroll indicator */}
       <motion.div

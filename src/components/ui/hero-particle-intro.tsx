@@ -269,8 +269,8 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
     }
 
     const tick = () => {
-      // ── Background — fades out during settle so hero bg shows through ──
-      if (phase >= 7) bgAlpha = Math.max(0, bgAlpha - 0.003)
+      // ── Background — ease-out decay so fade is smooth with no sudden clear ──
+      if (phase >= 7) bgAlpha = bgAlpha > 0.002 ? bgAlpha * 0.965 : 0
 
       if (bgAlpha > 0) {
         ctx.fillStyle = `rgba(${bgR},${bgG},${bgB},${bgAlpha})`
