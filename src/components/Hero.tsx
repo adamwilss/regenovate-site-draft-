@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ParticleField } from "@/components/ui/particle-field";
 import { MagneticButton } from "@/components/ui/magnetic-button";
 import { HeroParticleIntro } from "@/components/ui/hero-particle-intro";
@@ -9,6 +9,7 @@ import { HeroParticleIntro } from "@/components/ui/hero-particle-intro";
 /* ─── Hero ──────────────────────────────────────────────────────── */
 export default function Hero() {
   const [introPhase, setIntroPhase] = useState<'intro' | 'settling' | 'done'>('intro');
+  const skipRef = useRef<(() => void) | null>(null);
 
   return (
     <header className="relative h-screen flex items-center overflow-hidden">
@@ -56,13 +57,14 @@ export default function Hero() {
               onWordFormed={() => {}}
               onSettleBegin={() => setIntroPhase('settling')}
               onComplete={() => setIntroPhase('done')}
+              skipRef={skipRef}
             />
             <div className="absolute inset-0 flex flex-col items-center justify-end pb-10 pointer-events-none select-none">
               <motion.button
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 2 }}
-                onClick={() => setIntroPhase('done')}
+                onClick={() => skipRef.current ? skipRef.current() : setIntroPhase('done')}
                 className="text-xs transition-colors tracking-wider uppercase pointer-events-auto cursor-pointer"
                 style={{ color: "var(--text-faint)" }}
               >
@@ -107,7 +109,7 @@ function HeroContent({ show }: { show: boolean }) {
   return (
     <div className="relative z-10 w-full max-w-7xl mx-auto px-8 md:px-16 pb-20">
 
-      {/* ── R. design element — large right-anchored graphic ── */}
+      {/* ── R. design element — dot-pattern fill, mirrors the particle intro ── */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={show ? { opacity: 1 } : { opacity: 0 }}
@@ -121,9 +123,14 @@ function HeroContent({ show }: { show: boolean }) {
             fontSize: "clamp(22rem, 38vw, 52rem)",
             lineHeight: 0.85,
             letterSpacing: "-0.02em",
-            color: "rgba(31,94,220,0.07)",
             display: "block",
             userSelect: "none",
+            backgroundImage: "radial-gradient(circle, rgba(58,123,255,0.38) 1.2px, transparent 1.2px)",
+            backgroundSize: "8px 8px",
+            WebkitBackgroundClip: "text",
+            backgroundClip: "text",
+            color: "transparent",
+            WebkitTextFillColor: "transparent",
           }}
         >
           R.
