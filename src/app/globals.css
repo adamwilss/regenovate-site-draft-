@@ -159,6 +159,40 @@ body {
     conic-gradient(from var(--border-angle), var(--color-blue-600), var(--color-emerald-400), var(--color-blue-400), var(--color-blue-600)) !important;
 }
 
+/* ─── Light theme: missing background variants ──────────────────── */
+[data-theme="light"] .bg-slate-900\/30     { background: rgba(255,255,255,0.55) !important; }
+[data-theme="light"] .bg-slate-900\/60     { background: rgba(255,255,255,0.75) !important; }
+[data-theme="light"] .bg-slate-900\/80     { background: rgba(255,255,255,0.88) !important; }
+[data-theme="light"] .bg-slate-800\/50     { background: rgba(255,255,255,0.80) !important; }
+[data-theme="light"] .hover\:bg-slate-900\/60:hover { background: rgba(240,244,255,0.85) !important; }
+[data-theme="light"] .hover\:bg-slate-900\/80:hover { background: rgba(230,238,255,0.92) !important; }
+
+/* ─── Light theme: missing border variants ──────────────────────── */
+[data-theme="light"] .border-slate-800\/50 { border-color: rgba(15,23,42,0.10) !important; }
+[data-theme="light"] .border-slate-800\/80 { border-color: rgba(15,23,42,0.14) !important; }
+[data-theme="light"] .border-slate-700\/80 { border-color: rgba(15,23,42,0.16) !important; }
+
+/* ─── Light theme: form inputs ──────────────────────────────────── */
+[data-theme="light"] input,
+[data-theme="light"] textarea,
+[data-theme="light"] select {
+  background: rgba(255,255,255,0.9) !important;
+  color: var(--text-primary) !important;
+  border-color: rgba(15,23,42,0.18) !important;
+}
+[data-theme="light"] input::placeholder,
+[data-theme="light"] textarea::placeholder {
+  color: var(--text-faint) !important;
+  opacity: 1;
+}
+
+/* ─── Light theme: hover text on links/nav ──────────────────────── */
+[data-theme="light"] .hover\:text-white:hover { color: var(--text-primary) !important; }
+
+/* ─── Light theme: keep white text on coloured buttons ─────────── */
+[data-theme="light"] [class*="bg-blue-"]       { color: #ffffff !important; }
+[data-theme="light"] [class*="bg-blue-"] svg   { color: #ffffff !important; }
+
 /* ─── Utilities ────────────────────────────────────────────────── */
 .gradient-text {
   background: linear-gradient(135deg, var(--color-blue-400), var(--color-blue-500), var(--color-emerald-400));
