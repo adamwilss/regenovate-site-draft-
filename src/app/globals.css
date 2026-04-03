@@ -137,6 +137,14 @@ body {
 /* Hover border */
 [data-theme="light"] .hover\:border-slate-700:hover { border-color: rgba(15,23,42,0.22) !important; }
 
+/* Stats section hardcoded dark bg */
+[data-theme="light"] .bg-\[#0B0F1A\]              { background: rgba(255,255,255,0.85) !important; }
+[data-theme="light"] .bg-slate-800\/30             { background: rgba(15,23,42,0.08)   !important; }
+[data-theme="light"] .border-slate-800\/60         { border-color: rgba(15,23,42,0.14) !important; }
+
+/* Opacity variants of text-white missed by base overrides */
+[data-theme="light"] [class*="text-white"]         { color: var(--text-primary) !important; }
+
 /* Glass override */
 [data-theme="light"] .glass {
   background: rgba(240,244,255,0.88) !important;

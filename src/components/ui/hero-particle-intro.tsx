@@ -159,7 +159,7 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin }: P
 
     // ── Phase thresholds ─────────────────────────────────────────
     // 0 forming → 1 hold → 2 burst → 3 reform → 4 hold2 → 5 explode → 6 settle → done
-    const T = { hold: 155, burst: 205, reform: 240, hold2: 420, explode: 460, settle: 490, done: 600 }
+    const T = { hold: 155, burst: 205, reform: 240, hold2: 400, reformR: 440, holdR: 560, explode: 600, settle: 630, done: 750 }
 
     // ── Build source words ────────────────────────────────────────
     const formWords = () => {
@@ -214,6 +214,30 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin }: P
       }
     }
 
+    // ── Reform to R. icon — particles converge from Regenovate ────
+    const reformToR = () => {
+      const rFs = Math.min(Math.max((W * 0.30) | 0, 150), 400)
+      const pts = shuffle(textPositions("R.", W * 0.5, H * 0.5, rFs, W, H, STEP))
+      const IR: [number,number,number] = [58, 123, 255]  // brand blue #3A7BFF
+
+      for (let i = 0; i < Math.min(pts.length, particles.length); i++) {
+        const p   = particles[i]
+        const pos = pts[i]
+        p.spd  = Math.random() * 5 + 12
+        p.frc  = p.spd * 0.08
+        p.rate = Math.random() * 0.02 + 0.015
+        p.setTarget(pos.x, pos.y, IR[0], IR[1], IR[2])
+      }
+
+      for (let i = pts.length; i < particles.length; i++) {
+        const p = particles[i]
+        if (!p.dead) p.burst()
+        const a = Math.random() * Math.PI * 2
+        p.tx = W / 2 + Math.cos(a) * (W + 200)
+        p.ty = H / 2 + Math.sin(a) * (H + 200)
+      }
+    }
+
     // Pre-compute scatter targets for settle phase
     const settleTargets = Array.from({ length: 2000 },
       () => ({ x: Math.random() * W, y: Math.random() * H }))
@@ -229,9 +253,9 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin }: P
 
     const tick = () => {
       // Trail alpha varies by phase
-      if (phase >= 6) {
+      if (phase >= 8) {
         ctx.fillStyle = "rgba(13,27,62,0.12)"   // dust fade during settle
-      } else if (phase === 5) {
+      } else if (phase === 7) {
         ctx.fillStyle = "rgba(13,27,62,0.04)"   // near-transparent streaks during explosion
       } else {
         ctx.fillStyle = "rgba(13,27,62,0.22)"   // normal
@@ -251,17 +275,18 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin }: P
       }
 
       frame++
-      if (phase === 0 && frame >= T.hold)   phase = 1
-      if (phase === 1 && frame >= T.burst)  { phase = 2; particles.forEach(p => p.burst()) }
-      if (phase === 2 && frame >= T.reform) { phase = 3; reformWord() }
-      if (phase === 3 && frame >= T.hold2)  { phase = 4; onFormedRef.current() }
-      if (phase === 4 && frame >= T.explode) {
-        phase = 5
+      if (phase === 0 && frame >= T.hold)    phase = 1
+      if (phase === 1 && frame >= T.burst)   { phase = 2; particles.forEach(p => p.burst()) }
+      if (phase === 2 && frame >= T.reform)  { phase = 3; reformWord() }
+      if (phase === 3 && frame >= T.hold2)   { phase = 4; onFormedRef.current() }
+      if (phase === 4 && frame >= T.reformR) { phase = 5; reformToR() }
+      if (phase === 5 && frame >= T.holdR)   phase = 6
+      if (phase === 6 && frame >= T.explode) {
+        phase = 7
         particles.forEach(p => p.explodeFrom(cx, cy))
       }
-      if (phase === 5 && frame >= T.settle) {
-        phase = 6
-        // Assign scatter targets to all particles
+      if (phase === 7 && frame >= T.settle) {
+        phase = 8
         shuffle(settleTargets)
         particles.forEach((p, i) => {
           const t = settleTargets[i % settleTargets.length]
@@ -269,7 +294,7 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin }: P
         })
         onSettleBeginRef.current?.()
       }
-      if (phase === 6 && frame >= T.done && !done) {
+      if (phase === 8 && frame >= T.done && !done) {
         done = true
         onCompleteRef.current()
       }

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useScroll, useTransform, useInView, useMotionValue, useMotionValueEvent, MotionValue } from "framer-motion";
-import { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 
 /* ─── Data ─────────────────────────────────────────────────────── */
@@ -209,10 +209,11 @@ function ApproachConnector({
 
 /* ─── Step card ─────────────────────────────────────────────────── */
 function StepCard({
-  step, progress,
+  step, progress, outerStyle,
 }: {
   step: typeof steps[0];
   progress: MotionValue<number>;
+  outerStyle?: React.CSSProperties;
 }) {
   const filterVal = useTransform(progress, p => `grayscale(${(1-p)*75}%) brightness(${0.3 + p * 0.7})`);
   const glowShadow = useTransform(progress, p =>
@@ -234,6 +235,7 @@ function StepCard({
         background: "var(--surface-glass)",
         border: "1px solid var(--border-subtle)",
         minHeight: "440px",
+        ...outerStyle,
       }}
     >
       {/* Colour wash */}
@@ -391,84 +393,113 @@ function ApproachDesktop() {
   );
 }
 
-/* ─── Mobile stacked ─────────────────────────────────────────────── */
-function ApproachMobile() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-60px" });
+/* ─── Mobile: scroll-driven horizontal strip ────────────────────── */
+// Each card has its own scroll segment. The strip pans DURING each
+// connector animation so the orb sweeps across the screen as card N+1
+// slides into the center. This keeps timing coherent on one-card views.
+const MCARD_W = 280;
+const MCONN_W = 100;
+const MSTEP   = MCARD_W + MCONN_W; // 380px per step
+
+function ApproachMobileScrolly() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(containerRef, { once: true, margin: "-5%" });
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"],
+  });
+
+  // Mobile-specific non-overlapping scroll segments:
+  //  card animates → connector fires + strip pans → next card animates …
+  const ms1 = useTransform(scrollYProgress, [0.02, 0.13], [0, 1]);
+  const mc1 = useTransform(scrollYProgress, [0.11, 0.25], [0, 1]);
+  const ms2 = useTransform(scrollYProgress, [0.23, 0.37], [0, 1]);
+  const mc2 = useTransform(scrollYProgress, [0.37, 0.51], [0, 1]);
+  const ms3 = useTransform(scrollYProgress, [0.49, 0.63], [0, 1]);
+  const mc3 = useTransform(scrollYProgress, [0.63, 0.77], [0, 1]);
+  const ms4 = useTransform(scrollYProgress, [0.75, 0.97], [0, 1]);
+
+  // Strip pans during each connector fire — hold, pan, hold, pan …
+  // Between holds, the orb sweeps across the viewport as the strip moves.
+  const stripX = useTransform(
+    scrollYProgress,
+    [0,    0.11, 0.25,   0.37, 0.51,     0.63, 0.77,     1.0],
+    [0,    0,   -MSTEP, -MSTEP, -MSTEP*2, -MSTEP*2, -MSTEP*3, -MSTEP*3],
+  );
+
+  const [activeStep, setActiveStep] = useState(0);
+  useMotionValueEvent(scrollYProgress, "change", v => {
+    if (v < 0.25)      setActiveStep(0);
+    else if (v < 0.51) setActiveStep(1);
+    else if (v < 0.77) setActiveStep(2);
+    else               setActiveStep(3);
+  });
 
   return (
-    <section className="py-24 lg:hidden" ref={ref}>
-      <div className="max-w-xl mx-auto px-5">
-        <Header visible={isInView} />
-        <div className="flex flex-col gap-5 mt-6">
-          {steps.map((step, i) => (
-            <div key={step.number}>
-              <motion.div
-                initial={{ opacity: 0, y: 32 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.65, delay: 0.1 * i, ease: [0.16,1,0.3,1] }}
-                className="relative rounded-3xl overflow-hidden p-8"
-                style={{
-                  background: "var(--surface-glass)",
-                  border: `1px solid ${step.color}20`,
-                  boxShadow: `0 0 60px ${step.glow.replace("0.3","0.12")}`,
-                }}
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <span className={`text-5xl font-bold leading-none bg-gradient-to-br ${step.gradFrom} ${step.gradTo} bg-clip-text text-transparent`}
-                    style={{ fontFamily: '"Bebas Neue", serif' }}>{step.number}</span>
-                  <div className="w-7 h-7 mt-1" style={{ color: step.color, opacity: 0.65 }}>{step.icon}</div>
-                </div>
-                <h3 className="text-xl font-bold mb-3"
-                  style={{ fontFamily: '"DM Serif Display", serif', color: "var(--text-primary)" }}>{step.title}</h3>
-                <p className="text-sm leading-relaxed mb-5" style={{ color: "var(--text-muted)" }}>{step.desc}</p>
-                <div className="flex flex-wrap gap-2">
-                  {step.tags.map(tag => (
-                    <span key={tag} className="text-[9px] tracking-[0.3em] uppercase font-medium px-3 py-1.5 rounded-full"
-                      style={{ color: step.color, background: `${step.glow.replace("0.3","0.08")}`, border: `1px solid ${step.color}25` }}>
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </motion.div>
-              {i < steps.length - 1 && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={isInView ? { opacity: 1 } : {}}
-                  transition={{ delay: 0.1 * i + 0.4 }}
-                  className="flex flex-col items-center py-3 gap-1"
-                >
-                  <div className="w-px h-6"
-                    style={{ background: `linear-gradient(to bottom, ${step.color}40, ${steps[i+1].color}40)` }}/>
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                    <path d="M7 2v10M3 8l4 4 4-4" stroke={steps[i+1].color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
-                      style={{ filter: `drop-shadow(0 0 4px ${steps[i+1].color})` }}/>
-                  </svg>
-                </motion.div>
-              )}
+    <div ref={containerRef} className="relative lg:hidden" style={{ height: "360vh" }}>
+      <div className="sticky top-0 h-[100svh] flex flex-col justify-center overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "var(--border-subtle)", opacity: 0.4 }} />
+
+        <div className="px-4 pt-2 pb-1">
+          <Header visible={isInView} />
+        </div>
+
+        {/* Strip — overflow:hidden clips offscreen cards; sticky
+            container provides the clipping boundary */}
+        <div className="flex-1 flex items-center overflow-hidden">
+          <motion.div
+            style={{
+              x: stripX,
+              paddingLeft: `calc(50vw - ${MCARD_W / 2}px)`,
+            }}
+            className="flex items-center"
+          >
+            <div style={{ width: MCARD_W, flexShrink: 0 }}>
+              <StepCard step={steps[0]} progress={ms1} outerStyle={{ minHeight: "340px" }} />
             </div>
+            <ApproachConnector progress={mc1} fromColor={steps[0].color} toColor={steps[1].color} id="m1" />
+            <div style={{ width: MCARD_W, flexShrink: 0 }}>
+              <StepCard step={steps[1]} progress={ms2} outerStyle={{ minHeight: "340px" }} />
+            </div>
+            <ApproachConnector progress={mc2} fromColor={steps[1].color} toColor={steps[2].color} id="m2" />
+            <div style={{ width: MCARD_W, flexShrink: 0 }}>
+              <StepCard step={steps[2]} progress={ms3} outerStyle={{ minHeight: "340px" }} />
+            </div>
+            <ApproachConnector progress={mc3} fromColor={steps[2].color} toColor={steps[3].color} id="m3" />
+            <div style={{ width: MCARD_W, flexShrink: 0 }}>
+              <StepCard step={steps[3]} progress={ms4} outerStyle={{ minHeight: "340px" }} />
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Step indicator */}
+        <div className="flex justify-center items-center gap-2 py-2">
+          {steps.map((step, i) => (
+            <div
+              key={i}
+              className="rounded-full transition-all duration-300"
+              style={{
+                width: activeStep === i ? "20px" : "6px",
+                height: "6px",
+                background: activeStep === i ? step.color : "rgba(148,163,184,0.2)",
+                boxShadow: activeStep === i ? `0 0 8px ${step.color}` : "none",
+              }}
+            />
           ))}
         </div>
 
-        {/* CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.6, duration: 0.6 }}
-          className="mt-10 flex flex-col gap-3"
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : {}}
+          transition={{ delay: 1.4, duration: 0.8 }}
+          className="text-center text-[9px] tracking-[0.4em] uppercase pb-4"
+          style={{ color: "var(--text-faint)" }}
         >
-          <Link href="/contact"
-            className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm tracking-wide rounded-xl transition-all text-center">
-            Request a Confidential Call
-          </Link>
-          <Link href="/about"
-            className="px-8 py-4 text-sm font-semibold tracking-wide rounded-xl transition-all text-center"
-            style={{ border: "1px solid var(--border-subtle)", color: "var(--text-muted)" }}>
-            Learn About Us
-          </Link>
-        </motion.div>
+          Scroll to progress through each phase
+        </motion.p>
       </div>
-    </section>
+    </div>
   );
 }
 
@@ -478,7 +509,7 @@ function ApproachCTA() {
   const isInView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section className="py-20 hidden lg:block" ref={ref}>
+    <section className="py-20" ref={ref}>
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -504,8 +535,8 @@ export default function Approach() {
   return (
     <>
       <ApproachDesktop />
+      <ApproachMobileScrolly />
       <ApproachCTA />
-      <ApproachMobile />
     </>
   );
 }
