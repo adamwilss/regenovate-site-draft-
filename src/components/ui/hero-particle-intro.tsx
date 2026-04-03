@@ -225,7 +225,7 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
       particles.forEach(p => {
         p.spd = 1.5 + Math.random() * 1.5   // soft spring — mouse can push it
         p.frc = 0.06
-        p.sz  = 1                            // shrink to dot size
+        p.sz  = 2.5                          // visible dot size
       })
       onSettleBeginRef.current?.()
     }
