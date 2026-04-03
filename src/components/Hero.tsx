@@ -1,10 +1,81 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ParticleField } from "@/components/ui/particle-field";
 import { MagneticButton } from "@/components/ui/magnetic-button";
 import { HeroParticleIntro } from "@/components/ui/hero-particle-intro";
+
+/* ─── Dot R. canvas ─────────────────────────────────────────────────
+   Draws the R. logo as individual dots at the exact same position and
+   size as the particle intro's final reformToR step. Crossfades in as
+   the intro fades out, so it looks like the particle R. persisted.
+───────────────────────────────────────────────────────────────────── */
+function DotR({ visible }: { visible: boolean }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = ref.current;
+    if (!canvas) return;
+    const W = canvas.offsetWidth  || window.innerWidth;
+    const H = canvas.offsetHeight || window.innerHeight;
+    canvas.width  = W;
+    canvas.height = H;
+    const ctx = canvas.getContext("2d")!;
+
+    const mob  = W < 700;
+    const STEP = mob ? 7 : 9;
+    // Match particle intro exactly
+    const rFs    = Math.min(Math.max((W * 0.30) | 0, 150), 400);
+    const cx     = mob ? W * 0.5 : W * 0.76;
+
+    const mc   = document.createElement("canvas");
+    const mctx = mc.getContext("2d")!;
+    mctx.font  = `bold ${rFs}px Arial`;
+    const fullW  = mctx.measureText("R.").width;
+    const rCharW = mctx.measureText("R").width;
+    const startX = cx - fullW / 2;
+
+    const sample = (char: string, ox: number): Array<[number, number]> => {
+      const oc   = document.createElement("canvas");
+      oc.width   = W; oc.height = H;
+      const octx = oc.getContext("2d", { willReadFrequently: true })!;
+      octx.fillStyle    = "white";
+      octx.font         = `bold ${rFs}px Arial`;
+      octx.textAlign    = "left";
+      octx.textBaseline = "middle";
+      octx.fillText(char, ox, H * 0.5);
+      const d   = octx.getImageData(0, 0, W, H).data;
+      const pts: Array<[number, number]> = [];
+      for (let i = 0; i < d.length; i += STEP * 4)
+        if (d[i + 3] > 128) pts.push([(i / 4) % W, Math.floor(i / 4 / W)]);
+      return pts;
+    };
+
+    // R — brand blue, same colour as particle intro
+    ctx.fillStyle = "rgba(58,123,255,0.38)";
+    for (const [x, y] of sample("R", startX))
+      ctx.fillRect(x, y, 2, 2);
+
+    // . — near-invisible, same as particle intro
+    ctx.fillStyle = "rgba(18,22,42,0.6)";
+    for (const [x, y] of sample(".", startX + rCharW))
+      ctx.fillRect(x, y, 2, 2);
+  }, []);
+
+  return (
+    <canvas
+      ref={ref}
+      aria-hidden="true"
+      className="absolute inset-0 w-full h-full pointer-events-none select-none"
+      style={{
+        zIndex: 3,
+        opacity: visible ? 1 : 0,
+        transition: "opacity 1.5s ease",
+      }}
+    />
+  );
+}
 
 /* ─── Hero ──────────────────────────────────────────────────────── */
 export default function Hero() {
@@ -43,6 +114,9 @@ export default function Hero() {
         }}
       />
 
+      {/* ── Dot R. — crossfades in as the intro fades out ────────── */}
+      <DotR visible={introPhase !== 'intro'} />
+
       {/* ═══ PARTICLE INTRO ════════════════════════════════════════ */}
       <AnimatePresence>
         {introPhase !== 'done' && (
@@ -78,7 +152,7 @@ export default function Hero() {
       {/* ═══ MAIN HERO CONTENT ════════════════════════════════════ */}
       <HeroContent show={introPhase === 'done'} />
 
-      {/* Scroll indicator — left-aligned to match layout */}
+      {/* Scroll indicator */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: introPhase === 'done' ? 1 : 0 }}
@@ -108,34 +182,6 @@ function HeroContent({ show }: { show: boolean }) {
 
   return (
     <div className="relative z-10 w-full max-w-7xl mx-auto px-8 md:px-16 pb-20">
-
-      {/* ── R. design element — dot-pattern fill, mirrors the particle intro ── */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={show ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 1.8, delay: 0.2 }}
-        className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none select-none hidden lg:block"
-        aria-hidden="true"
-      >
-        <span
-          style={{
-            fontFamily: '"Bebas Neue", sans-serif',
-            fontSize: "clamp(22rem, 38vw, 52rem)",
-            lineHeight: 0.85,
-            letterSpacing: "-0.02em",
-            display: "block",
-            userSelect: "none",
-            backgroundImage: "radial-gradient(circle, rgba(58,123,255,0.38) 1.2px, transparent 1.2px)",
-            backgroundSize: "8px 8px",
-            WebkitBackgroundClip: "text",
-            backgroundClip: "text",
-            color: "transparent",
-            WebkitTextFillColor: "transparent",
-          }}
-        >
-          R.
-        </span>
-      </motion.div>
 
       {/* ── Left content column ── */}
       <div className="relative max-w-2xl">
@@ -188,7 +234,7 @@ function HeroContent({ show }: { show: boolean }) {
           ))}
         </div>
 
-        {/* ── Body copy — short and hard ── */}
+        {/* ── Body copy ── */}
         <motion.p
           {...fadeUp(0.46)}
           className="text-sm md:text-base max-w-md leading-relaxed tracking-wide mb-12"
