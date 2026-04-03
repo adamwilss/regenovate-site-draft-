@@ -56,20 +56,7 @@ class P {
     this.blend = 0
   }
 
-  settleToAmbient(tx: number, ty: number) {
-    this.tx   = tx
-    this.ty   = ty
-    this.frc  = 0.06
-    this.spd  = 0.4
-    this.rate = 0.008
-    this.sz   = 1
-    this.sr = this.r | 0; this.sg = this.g | 0; this.sb = this.b | 0
-    this.tr = 70  + Math.random() * 40
-    this.tg = 155 + Math.random() * 20
-    this.tb = 245 + Math.random() * 10
-    this.blend = 0
-    this.dead  = false
-  }
+
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────
@@ -232,14 +219,13 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
       }
     }
 
-    const settleTargets = Array.from({ length: 2000 },
-      () => ({ x: Math.random() * W, y: Math.random() * H }))
-
-    const settleAll = () => {
-      shuffle(settleTargets)
-      particles.forEach((p, i) => {
-        const t = settleTargets[i % settleTargets.length]
-        p.settleToAmbient(t.x, t.y)
+    // Soften the spring on each particle so mouse repulsion is satisfying
+    // but keeps pulling them back to their exact R. positions
+    const settleInPlace = () => {
+      particles.forEach(p => {
+        p.spd = 1.5 + Math.random() * 1.5   // soft spring — mouse can push it
+        p.frc = 0.06
+        p.sz  = 1                            // shrink to dot size
       })
       onSettleBeginRef.current?.()
     }
@@ -294,7 +280,7 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
           const dy   = p.y - mouseY
           const dist = Math.sqrt(dx * dx + dy * dy)
           if (dist < MOUSE_RADIUS && dist > 0.1) {
-            const strength = (1 - dist / MOUSE_RADIUS) * 2.5
+            const strength = (1 - dist / MOUSE_RADIUS) * 3.5
             p.vx += (dx / dist) * strength
             p.vy += (dy / dist) * strength
           }
@@ -316,7 +302,7 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
       if (phase === 3 && frame >= T.hold2)   { phase = 4; onFormedRef.current() }
       if (phase === 4 && frame >= T.reformR) { phase = 5; reformToR() }
       if (phase === 5 && frame >= T.holdR)   { phase = 6 }
-      if (phase === 6 && frame >= T.settle)  { phase = 7; settleAll() }
+      if (phase === 6 && frame >= T.settle)  { phase = 7; settleInPlace() }
       if (phase >= 7 && frame >= T.done && !done) {
         done = true
         onCompleteRef.current()
