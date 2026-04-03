@@ -114,7 +114,15 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
     canvas.height = H
 
     const ctx = canvas.getContext("2d")!
-    ctx.fillStyle = "rgb(13,27,62)"
+
+    // ── Theme-aware colours ───────────────────────────────────────
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light'
+    // Background rgb components — canvas trail + initial fill match the page bg
+    const bgR = isLight ? 240 : 13
+    const bgG = isLight ? 244 : 27
+    const bgB = isLight ? 255 : 62
+
+    ctx.fillStyle = `rgb(${bgR},${bgG},${bgB})`
     ctx.fillRect(0, 0, W, H)
 
     const particles: P[] = []
@@ -124,8 +132,9 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
     const fSrc = Math.min(Math.max((W / (mob ? 10 : 20)) | 0, 30), 90)
     const fFin = Math.min(Math.max((W / (mob ? 8  : 15)) | 0, 36), 100)
 
-    const WHITE: [number, number, number] = [255, 255, 255]
-    const BLUE:  [number, number, number] = [96,  165, 250]
+    // Particle word colours — invert for light theme so they're visible
+    const WHITE: [number, number, number] = isLight ? [20,  58, 140] : [255, 255, 255]
+    const BLUE:  [number, number, number] = isLight ? [59,  95, 199] : [96,  165, 250]
 
     // ── Phase thresholds ─────────────────────────────────────────
     // 0 forming → 1 hold → 2 burst → 3 reform → 4 hold2
@@ -175,7 +184,7 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
       }
       for (let i = pts.length; i < particles.length; i++) {
         const p = particles[i]
-        if (!p.dead) p.burst()
+        if (!p.dead) { p.burst(); p.tr = bgR; p.tg = bgG; p.tb = bgB }
         const a = Math.random() * Math.PI * 2
         p.tx = W / 2 + Math.cos(a) * (W + 200)
         p.ty = H / 2 + Math.sin(a) * (H + 200)
@@ -192,8 +201,9 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
       const cx     = mob ? W * 0.5 : W * 0.76
       const startX = cx - fullW / 2
 
-      const IR: [number,number,number] = [58, 123, 255]
-      const ID: [number,number,number] = [18, 22, 42]
+      // R. colours — visible on both dark and light backgrounds
+      const IR: [number,number,number] = isLight ? [30, 80, 200]  : [58, 123, 255]
+      const ID: [number,number,number] = isLight ? [180, 195, 220] : [18, 22, 42]
 
       type Colored = { x: number; y: number; c: [number,number,number] }
       const allPts: Colored[] = [
@@ -205,14 +215,14 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
       for (let i = 0; i < Math.min(allPts.length, particles.length); i++) {
         const p   = particles[i]
         const pos = allPts[i]
-        p.spd  = Math.random() * 5 + 12
-        p.frc  = p.spd * 0.08
-        p.rate = Math.random() * 0.02 + 0.015
+        p.spd  = Math.random() * 6 + 22   // faster — was 5+12
+        p.frc  = p.spd * 0.09
+        p.rate = Math.random() * 0.03 + 0.025
         p.setTarget(pos.x, pos.y, pos.c[0], pos.c[1], pos.c[2])
       }
       for (let i = allPts.length; i < particles.length; i++) {
         const p = particles[i]
-        if (!p.dead) p.burst()
+        if (!p.dead) { p.burst(); p.tr = bgR; p.tg = bgG; p.tb = bgB }
         const a = Math.random() * Math.PI * 2
         p.tx = W / 2 + Math.cos(a) * (W + 200)
         p.ty = H / 2 + Math.sin(a) * (H + 200)
@@ -263,7 +273,7 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
       if (phase >= 7) bgAlpha = Math.max(0, bgAlpha - 0.003)
 
       if (bgAlpha > 0) {
-        ctx.fillStyle = `rgba(13,27,62,${bgAlpha})`
+        ctx.fillStyle = `rgba(${bgR},${bgG},${bgB},${bgAlpha})`
         ctx.fillRect(0, 0, W, H)
       } else {
         ctx.clearRect(0, 0, W, H)
@@ -297,7 +307,7 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
       // ── Phase transitions ──────────────────────────────────────────
       frame++
       if (phase === 0 && frame >= T.hold)    phase = 1
-      if (phase === 1 && frame >= T.burst)   { phase = 2; particles.forEach(p => p.burst()) }
+      if (phase === 1 && frame >= T.burst)   { phase = 2; particles.forEach(p => { p.burst(); p.tr = bgR; p.tg = bgG; p.tb = bgB }) }
       if (phase === 2 && frame >= T.reform)  { phase = 3; reformWord() }
       if (phase === 3 && frame >= T.hold2)   { phase = 4; onFormedRef.current() }
       if (phase === 4 && frame >= T.reformR) { phase = 5; reformToR() }
