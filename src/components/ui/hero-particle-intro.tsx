@@ -116,7 +116,7 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
     const ctx = canvas.getContext("2d")!
 
     // ── Colours — hero is always dark ────────────────────────────
-    const bgR = 13, bgG = 27, bgB = 62
+    const bgR = 6, bgG = 7, bgB = 13   // #06070d
 
     ctx.fillStyle = `rgb(${bgR},${bgG},${bgB})`
     ctx.fillRect(0, 0, W, H)
@@ -241,11 +241,13 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
     let done       = false
     let timeOffset = 0
     const startTime = performance.now()
-    let rafId   = 0
-    let bgAlpha = 0.22         // fades to 0 during settle, revealing hero bg
-    let mouseX  = -9999
-    let mouseY  = -9999
-    const MOUSE_RADIUS = 130
+    let rafId    = 0
+    let bgAlpha  = 0.22         // fades to 0 during settle, revealing hero bg
+    let mouseX   = -9999
+    let mouseY   = -9999
+    let pausedAt = 0
+    const MOUSE_RADIUS   = 130
+    const MOUSE_RADIUS_SQ = MOUSE_RADIUS * MOUSE_RADIUS
 
     // Mouse tracking via window so hero content doesn't block it
     const onMouseMove = (e: MouseEvent) => {
@@ -262,6 +264,18 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
     window.addEventListener("mousemove", onMouseMove)
     window.addEventListener("touchmove", onTouchMove, { passive: true })
 
+    // Pause RAF when tab is hidden — no wasted work, and resume without skipping phases
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(rafId)
+        pausedAt = performance.now()
+      } else {
+        timeOffset -= performance.now() - pausedAt  // subtract hidden duration so phases don't skip
+        rafId = requestAnimationFrame(tick)
+      }
+    }
+    document.addEventListener("visibilitychange", onVisibilityChange)
+
     // Skip: jump straight to R. on the right, then settle
     if (skipRef) {
       skipRef.current = () => {
@@ -272,7 +286,12 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
       }
     }
 
-    const tick = () => {
+    // Cap physics to 60fps — particle velocity is frame-rate dependent,
+    // so 140Hz would run 2.3x faster than 60Hz without this gate.
+    let lastTickTime = 0
+    const tick = (now: number) => {
+      if (now - lastTickTime < 16) { rafId = requestAnimationFrame(tick); return }
+      lastTickTime = now
       // ── Background ────────────────────────────────────────────────
       if (phase >= 7) {
         // Settle phase: always clearRect first so mouse-repelled dots
@@ -295,11 +314,13 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
         p.update()
 
         // Mouse repulsion — active after settle, creates satisfying ripple
+        // Fast-reject with squared distance before sqrt
         if (phase >= 7) {
-          const dx   = p.x - mouseX
-          const dy   = p.y - mouseY
-          const dist = Math.sqrt(dx * dx + dy * dy)
-          if (dist < MOUSE_RADIUS && dist > 0.1) {
+          const dx     = p.x - mouseX
+          const dy     = p.y - mouseY
+          const distSq = dx * dx + dy * dy
+          if (distSq < MOUSE_RADIUS_SQ && distSq > 0.01) {
+            const dist = Math.sqrt(distSq)
             const strength = (1 - dist / MOUSE_RADIUS) * 1.6
             p.vx += (dx / dist) * strength
             p.vy += (dy / dist) * strength
@@ -339,6 +360,7 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
       cancelAnimationFrame(rafId)
       window.removeEventListener("mousemove", onMouseMove)
       window.removeEventListener("touchmove", onTouchMove)
+      document.removeEventListener("visibilitychange", onVisibilityChange)
     }
   }, [])
 

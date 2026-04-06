@@ -14,7 +14,11 @@ export default function Hero() {
 
   useEffect(() => {
     let t: ReturnType<typeof setTimeout>
+    let lastWidth = window.innerWidth
     const onResize = () => {
+      const newWidth = window.innerWidth
+      if (newWidth === lastWidth) return  // ignore height-only changes (mobile browser chrome)
+      lastWidth = newWidth
       clearTimeout(t)
       t = setTimeout(() => {
         setResizeKey(k => k + 1)
@@ -29,13 +33,13 @@ export default function Hero() {
     <header
       className="relative h-screen flex items-center overflow-hidden"
       data-theme="dark"
-      style={{ backgroundColor: '#0B0F1A' }}
+      style={{ backgroundColor: '#06070d' }}
     >
 
       {/* Background particle field — deferred until after intro to save GPU */}
       {introPhase !== 'intro' && (
         <ParticleField
-          particleCount={90}
+          particleCount={window.innerWidth < 700 ? 40 : 90}
           connectionDistance={130}
           mouseRadius={160}
           baseHue={225}

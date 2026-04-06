@@ -60,13 +60,14 @@ export function ParticleField({
     const canvas = canvasRef.current
     if (!canvas) return
 
+    const ctx = canvas.getContext("2d")!  // cache once — never re-fetch in the loop
+
     const resize = () => {
-      const dpr = window.devicePixelRatio || 1
+      const dpr = Math.min(window.devicePixelRatio || 1, 2)  // cap at 2 — phones at 3x do 9x the work
       const rect = canvas.getBoundingClientRect()
       canvas.width = rect.width * dpr
       canvas.height = rect.height * dpr
       dimsRef.current = { w: canvas.width, h: canvas.height }
-      const ctx = canvas.getContext("2d")!
       ctx.scale(dpr, dpr)
       if (particlesRef.current.length === 0) {
         initParticles(rect.width, rect.height)
@@ -94,8 +95,23 @@ export function ParticleField({
     window.addEventListener("mousemove", handleMouse)
     window.addEventListener("touchmove", handleTouch, { passive: true })
 
+    let rafPaused = false
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        rafPaused = true
+        cancelAnimationFrame(animRef.current)
+      } else {
+        rafPaused = false
+        animRef.current = requestAnimationFrame(animate)
+      }
+    }
+    document.addEventListener("visibilitychange", onVisibilityChange)
+
+    const connectionDistSq = connectionDistance * connectionDistance
+    const mouseRadiusSq = mouseRadius * mouseRadius
+
     const animate = () => {
-      const ctx = canvas.getContext("2d")!
+      if (rafPaused) return
       const rect = canvas.getBoundingClientRect()
       const w = rect.width
       const h = rect.height
@@ -108,12 +124,13 @@ export function ParticleField({
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i]
 
-        // Mouse repulsion
+        // Mouse repulsion — fast-reject with squared distance before sqrt
         const dx = p.x - mouse.x
         const dy = p.y - mouse.y
-        const dist = Math.sqrt(dx * dx + dy * dy)
+        const distSq = dx * dx + dy * dy
 
-        if (dist < mouseRadius && dist > 0) {
+        if (distSq < mouseRadiusSq && distSq > 0) {
+          const dist = Math.sqrt(distSq)
           const force = (mouseRadius - dist) / mouseRadius
           p.vx += (dx / dist) * force * 0.8
           p.vy += (dy / dist) * force * 0.8
@@ -140,14 +157,15 @@ export function ParticleField({
         ctx.fillStyle = `hsla(${p.hue}, 70%, 65%, ${p.opacity})`
         ctx.fill()
 
-        // Draw connections
+        // Draw connections — fast-reject with squared distance before sqrt
         for (let j = i + 1; j < particles.length; j++) {
           const p2 = particles[j]
           const cdx = p.x - p2.x
           const cdy = p.y - p2.y
-          const cdist = Math.sqrt(cdx * cdx + cdy * cdy)
+          const cdistSq = cdx * cdx + cdy * cdy
 
-          if (cdist < connectionDistance) {
+          if (cdistSq < connectionDistSq) {
+            const cdist = Math.sqrt(cdistSq)
             const lineOpacity = (1 - cdist / connectionDistance) * 0.45 * Math.min(p.opacity, p2.opacity) * 2
             ctx.beginPath()
             ctx.moveTo(p.x, p.y)
@@ -178,6 +196,7 @@ export function ParticleField({
       window.removeEventListener("resize", resize)
       window.removeEventListener("mousemove", handleMouse)
       window.removeEventListener("touchmove", handleTouch)
+      document.removeEventListener("visibilitychange", onVisibilityChange)
     }
   }, [initParticles, connectionDistance, mouseRadius, baseHue])
 

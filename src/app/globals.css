@@ -38,22 +38,22 @@
 /* ─── Theme tokens ─────────────────────────────────────────────── */
 :root,
 [data-theme="dark"] {
-  --bg-base:          #0d1b3e;
-  --surface-card:     #0B0F1A;
-  --divider-color:    rgba(148,163,184,0.08);
-  --bg-gradient:      radial-gradient(ellipse 110% 55% at 70% -5%, #1a3666 0%, transparent 55%);
+  --bg-base:          #06070d;
+  --surface-card:     #0a0b12;
+  --divider-color:    rgba(148,163,184,0.07);
+  --bg-gradient:      radial-gradient(ellipse 110% 55% at 70% -5%, rgba(31,94,220,0.08) 0%, transparent 50%);
   --text-primary:     #e2e8f0;
   --text-muted:       #94a3b8;
   --text-faint:       #475569;
-  --surface-glass:    rgba(13, 27, 62, 0.65);
-  --border-subtle:    rgba(148, 163, 184, 0.1);
+  --surface-glass:    rgba(6, 7, 13, 0.70);
+  --border-subtle:    rgba(148, 163, 184, 0.09);
   --hero-display:     #ffffff;
   --hero-sub:         #e2e8f0;
-  --scrollbar-track:  #0f172a;
-  --scrollbar-thumb:  #334155;
-  --orb-primary:      rgba(59, 95, 199, 0.25);
-  --orb-secondary:    rgba(59, 130, 246, 0.12);
-  --orb-tertiary:     rgba(52, 211, 153, 0.08);
+  --scrollbar-track:  #0a0b12;
+  --scrollbar-thumb:  #1a1d2e;
+  --orb-primary:      rgba(31, 94, 220, 0.15);
+  --orb-secondary:    rgba(58, 123, 255, 0.07);
+  --orb-tertiary:     rgba(52, 211, 153, 0.05);
 }
 
 [data-theme="light"] {
