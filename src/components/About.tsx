@@ -15,7 +15,6 @@ function useCounter(target: number, inView: boolean, duration = 1.8) {
     const timer = setInterval(() => {
       frame++;
       const progress = frame / totalFrames;
-      // ease-out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
       setCount(Math.round(eased * target));
       if (frame >= totalFrames) clearInterval(timer);
@@ -47,23 +46,34 @@ const principles = [
 const story = [
   {
     label: "How it started",
-    text: "Twenty years ago, we weren't building a methodology. We were just trying to fix broken businesses — not the obvious kind, but the ones that looked fine on the surface yet were full of friction underneath. Disconnected systems. Conflicting data. Good people pulling in different directions.",
+    year: "20 yrs ago",
+    text: "We weren't building a methodology. We were trying to fix broken businesses — not the obvious kind, but the ones that looked fine on the surface yet were full of friction underneath. Disconnected systems. Conflicting data. Good people pulling in different directions.",
   },
   {
     label: "What we learned",
-    text: "We came from a background of building and running businesses ourselves, not advising from the sidelines. Through trial, error, and getting it wrong more than once, we learned what actually moves the needle. Not theory. Not trends. What works. That became the foundation of Regenovate.",
+    year: "The grind",
+    text: "We came from a background of building and running businesses ourselves, not advising from the sidelines. Through trial, error, and getting it wrong more than once, we learned what actually moves the needle. Not theory. Not trends. What works.",
   },
   {
     label: "The turning point",
-    text: "One conversation changed everything. Instead of guiding a client through transformation, we proposed something different: acquire the business, fix it properly, and hand it back better. They didn't take the offer — but the idea stuck. Because it solved a problem most consultants never face: we would live with the consequences.",
+    year: "The shift",
+    text: "One conversation changed everything. Instead of guiding a client through transformation, we proposed something different: acquire the business, fix it properly, and hand it back better. The idea stuck — because we would live with the consequences.",
   },
   {
     label: "Where we are now",
-    text: "Today, we own and operate multiple businesses across manufacturing, software, display and engineering. We don't just recommend change — we implement it, test it, and prove it in our own companies first. That's the difference.",
+    year: "Today",
+    text: "We own and operate multiple businesses across manufacturing, software, display and engineering. We don't just recommend change — we implement it, test it, and prove it in our own companies first. That's the difference.",
   },
 ];
 
 const sectors = ["Manufacturing", "Software Development", "Engineering", "Display Technology"];
+
+const stats = [
+  { value: 20,  suffix: "+", label: "Years' experience" },
+  { value: 10,  suffix: "",  label: "Businesses owned" },
+  { value: 4,   suffix: "",  label: "Core sectors" },
+  { value: 200, suffix: "+", label: "Clients transformed" },
+];
 
 /* ─── Stat ───────────────────────────────────────────────────────── */
 function Stat({
@@ -71,11 +81,13 @@ function Stat({
   suffix,
   label,
   delay,
+  index,
 }: {
   value: number;
   suffix?: string;
   label: string;
   delay: number;
+  index: number;
 }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
@@ -84,16 +96,25 @@ function Stat({
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] }}
-      className="flex flex-col items-center text-center gap-2"
+      className="relative flex flex-col gap-3 p-8"
+      style={{
+        borderRight: index < stats.length - 1 ? "1px solid rgba(148,163,184,0.07)" : "none",
+      }}
     >
+      {/* Subtle top accent line */}
+      <div
+        className="absolute top-0 left-8 w-8 h-[2px] rounded-full"
+        style={{ background: "linear-gradient(to right, #3a7bff, transparent)" }}
+      />
+
       <span
-        className="text-5xl md:text-6xl font-bold leading-none"
+        className="text-5xl md:text-6xl font-bold leading-none tabular-nums"
         style={{
           fontFamily: '"Space Grotesk", sans-serif',
-          background: "linear-gradient(135deg, #60a5fa 0%, #7dd3fc 60%, #a5b4fc 100%)",
+          background: "linear-gradient(135deg, #ffffff 0%, #afc4e8 100%)",
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
           backgroundClip: "text",
@@ -103,7 +124,7 @@ function Stat({
         {suffix}
       </span>
       <span
-        className="text-[10px] tracking-[0.35em] uppercase"
+        className="text-[11px] tracking-[0.3em] uppercase"
         style={{ color: "var(--text-faint)", fontFamily: '"Inter", sans-serif' }}
       >
         {label}
@@ -131,46 +152,33 @@ function PrincipleCard({
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, x: -24 }}
-      animate={inView ? { opacity: 1, x: 0 } : {}}
+      initial={{ opacity: 0, y: 20 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="group relative flex gap-5 p-6 rounded-2xl cursor-default transition-all duration-300"
+      className="group relative flex gap-6 p-7 rounded-2xl cursor-default transition-all duration-300"
       style={{
-        border: `1px solid ${hovered ? "rgba(96,165,250,0.25)" : "rgba(148,163,184,0.07)"}`,
+        border: `1px solid ${hovered ? "rgba(58,123,255,0.2)" : "rgba(148,163,184,0.07)"}`,
         background: hovered
-          ? "rgba(96,165,250,0.04)"
-          : "transparent",
+          ? "rgba(31,94,220,0.05)"
+          : "rgba(10,11,18,0.4)",
       }}
     >
-      {/* Left accent bar */}
-      <motion.div
-        animate={{ scaleY: hovered ? 1 : 0.3, opacity: hovered ? 1 : 0.3 }}
-        transition={{ duration: 0.3 }}
-        className="absolute left-0 top-4 bottom-4 w-[2px] rounded-full"
+      {/* Number — top-left absolute */}
+      <div
+        className="absolute top-7 right-7 text-[11px] font-bold tracking-[0.2em] transition-colors duration-300"
         style={{
-          background: "linear-gradient(to bottom, #3a7bff, #7dd3fc)",
-          transformOrigin: "top",
+          fontFamily: '"Space Grotesk", sans-serif',
+          color: hovered ? "rgba(58,123,255,0.6)" : "rgba(148,163,184,0.2)",
         }}
-      />
-
-      <div className="flex-shrink-0 pt-0.5">
-        <span
-          className="text-[11px] font-semibold tracking-[0.2em]"
-          style={{
-            color: hovered ? "#60a5fa" : "var(--text-faint)",
-            fontFamily: '"Space Grotesk", sans-serif',
-            transition: "color 0.3s",
-          }}
-        >
-          {number}
-        </span>
+      >
+        {number}
       </div>
 
       <div>
         <h3
-          className="text-sm font-semibold mb-2 leading-snug transition-colors duration-300"
+          className="text-sm font-semibold mb-2.5 leading-snug pr-10 transition-colors duration-300"
           style={{
             color: hovered ? "#ffffff" : "var(--text-primary)",
             fontFamily: '"Space Grotesk", sans-serif',
@@ -178,78 +186,88 @@ function PrincipleCard({
         >
           {title}
         </h3>
-        <motion.p
-          animate={{ opacity: hovered ? 1 : 0.5 }}
-          transition={{ duration: 0.3 }}
-          className="text-sm leading-relaxed"
-          style={{ color: "var(--text-muted)", fontFamily: '"Inter", sans-serif' }}
+        <p
+          className="text-sm leading-relaxed transition-opacity duration-300"
+          style={{
+            color: "var(--text-muted)",
+            fontFamily: '"Inter", sans-serif',
+            opacity: hovered ? 1 : 0.6,
+          }}
         >
           {body}
-        </motion.p>
+        </p>
       </div>
     </motion.div>
   );
 }
 
-/* ─── Story accordion ────────────────────────────────────────────── */
-function StoryAccordion() {
-  const [open, setOpen] = useState(0);
+/* ─── Story timeline ─────────────────────────────────────────────── */
+function StoryTimeline() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
 
   return (
-    <div ref={ref} className="flex flex-col divide-y" style={{ borderColor: "rgba(148,163,184,0.07)" }}>
-      {story.map((item, i) => {
-        const isOpen = open === i;
-        return (
-          <motion.div
-            key={item.label}
-            initial={{ opacity: 0, y: 16 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.5, delay: 0.1 + i * 0.08, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <button
-              onClick={() => setOpen(isOpen ? -1 : i)}
-              className="w-full flex items-center justify-between py-5 text-left group"
+    <div ref={ref} className="relative flex flex-col gap-0">
+      {/* Vertical line */}
+      <motion.div
+        initial={{ scaleY: 0 }}
+        animate={inView ? { scaleY: 1 } : {}}
+        transition={{ duration: 1.2, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+        className="absolute left-[7px] top-2 bottom-2 w-[1px]"
+        style={{
+          background: "linear-gradient(to bottom, #3a7bff, rgba(58,123,255,0.05))",
+          transformOrigin: "top",
+        }}
+      />
+
+      {story.map((item, i) => (
+        <motion.div
+          key={item.label}
+          initial={{ opacity: 0, x: 16 }}
+          animate={inView ? { opacity: 1, x: 0 } : {}}
+          transition={{ duration: 0.5, delay: 0.2 + i * 0.1, ease: [0.16, 1, 0.3, 1] }}
+          className="relative flex gap-6 pb-10 last:pb-0"
+        >
+          {/* Dot */}
+          <div className="flex-shrink-0 mt-1.5">
+            <div
+              className="w-[15px] h-[15px] rounded-full border flex items-center justify-center"
+              style={{
+                borderColor: "rgba(58,123,255,0.5)",
+                background: "#0B0F1A",
+              }}
             >
+              <div
+                className="w-[5px] h-[5px] rounded-full"
+                style={{ background: "#3a7bff" }}
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2 pt-0">
+            <div className="flex items-baseline gap-3">
               <span
-                className="text-sm font-semibold tracking-wide transition-colors duration-200"
-                style={{
-                  fontFamily: '"Space Grotesk", sans-serif',
-                  color: isOpen ? "#60a5fa" : "var(--text-primary)",
-                }}
+                className="text-xs font-semibold tracking-wide"
+                style={{ color: "var(--text-primary)", fontFamily: '"Space Grotesk", sans-serif' }}
               >
                 {item.label}
               </span>
-              <motion.span
-                animate={{ rotate: isOpen ? 45 : 0 }}
-                transition={{ duration: 0.25 }}
-                className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs"
-                style={{
-                  border: `1px solid ${isOpen ? "rgba(96,165,250,0.4)" : "rgba(148,163,184,0.15)"}`,
-                  color: isOpen ? "#60a5fa" : "var(--text-faint)",
-                }}
+              <span
+                className="text-[10px] tracking-[0.2em] uppercase"
+                style={{ color: "rgba(58,123,255,0.7)", fontFamily: '"Inter", sans-serif' }}
               >
-                +
-              </motion.span>
-            </button>
-
-            <motion.div
-              initial={false}
-              animate={{ height: isOpen ? "auto" : 0, opacity: isOpen ? 1 : 0 }}
-              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="overflow-hidden"
+                {item.year}
+              </span>
+            </div>
+            <p
+              className="text-sm leading-relaxed"
+              style={{ color: "var(--text-muted)", fontFamily: '"Inter", sans-serif' }}
             >
-              <p
-                className="pb-5 text-sm leading-relaxed"
-                style={{ color: "var(--text-muted)", fontFamily: '"Inter", sans-serif' }}
-              >
-                {item.text}
-              </p>
-            </motion.div>
-          </motion.div>
-        );
-      })}
+              {item.text}
+            </p>
+          </div>
+        </motion.div>
+      ))}
     </div>
   );
 }
@@ -262,19 +280,19 @@ export default function About() {
   return (
     <section id="about" className="relative py-32 overflow-hidden" ref={sectionRef}>
 
-      {/* Subtle background glow */}
+      {/* Background glows */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse 60% 50% at 80% 50%, rgba(31,94,220,0.05) 0%, transparent 70%)",
+            "radial-gradient(ellipse 55% 60% at 85% 40%, rgba(31,94,220,0.06) 0%, transparent 65%), radial-gradient(ellipse 40% 40% at 15% 70%, rgba(10,31,68,0.4) 0%, transparent 70%)",
         }}
       />
 
       <div className="relative max-w-7xl mx-auto px-6">
 
         {/* ── Section header ── */}
-        <div className="max-w-2xl mb-20">
+        <div className="max-w-3xl mb-20">
           <motion.p
             initial={{ opacity: 0, y: 12 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -320,16 +338,16 @@ export default function About() {
               initial={{ opacity: 0, y: 12 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: 0.55 }}
-              className="mt-2 flex flex-wrap gap-2"
+              className="mt-3 flex flex-wrap gap-2"
             >
               {sectors.map((s) => (
                 <span
                   key={s}
                   className="px-3 py-1.5 rounded-lg text-[10px] tracking-[0.25em] uppercase"
                   style={{
-                    border: "1px solid rgba(96,165,250,0.15)",
-                    color: "#60a5fa",
-                    background: "rgba(96,165,250,0.05)",
+                    border: "1px solid rgba(58,123,255,0.15)",
+                    color: "rgba(96,165,250,0.8)",
+                    background: "rgba(58,123,255,0.04)",
                     fontFamily: '"Inter", sans-serif',
                   }}
                 >
@@ -339,7 +357,7 @@ export default function About() {
             </motion.div>
           </div>
 
-          {/* Right: Story accordion */}
+          {/* Right: Story timeline */}
           <div className="flex flex-col gap-8">
             <motion.p
               initial={{ opacity: 0 }}
@@ -351,33 +369,35 @@ export default function About() {
               Our story
             </motion.p>
 
-            <StoryAccordion />
+            <StoryTimeline />
           </div>
         </div>
 
         {/* ── Stats bar ── */}
-        <div
-          className="mt-24 rounded-2xl p-10 md:p-14 grid grid-cols-2 md:grid-cols-4 gap-10"
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.7, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-24 rounded-2xl overflow-hidden grid grid-cols-2 md:grid-cols-4"
           style={{
             border: "1px solid rgba(148,163,184,0.07)",
-            background: "rgba(10,11,18,0.6)",
+            background: "rgba(10,11,18,0.7)",
           }}
         >
-          <Stat value={20}  suffix="+"  label="Years' experience"           delay={0}    />
-          <Stat value={10}  suffix=""   label="Businesses owned & operated"  delay={0.1}  />
-          <Stat value={4}   suffix=""   label="Core sectors"                 delay={0.2}  />
-          <Stat value={200} suffix="+"  label="Clients transformed"          delay={0.3}  />
-        </div>
+          {stats.map((s, i) => (
+            <Stat key={s.label} {...s} delay={0.1 * i} index={i} />
+          ))}
+        </motion.div>
 
         {/* ── CTA block ── */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.7, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-16 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8 rounded-2xl p-8 md:p-10"
+          className="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8 rounded-2xl p-8 md:p-10"
           style={{
-            border: "1px solid rgba(96,165,250,0.12)",
-            background: "linear-gradient(135deg, rgba(31,94,220,0.06) 0%, rgba(58,123,255,0.03) 100%)",
+            border: "1px solid rgba(58,123,255,0.12)",
+            background: "linear-gradient(135deg, rgba(31,94,220,0.07) 0%, rgba(58,123,255,0.03) 100%)",
           }}
         >
           <div>
@@ -398,7 +418,7 @@ export default function About() {
           <div className="flex items-center gap-4 flex-shrink-0">
             <Link
               href="/about"
-              className="text-sm font-medium tracking-wide transition-colors duration-200 whitespace-nowrap"
+              className="text-sm font-medium tracking-wide transition-colors duration-200 whitespace-nowrap hover:text-white"
               style={{ color: "var(--text-muted)", fontFamily: '"Inter", sans-serif' }}
             >
               Our full story →
