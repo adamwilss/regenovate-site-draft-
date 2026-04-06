@@ -194,7 +194,10 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
       mctx.font    = `bold ${rFs}px Arial`
       const fullW  = mctx.measureText("R.").width
       const rCharW = mctx.measureText("R").width
-      const cx     = mob ? W * 0.5 : W * 0.76
+      // On mobile the hero text fills the vertical centre, so push R. to the
+      // bottom-right corner where it sits clear of all content.
+      const cx  = mob ? W * 0.78 : W * 0.76
+      const cy  = mob ? H * 0.84 : H * 0.5
       const startX = cx - fullW / 2
 
       const IR: [number,number,number] = [58, 123, 255]
@@ -202,8 +205,8 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
 
       type Colored = { x: number; y: number; c: [number,number,number] }
       const allPts: Colored[] = [
-        ...textPositions("R", startX,          H * 0.5, rFs, W, H, STEP, "left").map(p => ({ ...p, c: IR })),
-        ...textPositions(".", startX + rCharW, H * 0.5, rFs, W, H, STEP, "left").map(p => ({ ...p, c: ID })),
+        ...textPositions("R", startX,          cy, rFs, W, H, STEP, "left").map(p => ({ ...p, c: IR })),
+        ...textPositions(".", startX + rCharW, cy, rFs, W, H, STEP, "left").map(p => ({ ...p, c: ID })),
       ]
       shuffle(allPts)
 
