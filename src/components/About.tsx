@@ -3,10 +3,9 @@
 import { motion, useInView } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
-import { TextReveal } from "@/components/ui/text-reveal";
 
 /* ─── Animated counter ───────────────────────────────────────────── */
-function useCounter(target: number, inView: boolean, duration = 1.8) {
+function useCounter(target: number, inView: boolean, duration = 2) {
   const [count, setCount] = useState(0);
   useEffect(() => {
     if (!inView) return;
@@ -15,7 +14,7 @@ function useCounter(target: number, inView: boolean, duration = 1.8) {
     const timer = setInterval(() => {
       frame++;
       const progress = frame / totalFrames;
-      const eased = 1 - Math.pow(1 - progress, 3);
+      const eased = 1 - Math.pow(1 - progress, 4);
       setCount(Math.round(eased * target));
       if (frame >= totalFrames) clearInterval(timer);
     }, 1000 / 60);
@@ -75,8 +74,8 @@ const stats = [
   { value: 200, suffix: "+", label: "Clients transformed" },
 ];
 
-/* ─── Stat ───────────────────────────────────────────────────────── */
-function Stat({
+/* ─── Stat block ─────────────────────────────────────────────────── */
+function StatBlock({
   value,
   suffix,
   label,
@@ -90,42 +89,65 @@ function Stat({
   index: number;
 }) {
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
+  const inView = useInView(ref, { once: true, margin: "-40px" });
   const count = useCounter(value, inView);
 
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 32 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] }}
-      className="relative flex flex-col gap-3 p-8"
+      transition={{ duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] }}
+      className="relative flex flex-col gap-4 py-10 px-8"
       style={{
-        borderRight: index < stats.length - 1 ? "1px solid rgba(148,163,184,0.07)" : "none",
+        borderRight: index < stats.length - 1 ? "1px solid rgba(255,255,255,0.06)" : "none",
       }}
     >
-      {/* Subtle top accent line */}
+      {/* Large number in Bebas Neue */}
+      <div className="flex items-end gap-1 leading-none">
+        <span
+          className="leading-none tabular-nums"
+          style={{
+            fontFamily: '"Bebas Neue", sans-serif',
+            fontSize: "clamp(4rem, 7vw, 7rem)",
+            letterSpacing: "0.02em",
+            background: "linear-gradient(160deg, #ffffff 30%, #3a7bff 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+          }}
+        >
+          {count}
+        </span>
+        {suffix && (
+          <span
+            className="mb-2 leading-none"
+            style={{
+              fontFamily: '"Bebas Neue", sans-serif',
+              fontSize: "clamp(2rem, 4vw, 4rem)",
+              color: "#3a7bff",
+              letterSpacing: "0.02em",
+            }}
+          >
+            {suffix}
+          </span>
+        )}
+      </div>
+
+      {/* Thin rule */}
       <div
-        className="absolute top-0 left-8 w-8 h-[2px] rounded-full"
+        className="w-8 h-[1px]"
         style={{ background: "linear-gradient(to right, #3a7bff, transparent)" }}
       />
 
-      <span
-        className="text-5xl md:text-6xl font-bold leading-none tabular-nums"
-        style={{
-          fontFamily: '"Space Grotesk", sans-serif',
-          background: "linear-gradient(135deg, #ffffff 0%, #afc4e8 100%)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          backgroundClip: "text",
-        }}
-      >
-        {count}
-        {suffix}
-      </span>
+      {/* Label */}
       <span
         className="text-[11px] tracking-[0.3em] uppercase"
-        style={{ color: "var(--text-faint)", fontFamily: '"Inter", sans-serif' }}
+        style={{
+          color: "rgba(175,196,232,0.5)",
+          fontFamily: '"Inter", sans-serif',
+          letterSpacing: "0.28em",
+        }}
       >
         {label}
       </span>
@@ -133,8 +155,8 @@ function Stat({
   );
 }
 
-/* ─── Principle card ─────────────────────────────────────────────── */
-function PrincipleCard({
+/* ─── Principle row ──────────────────────────────────────────────── */
+function PrincipleRow({
   number,
   title,
   body,
@@ -146,56 +168,71 @@ function PrincipleCard({
   delay: number;
 }) {
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
+  const inView = useInView(ref, { once: true, margin: "-40px" });
   const [hovered, setHovered] = useState(false);
 
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="group relative flex gap-6 p-7 rounded-2xl cursor-default transition-all duration-300"
+      className="group relative py-8 cursor-default"
       style={{
-        border: `1px solid ${hovered ? "rgba(58,123,255,0.2)" : "rgba(148,163,184,0.07)"}`,
-        background: hovered
-          ? "rgba(31,94,220,0.05)"
-          : "rgba(10,11,18,0.4)",
+        borderBottom: "1px solid rgba(255,255,255,0.06)",
       }}
     >
-      {/* Number — top-left absolute */}
-      <div
-        className="absolute top-7 right-7 text-[11px] font-bold tracking-[0.2em] transition-colors duration-300"
-        style={{
-          fontFamily: '"Space Grotesk", sans-serif',
-          color: hovered ? "rgba(58,123,255,0.6)" : "rgba(148,163,184,0.2)",
-        }}
-      >
-        {number}
-      </div>
+      {/* Hover fill line */}
+      <motion.div
+        className="absolute bottom-0 left-0 h-[1px]"
+        animate={{ width: hovered ? "100%" : "0%" }}
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+        style={{ background: "linear-gradient(to right, #3a7bff, rgba(58,123,255,0.3))" }}
+      />
 
-      <div>
-        <h3
-          className="text-sm font-semibold mb-2.5 leading-snug pr-10 transition-colors duration-300"
+      <div className="flex items-start gap-8">
+        {/* Number */}
+        <span
+          className="flex-shrink-0 mt-0.5 transition-all duration-300"
           style={{
-            color: hovered ? "#ffffff" : "var(--text-primary)",
-            fontFamily: '"Space Grotesk", sans-serif',
+            fontFamily: '"Playfair Display", serif',
+            fontSize: "0.7rem",
+            letterSpacing: "0.15em",
+            color: hovered ? "rgba(58,123,255,0.8)" : "rgba(175,196,232,0.2)",
+            fontStyle: "italic",
+            paddingTop: "2px",
+            minWidth: "28px",
           }}
         >
-          {title}
-        </h3>
-        <p
-          className="text-sm leading-relaxed transition-opacity duration-300"
-          style={{
-            color: "var(--text-muted)",
-            fontFamily: '"Inter", sans-serif',
-            opacity: hovered ? 1 : 0.6,
-          }}
-        >
-          {body}
-        </p>
+          {number}
+        </span>
+
+        <div className="flex flex-col gap-2.5">
+          <h3
+            className="text-base font-medium leading-snug transition-colors duration-300"
+            style={{
+              fontFamily: '"DM Serif Display", serif',
+              color: hovered ? "#ffffff" : "rgba(255,255,255,0.85)",
+              fontSize: "1.05rem",
+              lineHeight: 1.4,
+            }}
+          >
+            {title}
+          </h3>
+          <p
+            className="text-sm leading-relaxed transition-all duration-300"
+            style={{
+              color: hovered ? "rgba(175,196,232,0.7)" : "rgba(175,196,232,0.4)",
+              fontFamily: '"Inter", sans-serif',
+              fontSize: "0.83rem",
+              lineHeight: 1.7,
+            }}
+          >
+            {body}
+          </p>
+        </div>
       </div>
     </motion.div>
   );
@@ -207,65 +244,55 @@ function StoryTimeline() {
   const inView = useInView(ref, { once: true, margin: "-60px" });
 
   return (
-    <div ref={ref} className="relative flex flex-col gap-0">
-      {/* Vertical line */}
-      <motion.div
-        initial={{ scaleY: 0 }}
-        animate={inView ? { scaleY: 1 } : {}}
-        transition={{ duration: 1.2, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-        className="absolute left-[7px] top-2 bottom-2 w-[1px]"
-        style={{
-          background: "linear-gradient(to bottom, #3a7bff, rgba(58,123,255,0.05))",
-          transformOrigin: "top",
-        }}
-      />
-
+    <div ref={ref} className="relative flex flex-col">
       {story.map((item, i) => (
         <motion.div
           key={item.label}
-          initial={{ opacity: 0, x: 16 }}
+          initial={{ opacity: 0, x: 20 }}
           animate={inView ? { opacity: 1, x: 0 } : {}}
-          transition={{ duration: 0.5, delay: 0.2 + i * 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="relative flex gap-6 pb-10 last:pb-0"
+          transition={{ duration: 0.55, delay: 0.15 + i * 0.12, ease: [0.16, 1, 0.3, 1] }}
+          className="relative grid gap-4 py-8"
+          style={{ borderBottom: i < story.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}
         >
-          {/* Dot */}
-          <div className="flex-shrink-0 mt-1.5">
-            <div
-              className="w-[15px] h-[15px] rounded-full border flex items-center justify-center"
+          {/* Year tag and label row */}
+          <div className="flex items-center gap-4">
+            <span
+              className="text-[9px] tracking-[0.4em] uppercase px-2.5 py-1 rounded-sm"
               style={{
-                borderColor: "rgba(58,123,255,0.5)",
-                background: "#0B0F1A",
+                fontFamily: '"Inter", sans-serif',
+                color: "#3a7bff",
+                background: "rgba(58,123,255,0.1)",
+                border: "1px solid rgba(58,123,255,0.2)",
+                letterSpacing: "0.35em",
               }}
             >
-              <div
-                className="w-[5px] h-[5px] rounded-full"
-                style={{ background: "#3a7bff" }}
-              />
-            </div>
+              {item.year}
+            </span>
+            <span
+              className="text-xs font-medium tracking-wide"
+              style={{
+                fontFamily: '"DM Serif Display", serif',
+                color: "rgba(255,255,255,0.6)",
+                fontSize: "0.82rem",
+                letterSpacing: "0.05em",
+              }}
+            >
+              {item.label}
+            </span>
           </div>
 
-          <div className="flex flex-col gap-2 pt-0">
-            <div className="flex items-baseline gap-3">
-              <span
-                className="text-xs font-semibold tracking-wide"
-                style={{ color: "var(--text-primary)", fontFamily: '"Space Grotesk", sans-serif' }}
-              >
-                {item.label}
-              </span>
-              <span
-                className="text-[10px] tracking-[0.2em] uppercase"
-                style={{ color: "rgba(58,123,255,0.7)", fontFamily: '"Inter", sans-serif' }}
-              >
-                {item.year}
-              </span>
-            </div>
-            <p
-              className="text-sm leading-relaxed"
-              style={{ color: "var(--text-muted)", fontFamily: '"Inter", sans-serif' }}
-            >
-              {item.text}
-            </p>
-          </div>
+          {/* Body */}
+          <p
+            className="text-sm leading-relaxed pl-0"
+            style={{
+              color: "rgba(175,196,232,0.45)",
+              fontFamily: '"Inter", sans-serif',
+              fontSize: "0.82rem",
+              lineHeight: 1.75,
+            }}
+          >
+            {item.text}
+          </p>
         </motion.div>
       ))}
     </div>
@@ -280,74 +307,153 @@ export default function About() {
   return (
     <section id="about" className="relative py-32 overflow-hidden" ref={sectionRef}>
 
-      {/* Background glows */}
+      {/* Background atmosphere */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background:
-            "radial-gradient(ellipse 55% 60% at 85% 40%, rgba(31,94,220,0.06) 0%, transparent 65%), radial-gradient(ellipse 40% 40% at 15% 70%, rgba(10,31,68,0.4) 0%, transparent 70%)",
+          background: [
+            "radial-gradient(ellipse 70% 50% at 80% 20%, rgba(31,94,220,0.07) 0%, transparent 65%)",
+            "radial-gradient(ellipse 50% 60% at 10% 80%, rgba(10,31,68,0.5) 0%, transparent 70%)",
+            "radial-gradient(ellipse 40% 40% at 50% 50%, rgba(58,123,255,0.02) 0%, transparent 80%)",
+          ].join(", "),
+        }}
+      />
+
+      {/* Subtle grid overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.018]"
+        style={{
+          backgroundImage: "linear-gradient(rgba(175,196,232,1) 1px, transparent 1px), linear-gradient(90deg, rgba(175,196,232,1) 1px, transparent 1px)",
+          backgroundSize: "80px 80px",
         }}
       />
 
       <div className="relative max-w-7xl mx-auto px-6">
 
         {/* ── Section header ── */}
-        <div className="max-w-3xl mb-20">
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
+        <div className="mb-24">
+
+          {/* Eyebrow */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.5 }}
-            className="text-[10px] tracking-[0.5em] uppercase mb-5 font-medium"
-            style={{ color: "var(--text-faint)", fontFamily: '"Inter", sans-serif' }}
+            className="flex items-center gap-4 mb-10"
           >
-            Who we are
-          </motion.p>
-          <h2
-            className="text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.05] mb-0"
-            style={{ fontFamily: '"Space Grotesk", sans-serif', color: "var(--text-primary)" }}
-          >
-            <TextReveal delay={0.1}>Built in real businesses.</TextReveal>
-            <br />
-            <span style={{ color: "var(--text-faint)" }}>
-              <TextReveal delay={0.35}>Not boardrooms.</TextReveal>
+            <div
+              className="w-6 h-[1px]"
+              style={{ background: "#3a7bff" }}
+            />
+            <span
+              className="text-[9px] tracking-[0.5em] uppercase"
+              style={{
+                color: "rgba(58,123,255,0.7)",
+                fontFamily: '"Inter", sans-serif',
+              }}
+            >
+              Who we are
             </span>
-          </h2>
+          </motion.div>
+
+          {/* Main headline — editorial, large-scale */}
+          <div className="overflow-hidden">
+            <motion.h2
+              initial={{ opacity: 0, y: 48 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.9, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+              style={{
+                fontFamily: '"DM Serif Display", serif',
+                fontSize: "clamp(2.8rem, 6.5vw, 6rem)",
+                lineHeight: 1.0,
+                letterSpacing: "-0.01em",
+                color: "#ffffff",
+              }}
+            >
+              Built in real businesses.
+            </motion.h2>
+          </div>
+
+          {/* Second line with rule — asymmetric offset */}
+          <div className="flex items-center gap-6 mt-4">
+            <motion.div
+              initial={{ scaleX: 0 }}
+              animate={isInView ? { scaleX: 1 } : {}}
+              transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className="flex-shrink-0 h-[1px] w-16 md:w-24"
+              style={{
+                background: "linear-gradient(to right, rgba(58,123,255,0.5), rgba(58,123,255,0.1))",
+                transformOrigin: "left",
+              }}
+            />
+            <motion.h2
+              initial={{ opacity: 0, x: -16 }}
+              animate={isInView ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.7, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
+              style={{
+                fontFamily: '"DM Serif Display", serif',
+                fontStyle: "italic",
+                fontSize: "clamp(2.8rem, 6.5vw, 6rem)",
+                lineHeight: 1.0,
+                letterSpacing: "-0.01em",
+                color: "rgba(175,196,232,0.3)",
+              }}
+            >
+              Not boardrooms.
+            </motion.h2>
+          </div>
+
         </div>
 
         {/* ── Main grid ── */}
-        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-start">
+        <div className="grid lg:grid-cols-2 gap-0 lg:gap-20 items-start">
 
-          {/* Left: Principles */}
-          <div className="flex flex-col gap-3">
-            <motion.p
+          {/* Left: Principles as editorial rows */}
+          <div className="flex flex-col">
+            <motion.div
               initial={{ opacity: 0 }}
               animate={isInView ? { opacity: 1 } : {}}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-[11px] tracking-[0.35em] uppercase mb-2"
-              style={{ color: "var(--text-faint)", fontFamily: '"Inter", sans-serif' }}
+              className="flex items-center gap-4 mb-2"
             >
-              What makes us different
-            </motion.p>
+              <span
+                className="text-[9px] tracking-[0.45em] uppercase"
+                style={{ color: "rgba(175,196,232,0.3)", fontFamily: '"Inter", sans-serif' }}
+              >
+                What makes us different
+              </span>
+            </motion.div>
+
+            {/* Top border */}
+            <motion.div
+              initial={{ scaleX: 0 }}
+              animate={isInView ? { scaleX: 1 } : {}}
+              transition={{ duration: 0.6, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="h-[1px] w-full mb-0"
+              style={{
+                background: "rgba(255,255,255,0.06)",
+                transformOrigin: "left",
+              }}
+            />
 
             {principles.map((p, i) => (
-              <PrincipleCard key={p.number} {...p} delay={0.2 + i * 0.1} />
+              <PrincipleRow key={p.number} {...p} delay={0.25 + i * 0.1} />
             ))}
 
             {/* Sector tags */}
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: 0.55 }}
-              className="mt-3 flex flex-wrap gap-2"
+              transition={{ duration: 0.5, delay: 0.6 }}
+              className="mt-8 flex flex-wrap gap-2"
             >
               {sectors.map((s) => (
                 <span
                   key={s}
-                  className="px-3 py-1.5 rounded-lg text-[10px] tracking-[0.25em] uppercase"
+                  className="px-3 py-1.5 rounded-sm text-[9px] tracking-[0.3em] uppercase"
                   style={{
                     border: "1px solid rgba(58,123,255,0.15)",
-                    color: "rgba(96,165,250,0.8)",
-                    background: "rgba(58,123,255,0.04)",
+                    color: "rgba(58,123,255,0.55)",
+                    background: "transparent",
                     fontFamily: '"Inter", sans-serif',
                   }}
                 >
@@ -357,17 +463,33 @@ export default function About() {
             </motion.div>
           </div>
 
-          {/* Right: Story timeline */}
-          <div className="flex flex-col gap-8">
-            <motion.p
+          {/* Right: Story */}
+          <div className="flex flex-col mt-12 lg:mt-0">
+            <motion.div
               initial={{ opacity: 0 }}
               animate={isInView ? { opacity: 1 } : {}}
               transition={{ duration: 0.5, delay: 0.25 }}
-              className="text-[11px] tracking-[0.35em] uppercase"
-              style={{ color: "var(--text-faint)", fontFamily: '"Inter", sans-serif' }}
+              className="flex items-center gap-4 mb-2"
             >
-              Our story
-            </motion.p>
+              <span
+                className="text-[9px] tracking-[0.45em] uppercase"
+                style={{ color: "rgba(175,196,232,0.3)", fontFamily: '"Inter", sans-serif' }}
+              >
+                Our story
+              </span>
+            </motion.div>
+
+            {/* Top border */}
+            <motion.div
+              initial={{ scaleX: 0 }}
+              animate={isInView ? { scaleX: 1 } : {}}
+              transition={{ duration: 0.6, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              className="h-[1px] w-full mb-0"
+              style={{
+                background: "rgba(255,255,255,0.06)",
+                transformOrigin: "left",
+              }}
+            />
 
             <StoryTimeline />
           </div>
@@ -375,65 +497,126 @@ export default function About() {
 
         {/* ── Stats bar ── */}
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 32 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.7, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-24 rounded-2xl overflow-hidden grid grid-cols-2 md:grid-cols-4"
-          style={{
-            border: "1px solid rgba(148,163,184,0.07)",
-            background: "rgba(10,11,18,0.7)",
-          }}
+          transition={{ duration: 0.8, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-28"
         >
-          {stats.map((s, i) => (
-            <Stat key={s.label} {...s} delay={0.1 * i} index={i} />
-          ))}
+          {/* Top rule with label */}
+          <div className="flex items-center gap-6 mb-0">
+            <div
+              className="flex-1 h-[1px]"
+              style={{ background: "rgba(255,255,255,0.05)" }}
+            />
+            <span
+              className="text-[8px] tracking-[0.5em] uppercase flex-shrink-0"
+              style={{ color: "rgba(175,196,232,0.2)", fontFamily: '"Inter", sans-serif' }}
+            >
+              By the numbers
+            </span>
+            <div
+              className="flex-1 h-[1px]"
+              style={{ background: "rgba(255,255,255,0.05)" }}
+            />
+          </div>
+
+          <div
+            className="grid grid-cols-2 md:grid-cols-4"
+            style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}
+          >
+            {stats.map((s, i) => (
+              <StatBlock key={s.label} {...s} delay={0.05 * i} index={i} />
+            ))}
+          </div>
+
+          {/* Bottom rule */}
+          <div
+            className="h-[1px] w-full"
+            style={{ background: "rgba(255,255,255,0.05)" }}
+          />
         </motion.div>
 
-        {/* ── CTA block ── */}
+        {/* ── CTA ── */}
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.7, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="mt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8 rounded-2xl p-8 md:p-10"
-          style={{
-            border: "1px solid rgba(58,123,255,0.12)",
-            background: "linear-gradient(135deg, rgba(31,94,220,0.07) 0%, rgba(58,123,255,0.03) 100%)",
-          }}
+          transition={{ duration: 0.6, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-16 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-8"
         >
-          <div>
+          <div className="max-w-lg">
             <p
-              className="text-lg font-semibold mb-1"
-              style={{ fontFamily: '"Space Grotesk", sans-serif', color: "var(--text-primary)" }}
+              className="mb-2"
+              style={{
+                fontFamily: '"DM Serif Display", serif',
+                fontSize: "clamp(1.1rem, 2vw, 1.4rem)",
+                color: "rgba(255,255,255,0.75)",
+                lineHeight: 1.35,
+              }}
             >
               Ready to see what ownership thinking looks like in your business?
             </p>
             <p
-              className="text-sm"
-              style={{ color: "var(--text-faint)", fontFamily: '"Inter", sans-serif' }}
+              className="text-xs"
+              style={{
+                color: "rgba(175,196,232,0.3)",
+                fontFamily: '"Inter", sans-serif',
+                letterSpacing: "0.04em",
+              }}
             >
               One conversation. No pitch decks. No theory.
             </p>
           </div>
 
-          <div className="flex items-center gap-4 flex-shrink-0">
+          <div className="flex items-center gap-6 flex-shrink-0">
             <Link
               href="/about"
-              className="text-sm font-medium tracking-wide transition-colors duration-200 whitespace-nowrap hover:text-white"
-              style={{ color: "var(--text-muted)", fontFamily: '"Inter", sans-serif' }}
-            >
-              Our full story →
-            </Link>
-            <Link
-              href="/contact"
-              className="inline-flex items-center gap-2 px-7 py-3.5 text-white text-sm font-semibold tracking-wide rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-blue-500/20 whitespace-nowrap"
+              className="text-xs font-medium tracking-widest uppercase transition-all duration-200 hover:text-white group flex items-center gap-2"
               style={{
-                background: "linear-gradient(135deg, #1f5edc, #3a7bff)",
+                color: "rgba(175,196,232,0.35)",
                 fontFamily: '"Inter", sans-serif',
+                letterSpacing: "0.2em",
               }}
             >
-              Start the conversation
-              <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4">
-                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              Our full story
+              <span
+                className="transition-transform duration-200 group-hover:translate-x-1"
+                style={{ display: "inline-block" }}
+              >
+                →
+              </span>
+            </Link>
+
+            <Link
+              href="/contact"
+              className="relative inline-flex items-center gap-2.5 px-8 py-4 text-white text-xs font-medium tracking-widest uppercase overflow-hidden group"
+              style={{
+                background: "transparent",
+                border: "1px solid rgba(58,123,255,0.4)",
+                fontFamily: '"Inter", sans-serif',
+                letterSpacing: "0.2em",
+              }}
+            >
+              {/* Hover fill */}
+              <motion.div
+                className="absolute inset-0 pointer-events-none"
+                initial={{ x: "-100%" }}
+                whileHover={{ x: "0%" }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                style={{ background: "linear-gradient(135deg, #1f5edc, #3a7bff)" }}
+              />
+              <span className="relative z-10">Start the conversation</span>
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                className="w-3.5 h-3.5 relative z-10 transition-transform duration-200 group-hover:translate-x-0.5"
+              >
+                <path
+                  d="M3 8h10M9 4l4 4-4 4"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </Link>
           </div>
