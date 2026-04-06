@@ -131,10 +131,10 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
     const WHITE: [number, number, number] = [255, 255, 255]
     const BLUE:  [number, number, number] = [56,  189, 248]
 
-    // ── Phase thresholds ─────────────────────────────────────────
+    // ── Phase thresholds (milliseconds, display-rate independent) ───
     // 0 forming → 1 hold → 2 burst → 3 reform → 4 hold2
     // → 5 reformR → 6 holdR → 7 settle → done
-    const T = { hold: 155, burst: 205, reform: 240, hold2: 400, reformR: 440, holdR: 560, settle: 600, done: 760 }
+    const T = { hold: 2583, burst: 3417, reform: 4000, hold2: 6667, reformR: 7333, holdR: 9333, settle: 10000, done: 12667 }
 
     const formWords = () => {
       // Innovate left, Regenerate right (swapped)
@@ -237,9 +237,10 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
 
     formWords()
 
-    let phase   = 0
-    let frame   = 0
-    let done    = false
+    let phase      = 0
+    let done       = false
+    let timeOffset = 0
+    const startTime = performance.now()
     let rafId   = 0
     let bgAlpha = 0.22         // fades to 0 during settle, revealing hero bg
     let mouseX  = -9999
@@ -259,7 +260,8 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
       skipRef.current = () => {
         reformToR()
         phase = 5
-        frame = T.holdR
+        // Fast-forward elapsed to just past holdR so settle fires normally (~667ms later)
+        timeOffset = Math.max(0, T.holdR - (performance.now() - startTime))
       }
     }
 
@@ -309,15 +311,15 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
       }
 
       // ── Phase transitions ──────────────────────────────────────────
-      frame++
-      if (phase === 0 && frame >= T.hold)    phase = 1
-      if (phase === 1 && frame >= T.burst)   { phase = 2; particles.forEach(p => { p.burst(); p.tr = bgR; p.tg = bgG; p.tb = bgB }) }
-      if (phase === 2 && frame >= T.reform)  { phase = 3; reformWord() }
-      if (phase === 3 && frame >= T.hold2)   { phase = 4; onFormedRef.current() }
-      if (phase === 4 && frame >= T.reformR) { phase = 5; reformToR() }
-      if (phase === 5 && frame >= T.holdR)   { phase = 6 }
-      if (phase === 6 && frame >= T.settle)  { phase = 7; settleInPlace() }
-      if (phase >= 7 && frame >= T.done && !done) {
+      const elapsed = performance.now() - startTime + timeOffset
+      if (phase === 0 && elapsed >= T.hold)    phase = 1
+      if (phase === 1 && elapsed >= T.burst)   { phase = 2; particles.forEach(p => { p.burst(); p.tr = bgR; p.tg = bgG; p.tb = bgB }) }
+      if (phase === 2 && elapsed >= T.reform)  { phase = 3; reformWord() }
+      if (phase === 3 && elapsed >= T.hold2)   { phase = 4; onFormedRef.current() }
+      if (phase === 4 && elapsed >= T.reformR) { phase = 5; reformToR() }
+      if (phase === 5 && elapsed >= T.holdR)   { phase = 6 }
+      if (phase === 6 && elapsed >= T.settle)  { phase = 7; settleInPlace() }
+      if (phase >= 7 && elapsed >= T.done && !done) {
         done = true
         onCompleteRef.current()
       }
