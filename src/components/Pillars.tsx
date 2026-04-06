@@ -690,7 +690,7 @@ function SectionHeader({
                   scale: activeStage === i ? 1.07 : 1,
                 }}
                 transition={{ duration: 0.35, ease: "easeOut" }}
-                className="flex items-center gap-2 px-4 py-1.5 rounded-full cursor-default select-none"
+                className="flex items-center gap-1.5 px-2 py-1 sm:px-4 sm:py-1.5 rounded-full cursor-default select-none"
                 style={{
                   border: `1px solid ${activeStage >= i ? STAGE_COLORS[i] + "35" : "var(--border-subtle)"}`,
                   background: activeStage === i ? `${STAGE_COLORS[i]}0d` : "var(--bg-base)",
@@ -706,14 +706,14 @@ function SectionHeader({
                     transition: "background 0.4s ease, box-shadow 0.4s ease",
                   }}
                 />
-                <span className="text-[8px] tracking-[0.45em] uppercase font-semibold">
+                <span className="text-[7px] tracking-[0.15em] sm:text-[8px] sm:tracking-[0.45em] uppercase font-semibold">
                   {p.subtitle}
                 </span>
               </motion.div>
 
               {/* Connector line lives only in the gap between pills */}
               {i < 2 && (
-                <div className="w-10 flex items-center justify-center" style={{ overflow: "visible" }}>
+                <div className="w-5 sm:w-10 flex items-center justify-center" style={{ overflow: "visible" }}>
                   {i === 0 && pillConn1 ? (
                     <PillConnector progress={pillConn1} fromColor={STAGE_COLORS[0]} toColor={STAGE_COLORS[1]} id="pc1" />
                   ) : i === 1 && pillConn2 ? (
