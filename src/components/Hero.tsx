@@ -106,22 +106,6 @@ export default function Hero() {
       {/* show on 'settling' so it crossfades with the canvas bg fade */}
       <HeroContent show={introPhase !== 'intro'} />
 
-      {/* Scroll indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: introPhase === 'done' ? 1 : 0 }}
-        transition={{ delay: 1.6, duration: 0.6 }}
-        className="absolute bottom-8 left-8 md:left-16 flex flex-col items-center gap-3 z-10"
-      >
-        <span className="text-[10px] tracking-[0.4em] uppercase" style={{ color: "var(--text-faint)" }}>
-          Scroll
-        </span>
-        <motion.div
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          className="w-px h-10 bg-gradient-to-b from-blue-400/50 to-transparent"
-        />
-      </motion.div>
     </header>
   );
 }
