@@ -54,6 +54,18 @@
   --orb-primary:      rgba(31, 94, 220, 0.15);
   --orb-secondary:    rgba(58, 123, 255, 0.07);
   --orb-tertiary:     rgba(52, 211, 153, 0.05);
+  /* SectorBar */
+  --sb-text:          rgba(255,255,255,0.82);
+  --sb-text-hover:    #ffffff;
+  --sb-italic:        rgba(175,196,232,0.38);
+  --sb-philosophy:    rgba(120,150,210,0.35);
+  --sb-accent:        58,123,255;
+  --sb-stat-num:      #6aaeff;
+  --sb-stat-label:    rgba(175,196,232,0.5);
+  --sb-sep:           rgba(58,123,255,0.2);
+  --sb-bloom:         rgba(31,94,220,0.07);
+  --sb-pill-bg:       linear-gradient(135deg,rgba(31,94,220,0.12) 0%,rgba(58,123,255,0.06) 100%);
+  --sb-pill-border:   rgba(58,123,255,0.28);
 }
 
 [data-theme="light"] {
@@ -73,6 +85,18 @@
   --orb-primary:      rgba(59, 95, 199, 0.18);
   --orb-secondary:    rgba(59, 130, 246, 0.10);
   --orb-tertiary:     rgba(52, 211, 153, 0.07);
+  /* SectorBar */
+  --sb-text:          rgba(15,23,42,0.75);
+  --sb-text-hover:    #0f172a;
+  --sb-italic:        rgba(30,58,122,0.5);
+  --sb-philosophy:    rgba(44,82,160,0.45);
+  --sb-accent:        31,94,220;
+  --sb-stat-num:      #1f5edc;
+  --sb-stat-label:    rgba(30,58,122,0.55);
+  --sb-sep:           rgba(31,94,220,0.25);
+  --sb-bloom:         rgba(31,94,220,0.05);
+  --sb-pill-bg:       linear-gradient(135deg,rgba(31,94,220,0.09) 0%,rgba(58,123,255,0.04) 100%);
+  --sb-pill-border:   rgba(31,94,220,0.25);
 }
 
 [data-theme="midnight"] {
@@ -92,6 +116,18 @@
   --orb-primary:      rgba(99, 102, 241, 0.30);
   --orb-secondary:    rgba(139, 92, 246, 0.18);
   --orb-tertiary:     rgba(59, 130, 246, 0.12);
+  /* SectorBar */
+  --sb-text:          rgba(224,231,255,0.78);
+  --sb-text-hover:    #ffffff;
+  --sb-italic:        rgba(165,180,252,0.4);
+  --sb-philosophy:    rgba(129,140,248,0.35);
+  --sb-accent:        129,140,248;
+  --sb-stat-num:      #a5b4fc;
+  --sb-stat-label:    rgba(165,180,252,0.5);
+  --sb-sep:           rgba(129,140,248,0.22);
+  --sb-bloom:         rgba(99,102,241,0.08);
+  --sb-pill-bg:       linear-gradient(135deg,rgba(99,102,241,0.14) 0%,rgba(139,92,246,0.07) 100%);
+  --sb-pill-border:   rgba(129,140,248,0.3);
 }
 
 /* ─── Base ─────────────────────────────────────────────────────── */
