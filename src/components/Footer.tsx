@@ -151,8 +151,14 @@ export default function Footer() {
             className="max-w-xl"
           >
             <p
-              className="text-[9px] tracking-[0.6em] uppercase mb-5"
-              style={{ color: "rgba(58,123,255,0.7)", fontFamily: '"Inter", sans-serif' }}
+              className="mb-5"
+              style={{
+                fontFamily: '"Playfair Display", serif',
+                fontStyle: "italic",
+                fontSize: "0.85rem",
+                color: "rgba(58,123,255,0.65)",
+                letterSpacing: "0.02em",
+              }}
             >
               Ready to transform
             </p>
@@ -231,23 +237,23 @@ export default function Footer() {
           />
         </div>
 
-        {/* REGENOVATE watermark */}
+        {/* Logo watermark */}
         <div
           className="absolute bottom-0 left-0 right-0 flex items-end justify-center pointer-events-none overflow-hidden select-none"
           aria-hidden="true"
         >
-          <span
+          <Image
+            src="/logo.png"
+            alt=""
+            width={1400}
+            height={360}
+            className="object-contain w-full max-w-5xl"
             style={{
-              fontFamily: '"Bebas Neue", sans-serif',
-              fontSize: "clamp(5rem, 20vw, 20rem)",
-              letterSpacing: "0.06em",
-              lineHeight: 0.82,
-              color: "rgba(175,196,232,0.03)",
-              whiteSpace: "nowrap",
+              filter: "brightness(0) invert(1)",
+              opacity: 0.038,
+              marginBottom: "-2%",
             }}
-          >
-            REGENOVATE
-          </span>
+          />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-6 pt-16 pb-8">
@@ -278,25 +284,24 @@ export default function Footer() {
                 We invest, partner, or acquire businesses to transform and scale them — protecting your team, securing your legacy.
               </p>
 
-              {/* SSS mantra with blue dots */}
-              <div className="flex items-center gap-0">
+              {/* SSS mantra — Bebas Neue for weight and character */}
+              <div className="flex items-center gap-3">
                 {["Stabilise", "Systemise", "Scale"].map((word, i) => (
-                  <span key={word} className="flex items-center">
+                  <span key={word} className="flex items-center gap-3">
                     <span
                       style={{
-                        fontFamily: '"Inter", sans-serif',
-                        fontSize: "0.65rem",
-                        letterSpacing: "0.3em",
-                        textTransform: "uppercase",
-                        color: "rgba(175,196,232,0.25)",
+                        fontFamily: '"Bebas Neue", sans-serif',
+                        fontSize: "1.05rem",
+                        letterSpacing: "0.12em",
+                        color: "rgba(175,196,232,0.2)",
                       }}
                     >
                       {word}
                     </span>
                     {i < 2 && (
                       <span
-                        className="mx-3 inline-block w-[3px] h-[3px] rounded-full flex-shrink-0"
-                        style={{ background: "rgba(58,123,255,0.35)" }}
+                        className="inline-block w-[3px] h-[3px] rounded-full flex-shrink-0"
+                        style={{ background: "rgba(58,123,255,0.3)" }}
                       />
                     )}
                   </span>
@@ -346,11 +351,12 @@ export default function Footer() {
                 <h4
                   className="mb-6"
                   style={{
-                    fontFamily: '"Inter", sans-serif',
-                    fontSize: "0.65rem",
-                    letterSpacing: "0.45em",
-                    textTransform: "uppercase",
-                    color: "rgba(175,196,232,0.2)",
+                    fontFamily: '"Playfair Display", serif',
+                    fontStyle: "italic",
+                    fontSize: "0.9rem",
+                    letterSpacing: "0.02em",
+                    color: "rgba(175,196,232,0.3)",
+                    fontWeight: 400,
                   }}
                 >
                   {col.heading}
@@ -376,11 +382,12 @@ export default function Footer() {
               <p
                 className="mb-3"
                 style={{
-                  fontFamily: '"Inter", sans-serif',
-                  fontSize: "0.65rem",
-                  letterSpacing: "0.45em",
-                  textTransform: "uppercase",
-                  color: "rgba(175,196,232,0.2)",
+                  fontFamily: '"Playfair Display", serif',
+                  fontStyle: "italic",
+                  fontSize: "0.9rem",
+                  letterSpacing: "0.02em",
+                  color: "rgba(175,196,232,0.3)",
+                  fontWeight: 400,
                 }}
               >
                 Get in touch
@@ -403,11 +410,12 @@ export default function Footer() {
               <p
                 className="mb-3"
                 style={{
-                  fontFamily: '"Inter", sans-serif',
-                  fontSize: "0.65rem",
-                  letterSpacing: "0.45em",
-                  textTransform: "uppercase",
-                  color: "rgba(175,196,232,0.2)",
+                  fontFamily: '"Playfair Display", serif',
+                  fontStyle: "italic",
+                  fontSize: "0.9rem",
+                  letterSpacing: "0.02em",
+                  color: "rgba(175,196,232,0.3)",
+                  fontWeight: 400,
                 }}
               >
                 Office
