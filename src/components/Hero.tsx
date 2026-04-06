@@ -132,7 +132,7 @@ function HeroContent({ show }: { show: boolean }) {
         </motion.p>
 
         {/* ── Headline: verb + descriptor pairs ── */}
-        <div className="mb-10 flex flex-col gap-1">
+        <div className="mb-10 flex flex-col gap-4 md:gap-5">
           {([
             { verb: "STABILISE", noun: "your people"      },
             { verb: "SYSTEMISE", noun: "your process"     },
@@ -146,21 +146,23 @@ function HeroContent({ show }: { show: boolean }) {
               <span
                 className="gradient-text-flow shrink-0"
                 style={{
-                  fontFamily: '"Bebas Neue", sans-serif',
+                  fontFamily: '"Space Grotesk", sans-serif',
+                  fontWeight: 700,
                   fontSize: "clamp(2.4rem, 9vw, 10rem)",
-                  letterSpacing: "0.03em",
-                  lineHeight: 0.93,
+                  letterSpacing: "-0.01em",
+                  lineHeight: 0.95,
                 }}
               >
                 {verb}
               </span>
               <span
                 style={{
-                  fontFamily: '"DM Serif Display", "Playfair Display", serif',
+                  fontFamily: '"Playfair Display", serif',
+                  fontWeight: 400,
                   fontSize: "clamp(1.1rem, 2.8vw, 2.8rem)",
                   fontStyle: "italic",
                   lineHeight: 1,
-                  color: "var(--text-muted)",
+                  color: "var(--text-faint)",
                   whiteSpace: "normal",
                 }}
               >
@@ -174,7 +176,7 @@ function HeroContent({ show }: { show: boolean }) {
         <motion.p
           {...fadeUp(0.46)}
           className="text-sm md:text-base max-w-md leading-relaxed tracking-wide mb-12"
-          style={{ color: "var(--text-muted)" }}
+          style={{ color: "var(--text-muted)", fontFamily: '"Inter", sans-serif', fontWeight: 400 }}
         >
           We fix, stabilise, and scale real businesses.
           Ownership thinking applied to transformation. No theory.
