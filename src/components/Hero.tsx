@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ParticleField } from "@/components/ui/particle-field";
 import { MagneticButton } from "@/components/ui/magnetic-button";
 import { HeroParticleIntro } from "@/components/ui/hero-particle-intro";
@@ -9,7 +9,21 @@ import { HeroParticleIntro } from "@/components/ui/hero-particle-intro";
 /* ─── Hero ──────────────────────────────────────────────────────── */
 export default function Hero() {
   const [introPhase, setIntroPhase] = useState<'intro' | 'settling' | 'done'>('intro');
+  const [resizeKey, setResizeKey] = useState(0);
   const skipRef = useRef<(() => void) | null>(null);
+
+  useEffect(() => {
+    let t: ReturnType<typeof setTimeout>
+    const onResize = () => {
+      clearTimeout(t)
+      t = setTimeout(() => {
+        setResizeKey(k => k + 1)
+        setIntroPhase('intro')
+      }, 300)
+    }
+    window.addEventListener('resize', onResize)
+    return () => { window.removeEventListener('resize', onResize); clearTimeout(t) }
+  }, [])
 
   return (
     <header
@@ -54,6 +68,7 @@ export default function Hero() {
           background to transparent so the settled dots remain visible.
           Mouse repulsion active after settle phase.               */}
       <HeroParticleIntro
+        key={resizeKey}
         onWordFormed={() => {}}
         onSettleBegin={() => setIntroPhase('settling')}
         onComplete={() => setIntroPhase('done')}
@@ -138,13 +153,13 @@ function HeroContent({ show }: { show: boolean }) {
             <motion.div
               key={verb}
               {...fadeUp(0.08 + i * 0.1)}
-              className="flex items-baseline gap-3 md:gap-5 leading-none"
+              className="flex flex-wrap items-baseline gap-3 md:gap-5 leading-none"
             >
               <span
                 className="gradient-text-flow shrink-0"
                 style={{
                   fontFamily: '"Bebas Neue", sans-serif',
-                  fontSize: "clamp(3.8rem, 10vw, 10rem)",
+                  fontSize: "clamp(2.4rem, 9vw, 10rem)",
                   letterSpacing: "0.03em",
                   lineHeight: 0.93,
                 }}
@@ -158,7 +173,7 @@ function HeroContent({ show }: { show: boolean }) {
                   fontStyle: "italic",
                   lineHeight: 1,
                   color: "var(--text-muted)",
-                  whiteSpace: "nowrap",
+                  whiteSpace: "normal",
                 }}
               >
                 {noun}

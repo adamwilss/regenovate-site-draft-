@@ -64,6 +64,11 @@ export default function Navbar() {
 
   useEffect(() => { setMobileOpen(false); }, [pathname]);
 
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [mobileOpen]);
+
   const logoNeedsWhiteBg = theme === "dark" || theme === "midnight";
 
   return (

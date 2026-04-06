@@ -83,7 +83,16 @@ export function ParticleField({
         y: e.clientY - rect.top,
       }
     }
+    const handleTouch = (e: TouchEvent) => {
+      if (!e.touches.length) return
+      const rect = canvas.getBoundingClientRect()
+      mouseRef.current = {
+        x: e.touches[0].clientX - rect.left,
+        y: e.touches[0].clientY - rect.top,
+      }
+    }
     window.addEventListener("mousemove", handleMouse)
+    window.addEventListener("touchmove", handleTouch, { passive: true })
 
     const animate = () => {
       const ctx = canvas.getContext("2d")!
@@ -168,6 +177,7 @@ export function ParticleField({
       cancelAnimationFrame(animRef.current)
       window.removeEventListener("resize", resize)
       window.removeEventListener("mousemove", handleMouse)
+      window.removeEventListener("touchmove", handleTouch)
     }
   }, [initParticles, connectionDistance, mouseRadius, baseHue])
 

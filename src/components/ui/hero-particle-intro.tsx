@@ -253,7 +253,14 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
       mouseX = (e.clientX - rect.left) * (W / rect.width)
       mouseY = (e.clientY - rect.top)  * (H / rect.height)
     }
+    const onTouchMove = (e: TouchEvent) => {
+      if (!e.touches.length) return
+      const rect = canvas.getBoundingClientRect()
+      mouseX = (e.touches[0].clientX - rect.left) * (W / rect.width)
+      mouseY = (e.touches[0].clientY - rect.top)  * (H / rect.height)
+    }
     window.addEventListener("mousemove", onMouseMove)
+    window.addEventListener("touchmove", onTouchMove, { passive: true })
 
     // Skip: jump straight to R. on the right, then settle
     if (skipRef) {
@@ -331,6 +338,7 @@ export function HeroParticleIntro({ onWordFormed, onComplete, onSettleBegin, ski
     return () => {
       cancelAnimationFrame(rafId)
       window.removeEventListener("mousemove", onMouseMove)
+      window.removeEventListener("touchmove", onTouchMove)
     }
   }, [])
 
