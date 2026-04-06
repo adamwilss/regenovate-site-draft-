@@ -361,7 +361,11 @@ header[data-theme="dark"] .gradient-text-flow {
 /* ─── Marquee ───────────────────────────────────────────────────── */
 @keyframes marquee {
   from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  to   { transform: translateX(-33.333%); }
+}
+@keyframes marquee-reverse {
+  from { transform: translateX(-33.333%); }
+  to   { transform: translateX(0); }
 }
 .marquee-track { animation: marquee 30s linear infinite; width: max-content; }
 .marquee-track:hover { animation-play-state: paused; }

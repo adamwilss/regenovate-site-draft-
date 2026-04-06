@@ -48,16 +48,16 @@ const SlashSep = () => (
 
 /* ─── Row 1 — Bebas Neue capabilities ───────────────────────────── */
 function CapabilityRow() {
-  const doubled = [...rowOne, ...rowOne];
+  const tripled = [...rowOne, ...rowOne, ...rowOne];
 
   return (
     <div className="overflow-hidden">
       <div
-        className="flex items-baseline whitespace-nowrap w-max"
-        style={{ animation: "marquee 45s linear infinite" }}
+        className="flex items-center whitespace-nowrap w-max"
+        style={{ animation: "marquee 55s linear infinite" }}
       >
-        {doubled.map((item, i) => (
-          <span key={i} className="flex items-baseline flex-shrink-0">
+        {tripled.map((item, i) => (
+          <span key={i} className="flex items-center flex-shrink-0">
             {item.isStat ? (
               /* Stat: number in blue, suffix in smaller weight */
               <span className="flex items-baseline gap-1">
@@ -107,15 +107,15 @@ function CapabilityRow() {
 
 /* ─── Row 2 — Playfair italic philosophy ────────────────────────── */
 function PhilosophyRow() {
-  const doubled = [...rowTwo, ...rowTwo];
+  const tripled = [...rowTwo, ...rowTwo, ...rowTwo];
 
   return (
     <div className="overflow-hidden">
       <div
         className="flex items-center whitespace-nowrap w-max"
-        style={{ animation: "marquee 35s linear infinite reverse" }}
+        style={{ animation: "marquee-reverse 42s linear infinite" }}
       >
-        {doubled.map((item, i) => (
+        {tripled.map((item, i) => (
           <span key={i} className="flex items-center flex-shrink-0">
             <span
               style={{
