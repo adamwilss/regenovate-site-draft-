@@ -29,8 +29,13 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files
-.env*.local
 .env
+.env.*
+!.env.example
+
+# scratch / tooling
+Modelfile
+hero-quiz.js
 
 # vercel
 .vercel
